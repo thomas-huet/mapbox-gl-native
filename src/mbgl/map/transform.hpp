@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/map/camera.hpp>
-#include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -17,11 +16,10 @@ namespace mbgl {
 
 class Transform : private util::noncopyable {
 public:
-    Transform(MapObserver& = MapObserver::nullObserver(),
-              ConstrainMode = ConstrainMode::HeightOnly,
+    Transform(ConstrainMode = ConstrainMode::HeightOnly,
               ViewportMode = ViewportMode::Default);
 
-    Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
+    Transform(const TransformState &state_) : state(state_) {}
 
     // Map view
     void resize(Size size);
@@ -155,7 +153,6 @@ public:
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
-    MapObserver& observer;
     TransformState state;
 
     void startTransition(const CameraOptions&,

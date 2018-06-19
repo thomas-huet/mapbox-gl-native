@@ -26,7 +26,3 @@ target_add_mason_package(mbgl-core PRIVATE vector-tile)
 mbgl_platform_core()
 
 create_source_groups(mbgl-core)
-
-xcode_create_scheme(TARGET mbgl-core)
-
-initialize_xcode_cxx_build_settings(mbgl-core)

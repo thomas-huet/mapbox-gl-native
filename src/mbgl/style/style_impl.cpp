@@ -63,7 +63,6 @@ void Style::Impl::loadURL(const std::string& url_) {
         if (res.error) {
             const std::string message = "loading style failed: " + res.error->message;
             Log::Error(Event::Setup, message.c_str());
-            observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
             observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified || res.noContent) {
             return;
@@ -79,7 +78,6 @@ void Style::Impl::parse(const std::string& json_) {
     if (auto error = parser.parse(json_)) {
         std::string message = "Failed to parse style: " + util::toString(error);
         Log::Error(Event::ParseStyle, message.c_str());
-        observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
         observer->onResourceError(error);
         return;
     }
@@ -287,12 +285,6 @@ void Style::Impl::setObserver(style::Observer* observer_) {
 void Style::Impl::onSourceLoaded(Source& source) {
     sources.update(source);
     observer->onSourceLoaded(source);
-    observer->onUpdate();
-}
-
-void Style::Impl::onSourceChanged(Source& source) {
-    sources.update(source);
-    observer->onSourceChanged(source);
     observer->onUpdate();
 }
 

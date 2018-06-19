@@ -36,10 +36,9 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-Transform::Transform(MapObserver& observer_,
-                     ConstrainMode constrainMode,
+Transform::Transform(ConstrainMode constrainMode,
                      ViewportMode viewportMode)
-    : observer(observer_), state(constrainMode, viewportMode) {
+    : state(constrainMode, viewportMode) {
 }
 
 #pragma mark - Map View
@@ -53,12 +52,8 @@ void Transform::resize(const Size size) {
         return;
     }
 
-    observer.onCameraWillChange(MapObserver::CameraChangeMode::Immediate);
-
     state.size = size;
     state.constrain(state.scale, state.x, state.y);
-
-    observer.onCameraDidChange(MapObserver::CameraChangeMode::Immediate);
 }
 
 #pragma mark - Camera
@@ -564,7 +559,6 @@ void Transform::startTransition(const CameraOptions& camera,
     }
 
     bool isAnimated = duration != Duration::zero();
-    observer.onCameraWillChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
 
     // Associate the anchor, if given, with a coordinate.
     optional<ScreenCoordinate> anchor = camera.anchor;
@@ -593,7 +587,6 @@ void Transform::startTransition(const CameraOptions& camera,
             if (animation.transitionFrameFn) {
                 animation.transitionFrameFn(t);
             }
-            observer.onCameraIsChanging();
             return false;
         } else {
             // Indicate that we need to terminate this transition
@@ -608,7 +601,6 @@ void Transform::startTransition(const CameraOptions& camera,
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }
-        observer.onCameraDidChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
     };
 
     if (!isAnimated) {

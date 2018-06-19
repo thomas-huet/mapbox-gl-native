@@ -38,7 +38,6 @@ class Map::Impl : public style::Observer,
 public:
     Impl(Map&,
          RendererFrontend&,
-         MapObserver&,
          float pixelRatio,
          FileSource&,
          Scheduler&,
@@ -49,11 +48,9 @@ public:
     ~Impl();
 
     // StyleObserver
-    void onSourceChanged(style::Source&) override;
     void onUpdate() override;
     void onStyleLoading() override;
     void onStyleLoaded() override;
-    void onStyleError(std::exception_ptr) override;
 
     // RendererObserver
     void onInvalidate() override;
@@ -64,7 +61,6 @@ public:
     void onDidFinishRenderingMap() override;
 
     Map& map;
-    MapObserver& observer;
     RendererFrontend& rendererFrontend;
     FileSource& fileSource;
     Scheduler& scheduler;
@@ -89,7 +85,6 @@ public:
 };
 
 Map::Map(RendererFrontend& rendererFrontend,
-         MapObserver& mapObserver,
          const Size size,
          const float pixelRatio,
          FileSource& fileSource,
@@ -99,7 +94,6 @@ Map::Map(RendererFrontend& rendererFrontend,
          ViewportMode viewportMode)
     : impl(std::make_unique<Impl>(*this,
                                   rendererFrontend,
-                                  mapObserver,
                                   pixelRatio,
                                   fileSource,
                                   scheduler,
@@ -111,7 +105,6 @@ Map::Map(RendererFrontend& rendererFrontend,
 
 Map::Impl::Impl(Map& map_,
                 RendererFrontend& frontend,
-                MapObserver& mapObserver,
                 float pixelRatio_,
                 FileSource& fileSource_,
                 Scheduler& scheduler_,
@@ -119,12 +112,10 @@ Map::Impl::Impl(Map& map_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_)
     : map(map_),
-      observer(mapObserver),
       rendererFrontend(frontend),
       fileSource(fileSource_),
       scheduler(scheduler_),
-      transform(observer,
-                constrainMode_,
+      transform(constrainMode_,
                 viewportMode_),
       mode(mode_),
       pixelRatio(pixelRatio_),
@@ -184,13 +175,11 @@ void Map::triggerRepaint() {
 
 void Map::Impl::onWillStartRenderingMap() {
     if (mode == MapMode::Continuous) {
-        observer.onWillStartRenderingMap();
     }
 }
 
 void Map::Impl::onWillStartRenderingFrame() {
     if (mode == MapMode::Continuous) {
-        observer.onWillStartRenderingFrame();
     }
 }
 
@@ -198,7 +187,6 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
     rendererFullyLoaded = renderMode == RenderMode::Full;
 
     if (mode == MapMode::Continuous) {
-        observer.onDidFinishRenderingFrame(MapObserver::RenderMode(renderMode));
 
         if (needsRepaint || transform.inTransition()) {
             onUpdate();
@@ -211,10 +199,8 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
 
 void Map::Impl::onDidFinishRenderingMap() {
     if (mode == MapMode::Continuous && loading) {
-        observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
         if (loading) {
             loading = false;
-            observer.onDidFinishLoadingMap();
         }
     }
 };
@@ -738,10 +724,6 @@ bool Map::isFullyLoaded() const {
     return impl->style->impl->isLoaded() && impl->rendererFullyLoaded;
 }
 
-void Map::Impl::onSourceChanged(style::Source& source) {
-    observer.onSourceChanged(source);
-}
-
 void Map::Impl::onInvalidate() {
     onUpdate();
 }
@@ -781,7 +763,6 @@ void Map::Impl::onUpdate() {
 void Map::Impl::onStyleLoading() {
     loading = true;
     rendererFullyLoaded = false;
-    observer.onWillStartLoadingMap();
 }
 
 void Map::Impl::onStyleLoaded() {
@@ -790,11 +771,6 @@ void Map::Impl::onStyleLoaded() {
     }
 
     annotationManager.onStyleLoaded();
-    observer.onDidFinishLoadingStyle();
-}
-
-void Map::Impl::onStyleError(std::exception_ptr error) {
-    observer.onDidFailLoadingMap(error);
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {

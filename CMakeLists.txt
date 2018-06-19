@@ -11,7 +11,6 @@ option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON
 
 include(cmake/mbgl.cmake)
 include(cmake/mason.cmake)
-include(cmake/xcode.cmake)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
@@ -101,24 +100,12 @@ if(CCACHE_PROGRAM)
     set(C_LAUNCHER   "${CCACHE_PROGRAM}")
     set(CXX_LAUNCHER "${CCACHE_PROGRAM}")
 
-    if(CMAKE_GENERATOR STREQUAL "Xcode")
-        # Set Xcode project attributes to route compilation and linking through our scripts
-        # Xcode doesn't include the path to the compiler/linker by default, so we'll have to add it.
-        configure_file(scripts/launch-c-xcode.in   launch-c   @ONLY)
-        configure_file(scripts/launch-cxx-xcode.in launch-cxx @ONLY)
+    # Support Unix Makefiles and Ninja
+    configure_file(scripts/launch-c.in   launch-c   @ONLY)
+    configure_file(scripts/launch-cxx.in launch-cxx @ONLY)
 
-        set(CMAKE_XCODE_ATTRIBUTE_CC         "${CMAKE_BINARY_DIR}/launch-c")
-        set(CMAKE_XCODE_ATTRIBUTE_CXX        "${CMAKE_BINARY_DIR}/launch-cxx")
-        set(CMAKE_XCODE_ATTRIBUTE_LD         "${CMAKE_BINARY_DIR}/launch-c")
-        set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
-    else()
-        # Support Unix Makefiles and Ninja
-        configure_file(scripts/launch-c.in   launch-c   @ONLY)
-        configure_file(scripts/launch-cxx.in launch-cxx @ONLY)
-
-        set(CMAKE_C_COMPILER_LAUNCHER        "${CMAKE_BINARY_DIR}/launch-c")
-        set(CMAKE_CXX_COMPILER_LAUNCHER      "${CMAKE_BINARY_DIR}/launch-cxx")
-    endif()
+    set(CMAKE_C_COMPILER_LAUNCHER        "${CMAKE_BINARY_DIR}/launch-c")
+    set(CMAKE_CXX_COMPILER_LAUNCHER      "${CMAKE_BINARY_DIR}/launch-cxx")
 
     execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
 
@@ -144,16 +131,6 @@ endif()
 include(cmake/core-files.cmake)
 include(cmake/core.cmake)
 
-if(COMMAND mbgl_platform_test)
-    include(cmake/test-files.cmake)
-    include(cmake/test.cmake)
-endif()
-
-if(COMMAND mbgl_platform_benchmark)
-    include(cmake/benchmark-files.cmake)
-    include(cmake/benchmark.cmake)
-endif()
-
 if(COMMAND mbgl_platform_glfw)
     include(cmake/glfw.cmake)
 endif()
@@ -168,11 +145,4 @@ endif()
 
 if(WITH_NODEJS AND COMMAND mbgl_platform_node)
     include(cmake/node.cmake)
-endif()
-
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    write_xcconfig_target_properties(
-        mbgl-core
-        mbgl-filesource
-    )
 endif()

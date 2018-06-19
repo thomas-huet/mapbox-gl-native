@@ -43,7 +43,3 @@ target_link_libraries(mbgl-filesource
 mbgl_filesource()
 
 create_source_groups(mbgl-filesource)
-
-xcode_create_scheme(TARGET mbgl-filesource)
-
-initialize_xcode_cxx_build_settings(mbgl-filesource)

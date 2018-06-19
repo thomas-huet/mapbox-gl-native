@@ -124,7 +124,6 @@ private:
 
     // SourceObserver implementation.
     void onSourceLoaded(Source&) override;
-    void onSourceChanged(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
     void onSourceDescriptionChanged(Source&) override;
 

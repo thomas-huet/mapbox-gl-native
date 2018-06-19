@@ -12,7 +12,6 @@ public:
     virtual void onStyleLoading() {}
     virtual void onStyleLoaded() {}
     virtual void onUpdate() {}
-    virtual void onStyleError(std::exception_ptr) {}
     virtual void onResourceError(std::exception_ptr) {}
 };
 

@@ -20,7 +20,6 @@ const ImageSource::Impl& ImageSource::impl() const {
 
 void ImageSource::setCoordinates(const std::array<LatLng, 4>& coords_) {
     baseImpl = makeMutable<Impl>(impl(), coords_);
-    observer->onSourceChanged(*this);
 }
 
 std::array<LatLng, 4> ImageSource::getCoordinates() const {
@@ -44,7 +43,6 @@ void ImageSource::setImage(PremultipliedImage&& image_) {
     }
     loaded = true;
     baseImpl = makeMutable<Impl>(impl(), std::move(image_));
-    observer->onSourceChanged(*this);
 }
 
 optional<std::string> ImageSource::getURL() const {

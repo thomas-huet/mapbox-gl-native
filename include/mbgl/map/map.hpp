@@ -2,7 +2,6 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/size.hpp>
@@ -30,7 +29,6 @@ class Style;
 class Map : private util::noncopyable {
 public:
     explicit Map(RendererFrontend&,
-                 MapObserver&,
                  Size size,
                  float pixelRatio,
                  FileSource&,

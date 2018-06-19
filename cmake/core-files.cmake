@@ -108,7 +108,6 @@ set(MBGL_CORE_FILES
     include/mbgl/map/camera.hpp
     include/mbgl/map/change.hpp
     include/mbgl/map/map.hpp
-    include/mbgl/map/map_observer.hpp
     include/mbgl/map/mode.hpp
     src/mbgl/map/map.cpp
     src/mbgl/map/transform.cpp
