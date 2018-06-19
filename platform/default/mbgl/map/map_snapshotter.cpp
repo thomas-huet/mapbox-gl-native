@@ -53,7 +53,7 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
            const optional<LatLngBounds> region,
            const optional<std::string> programCacheDir)
     : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler, MapMode::Static) {
+    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler) {
 
     if (style.first) {
         map.getStyle().loadJSON(style.second);

@@ -46,7 +46,6 @@ public:
     LineAtlas& lineAtlas;
 
     RenderPass pass = RenderPass::Opaque;
-    MapMode mapMode;
     MapDebugOptions debugOptions;
     GLContextMode contextMode;
     TimePoint timePoint;

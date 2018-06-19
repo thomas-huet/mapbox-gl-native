@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/image.hpp>
@@ -18,7 +17,6 @@ class AnnotationManager;
 class UpdateParameters {
 public:
     const bool styleLoaded;
-    const MapMode mode;
     const float pixelRatio;
     const MapDebugOptions debugOptions;
     const TimePoint timePoint;

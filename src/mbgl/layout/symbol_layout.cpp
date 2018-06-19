@@ -45,7 +45,6 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
-      mode(parameters.mode),
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
@@ -314,7 +313,7 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         if (avoidEdges && !inside) return;
 
-        if (mode == MapMode::Tile || withinPlus0) {
+        if (withinPlus0) {
             symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
                     layout.evaluate(zoom, feature), layoutTextSize,
                     symbolInstances.size(),

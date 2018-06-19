@@ -95,9 +95,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.context,
             gl::Triangles(),
             parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled(),
+            parameters.stencilModeForClipping(tile.clip),
             parameters.colorModeForRenderPass(),
             *bucket.indexBuffer,
             bucket.segments,

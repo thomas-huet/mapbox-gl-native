@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/map/mode.hpp>
-
 namespace mbgl {
 
 class TransformState;
@@ -18,7 +16,6 @@ public:
     const TransformState& transformState;
     Scheduler& workerScheduler;
     FileSource& fileSource;
-    const MapMode mode;
     AnnotationManager& annotationManager;
     ImageManager& imageManager;
     GlyphManager& glyphManager;

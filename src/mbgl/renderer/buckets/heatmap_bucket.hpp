@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
@@ -33,8 +32,6 @@ public:
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
     std::map<std::string, HeatmapProgram::PaintPropertyBinders> paintPropertyBinders;
-
-    const MapMode mode;
 };
 
 } // namespace mbgl

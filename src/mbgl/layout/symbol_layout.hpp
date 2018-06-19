@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/map/mode.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
@@ -71,7 +70,6 @@ private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     const float overscaling;
     const float zoom;
-    const MapMode mode;
     const float pixelRatio;
 
     style::SymbolLayoutProperties::PossiblyEvaluated layout;

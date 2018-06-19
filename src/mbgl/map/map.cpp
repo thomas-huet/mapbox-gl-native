@@ -41,7 +41,6 @@ public:
          float pixelRatio,
          FileSource&,
          Scheduler&,
-         MapMode,
          ConstrainMode,
          ViewportMode);
 
@@ -55,10 +54,7 @@ public:
     // RendererObserver
     void onInvalidate() override;
     void onResourceError(std::exception_ptr) override;
-    void onWillStartRenderingFrame() override;
-    void onDidFinishRenderingFrame(RenderMode, bool) override;
-    void onWillStartRenderingMap() override;
-    void onDidFinishRenderingMap() override;
+    void onDidFinishRenderingFrame(RenderMode) override;
 
     Map& map;
     RendererFrontend& rendererFrontend;
@@ -67,7 +63,6 @@ public:
 
     Transform transform;
 
-    const MapMode mode;
     const float pixelRatio;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
@@ -89,7 +84,6 @@ Map::Map(RendererFrontend& rendererFrontend,
          const float pixelRatio,
          FileSource& fileSource,
          Scheduler& scheduler,
-         MapMode mapMode,
          ConstrainMode constrainMode,
          ViewportMode viewportMode)
     : impl(std::make_unique<Impl>(*this,
@@ -97,7 +91,6 @@ Map::Map(RendererFrontend& rendererFrontend,
                                   pixelRatio,
                                   fileSource,
                                   scheduler,
-                                  mapMode,
                                   constrainMode,
                                   viewportMode)) {
     impl->transform.resize(size);
@@ -108,7 +101,6 @@ Map::Impl::Impl(Map& map_,
                 float pixelRatio_,
                 FileSource& fileSource_,
                 Scheduler& scheduler_,
-                MapMode mode_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_)
     : map(map_),
@@ -117,7 +109,6 @@ Map::Impl::Impl(Map& map_,
       scheduler(scheduler_),
       transform(constrainMode_,
                 viewportMode_),
-      mode(mode_),
       pixelRatio(pixelRatio_),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
       annotationManager(*style) {
@@ -137,11 +128,6 @@ Map::~Map() = default;
 void Map::renderStill(StillImageCallback callback) {
     if (!callback) {
         Log::Error(Event::General, "StillImageCallback not set");
-        return;
-    }
-
-    if (impl->mode != MapMode::Static && impl->mode != MapMode::Tile) {
-        callback(std::make_exception_ptr(util::MisuseException("Map is not in static or tile image render modes")));
         return;
     }
 
@@ -173,37 +159,14 @@ void Map::triggerRepaint() {
 
 #pragma mark - Map::Impl RendererObserver
 
-void Map::Impl::onWillStartRenderingMap() {
-    if (mode == MapMode::Continuous) {
-    }
-}
-
-void Map::Impl::onWillStartRenderingFrame() {
-    if (mode == MapMode::Continuous) {
-    }
-}
-
-void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepaint) {
+void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode) {
     rendererFullyLoaded = renderMode == RenderMode::Full;
 
-    if (mode == MapMode::Continuous) {
-
-        if (needsRepaint || transform.inTransition()) {
-            onUpdate();
-        }
-    } else if (stillImageRequest && rendererFullyLoaded) {
+    if (stillImageRequest && rendererFullyLoaded) {
         auto request = std::move(stillImageRequest);
         request->callback(nullptr);
     }
 }
-
-void Map::Impl::onDidFinishRenderingMap() {
-    if (mode == MapMode::Continuous && loading) {
-        if (loading) {
-            loading = false;
-        }
-    }
-};
 
 #pragma mark - Style
 
@@ -730,17 +693,16 @@ void Map::Impl::onInvalidate() {
 
 void Map::Impl::onUpdate() {
     // Don't load/render anything in still mode until explicitly requested.
-    if (mode != MapMode::Continuous && !stillImageRequest) {
+    if (!stillImageRequest) {
         return;
     }
     
-    TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
+    TimePoint timePoint = Clock::time_point::max();
 
     transform.updateTransitions(timePoint);
 
     UpdateParameters params = {
         style->impl->isLoaded(),
-        mode,
         pixelRatio,
         debugOptions,
         timePoint,
@@ -774,7 +736,7 @@ void Map::Impl::onStyleLoaded() {
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
-    if (mode != MapMode::Continuous && stillImageRequest) {
+    if (stillImageRequest) {
         auto request = std::move(stillImageRequest);
         request->callback(error);
     }

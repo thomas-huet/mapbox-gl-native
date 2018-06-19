@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/text/glyph.hpp>
@@ -31,7 +30,6 @@ public:
                        OverscaledTileID,
                        const std::string&,
                        const std::atomic<bool>&,
-                       const MapMode,
                        const float pixelRatio,
                        const bool showCollisionBoxes_);
     ~GeometryTileWorker();
@@ -63,7 +61,6 @@ private:
     const OverscaledTileID id;
     const std::string sourceID;
     const std::atomic<bool>& obsolete;
-    const MapMode mode;
     const float pixelRatio;
     
     std::unique_ptr<FeatureIndex> featureIndex;

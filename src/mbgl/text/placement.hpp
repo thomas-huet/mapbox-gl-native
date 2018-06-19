@@ -61,16 +61,13 @@ struct RetainedQueryData {
     
 class Placement {
 public:
-    Placement(const TransformState&, MapMode mapMode);
+    Placement(const TransformState&);
     void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
     void commit(const Placement& prevPlacement, TimePoint);
     void updateLayerOpacities(RenderSymbolLayer&);
-    float symbolFadeChange(TimePoint now) const;
-    bool hasTransitions(TimePoint now) const;
 
     const CollisionIndex& getCollisionIndex() const;
 
-    bool stillRecent(TimePoint now) const;
     void setRecent(TimePoint now);
     void setStale();
     
@@ -93,7 +90,6 @@ private:
     CollisionIndex collisionIndex;
 
     TransformState state;
-    MapMode mapMode;
     TimePoint fadeStartTime;
     TimePoint commitTime;
 

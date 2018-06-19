@@ -58,7 +58,7 @@ public:
 
 private:
     bool isLoaded() const;
-    bool hasTransitions(TimePoint) const;
+    bool hasTransitions() const;
 
     RenderSource* getRenderSource(const std::string& id) const;
 

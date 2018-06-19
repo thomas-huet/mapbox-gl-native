@@ -33,7 +33,6 @@ public:
                  float pixelRatio,
                  FileSource&,
                  Scheduler&,
-                 MapMode mapMode = MapMode::Continuous,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
                  ViewportMode viewportMode = ViewportMode::Default);
     ~Map();

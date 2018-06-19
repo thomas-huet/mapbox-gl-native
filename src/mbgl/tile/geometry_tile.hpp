@@ -119,8 +119,6 @@ private:
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
 
-    const MapMode mode;
-    
     bool showCollisionBoxes;
     
     enum class FadeState {

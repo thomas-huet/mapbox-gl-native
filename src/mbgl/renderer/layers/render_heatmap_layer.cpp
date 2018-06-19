@@ -88,9 +88,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 
-            const auto stencilMode = parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled();
+            const auto stencilMode = parameters.stencilModeForClipping(tile.clip);
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 

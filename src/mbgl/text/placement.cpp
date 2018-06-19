@@ -34,10 +34,9 @@ bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_)
+Placement::Placement(const TransformState& state_)
     : collisionIndex(state_)
     , state(state_)
-    , mapMode(mapMode_)
 {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
@@ -192,9 +191,7 @@ void Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Continuous ?
-        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300)) :
-        1.0;
+    float increment = 1.0;
 
     // add the opacities from the current placement, and copy their current values from the previous placement
     for (auto& jointPlacement : placements) {
@@ -327,26 +324,6 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     if (retainedData != retainedQueryData.end()) {
         retainedData->second.featureSortOrder = bucket.featureSortOrder;
     }
-}
-
-float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Continuous) {
-        return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
-    } else {
-        return 1.0;
-    }
-}
-
-bool Placement::hasTransitions(TimePoint now) const {
-    if (mapMode == MapMode::Continuous) {
-        return stale || std::chrono::duration<float>(now - fadeStartTime) < Duration(std::chrono::milliseconds(300));
-    } else {
-        return false;
-    }
-}
-
-bool Placement::stillRecent(TimePoint now) const {
-    return mapMode == MapMode::Continuous && commitTime + Duration(std::chrono::milliseconds(300)) > now;
 }
 
 void Placement::setStale() {

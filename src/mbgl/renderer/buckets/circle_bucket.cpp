@@ -10,8 +10,7 @@ namespace mbgl {
 
 using namespace style;
 
-CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
-    : mode(parameters.mode) {
+CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
@@ -43,15 +42,6 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 
     for (auto& circle : geometry) {
         for(auto& point : circle) {
-            auto x = point.x;
-            auto y = point.y;
-
-            // Do not include points that are outside the tile boundaries.
-            // Include all points in Still mode. You need to include points from
-            // neighbouring tiles so that they are not clipped at tile boundaries.
-            if ((mode == MapMode::Continuous) &&
-                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
-
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
                 segments.emplace_back(vertices.vertexSize(), triangles.indexSize());

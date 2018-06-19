@@ -52,12 +52,10 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              id_,
              sourceID,
              obsolete,
-             parameters.mode,
              parameters.pixelRatio,
              parameters.debugOptions & MapDebugOptions::Collision),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
-      mode(parameters.mode),
       showCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision) {
 }
 
@@ -276,8 +274,7 @@ void GeometryTile::querySourceFeatures(
 }
 
 bool GeometryTile::holdForFade() const {
-    return mode == MapMode::Continuous &&
-           (fadeState == FadeState::NeedsFirstPlacement || fadeState == FadeState::NeedsSecondPlacement);
+    return false;
 }
 
 void GeometryTile::markRenderedIdeal() {

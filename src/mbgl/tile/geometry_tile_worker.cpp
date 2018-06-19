@@ -24,7 +24,6 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        OverscaledTileID id_,
                                        const std::string& sourceID_,
                                        const std::atomic<bool>& obsolete_,
-                                       const MapMode mode_,
                                        const float pixelRatio_,
                                        const bool showCollisionBoxes_)
     : self(std::move(self_)),
@@ -32,7 +31,6 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
       id(std::move(id_)),
       sourceID(sourceID_),
       obsolete(obsolete_),
-      mode(mode_),
       pixelRatio(pixelRatio_),
       showCollisionBoxes(showCollisionBoxes_) {
 }
@@ -329,7 +327,7 @@ void GeometryTileWorker::parse() {
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
     buckets.clear();
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
-    BucketParameters parameters { id, mode, pixelRatio };
+    BucketParameters parameters { id, pixelRatio };
 
     GlyphDependencies glyphDependencies;
     ImageDependencies imageDependencies;

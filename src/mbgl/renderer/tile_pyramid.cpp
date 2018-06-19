@@ -109,19 +109,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
             tileZoom = idealZoom;
         }
 
-        // Only attempt prefetching in continuous mode.
-        if (parameters.mode == MapMode::Continuous) {
-            // Request lower zoom level tiles (if configured to do so) in an attempt
-            // to show something on the screen faster at the cost of a little of bandwidth.
-            if (parameters.prefetchZoomDelta) {
-                panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
-            }
-
-            if (panZoom < idealZoom) {
-                panTiles = util::tileCover(parameters.transformState, panZoom);
-            }
-        }
-
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
     }
 

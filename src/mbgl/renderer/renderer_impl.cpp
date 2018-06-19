@@ -60,7 +60,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static)) {
+    , placement(std::make_unique<Placement>(TransformState{})) {
     glyphManager->setObserver(this);
 }
 
@@ -84,10 +84,8 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
-    if (updateParameters.mode != MapMode::Continuous) {
-        // Reset zoom history state.
-        zoomHistory.first = true;
-    }
+    // Reset zoom history state.
+    zoomHistory.first = true;
     
     assert(BackendScope::exists());
     
@@ -97,13 +95,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     const TransitionParameters transitionParameters {
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? updateParameters.transitionOptions : TransitionOptions()
+        TransitionOptions()
     };
 
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero()
+        Duration::zero()
     };
 
     const TileParameters tileParameters {
@@ -112,7 +110,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         updateParameters.transformState,
         scheduler,
         fileSource,
-        updateParameters.mode,
         updateParameters.annotationManager,
         *imageManager,
         *glyphManager,
@@ -260,7 +257,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
-    if (updateParameters.mode != MapMode::Continuous && !loaded) {
+    if (!loaded) {
         return;
     }
 
@@ -374,10 +371,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     bool symbolBucketsChanged = false;
-    if (parameters.mapMode != MapMode::Continuous) {
-        // TODO: Think about right way for symbol index to handle still rendering
-        crossTileSymbolIndex.reset();
-    }
+    // TODO: Think about right way for symbol index to handle still rendering
+    crossTileSymbolIndex.reset();
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             const float lng = parameters.state.getLatLng().longitude();
@@ -386,28 +381,24 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     bool placementChanged = false;
-    if (!placement->stillRecent(parameters.timePoint)) {
-        placementChanged = true;
+    placementChanged = true;
 
-        auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
-        std::set<std::string> usedSymbolLayers;
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                usedSymbolLayers.insert(it->layer.getID());
-                newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
-            }
-        }
-
-        newPlacement->commit(*placement, parameters.timePoint);
-        crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-        placement = std::move(newPlacement);
-        
-        updateFadingTiles();
-    } else {
-        placement->setStale();
+    auto newPlacement = std::make_unique<Placement>(parameters.state);
+    std::set<std::string> usedSymbolLayers;
+    for (auto it = order.rbegin(); it != order.rend(); ++it) {
+	if (it->layer.is<RenderSymbolLayer>()) {
+	    usedSymbolLayers.insert(it->layer.getID());
+	    newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+	}
     }
 
-    parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
+    newPlacement->commit(*placement, parameters.timePoint);
+    crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
+    placement = std::move(newPlacement);
+    
+    updateFadingTiles();
+
+    parameters.symbolFadeChange = 1.0;
 
     if (placementChanged || symbolBucketsChanged) {
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
@@ -640,8 +631,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     observer->onDidFinishRenderingFrame(
-        loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        updateParameters.mode == MapMode::Continuous && hasTransitions(parameters.timePoint)
+        loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial
     );
 
     if (!loaded) {
@@ -799,7 +789,7 @@ RenderSource* Renderer::Impl::getRenderSource(const std::string& id) const {
     return it != renderSources.end() ? it->second.get() : nullptr;
 }
 
-bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
+bool Renderer::Impl::hasTransitions() const {
     if (renderLight.hasTransition()) {
         return true;
     }
@@ -810,10 +800,6 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
         }
     }
 
-    if (placement->hasTransitions(timePoint)) {
-        return true;
-    }
-    
     if (fadingTiles) {
         return true;
     }

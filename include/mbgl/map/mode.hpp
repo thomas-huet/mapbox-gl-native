@@ -9,12 +9,6 @@ namespace mbgl {
 
 using EnumType = uint32_t;
 
-enum class MapMode : EnumType {
-    Continuous, // continually updating map
-    Static, // a once-off still image of an arbitrary viewport
-    Tile // a once-off still image of a single tile
-};
-
 // We can choose to constrain the map both horizontally or vertically, or only
 // vertically e.g. while panning.
 enum class ConstrainMode : EnumType {
