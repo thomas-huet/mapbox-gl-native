@@ -131,18 +131,10 @@ endif()
 include(cmake/core-files.cmake)
 include(cmake/core.cmake)
 
-if(COMMAND mbgl_platform_glfw)
-    include(cmake/glfw.cmake)
-endif()
-
 if(COMMAND mbgl_platform_render)
     include(cmake/render.cmake)
 endif()
 
 if(COMMAND mbgl_platform_offline)
     include(cmake/offline.cmake)
-endif()
-
-if(WITH_NODEJS AND COMMAND mbgl_platform_node)
-    include(cmake/node.cmake)
 endif()

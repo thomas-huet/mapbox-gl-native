@@ -71,14 +71,6 @@ linux: glfw-app render offline
 linux-core: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core mbgl-loop-uv mbgl-filesource
 
-.PHONY: test
-test: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
-
-.PHONY: benchmark
-benchmark: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
-
 ifneq (,$(shell command -v gdb 2> /dev/null))
   GDB ?= $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
         	-batch -return-child-result \
@@ -88,18 +80,6 @@ ifneq (,$(shell command -v gdb 2> /dev/null))
         	-ex 'thread apply all bt' --args
 endif
 
-.PHONY: run-test
-run-test: run-test-*
-
-run-test-%: test
-	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
-
-.PHONY: run-benchmark
-run-benchmark: run-benchmark-.
-
-run-benchmark-%: benchmark
-	$(LINUX_OUTPUT_PATH)/mbgl-benchmark --benchmark_filter=$*
-
 .PHONY: render
 render: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
@@ -107,22 +87,6 @@ render: $(LINUX_BUILD)
 .PHONY: offline
 offline: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
-
-.PHONY: glfw-app
-glfw-app: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
-
-.PHONY: run-glfw-app
-run-glfw-app: glfw-app
-	cd $(LINUX_OUTPUT_PATH) && ./mbgl-glfw
-
-.PHONY: node
-node: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.active
-
-.PHONY: node-all
-node-all: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.all
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
