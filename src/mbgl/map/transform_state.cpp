@@ -240,29 +240,6 @@ float TransformState::getPitch() const {
     return pitch;
 }
 
-
-#pragma mark - State
-
-bool TransformState::isChanging() const {
-    return rotating || scaling || panning || gestureInProgress;
-}
-
-bool TransformState::isRotating() const {
-    return rotating;
-}
-
-bool TransformState::isScaling() const {
-    return scaling;
-}
-
-bool TransformState::isPanning() const {
-    return panning;
-}
-
-bool TransformState::isGestureInProgress() const {
-    return gestureInProgress;
-}
-
 #pragma mark - Projection
 
 double TransformState::zoomScale(double zoom) const {

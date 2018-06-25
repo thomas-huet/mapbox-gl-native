@@ -149,7 +149,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
             parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
-                bucket.sdfIcons || parameters.state.isChanging() || iconScaled || iconTransformed
+                bucket.sdfIcons || iconScaled || iconTransformed
                     ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
 
             const Size texsize = geometryTile.iconAtlasTexture->size;

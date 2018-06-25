@@ -62,28 +62,21 @@ public:
     // Camera
     CameraOptions getCameraOptions(const EdgeInsets&) const;
     void jumpTo(const CameraOptions&);
-    void easeTo(const CameraOptions&, const AnimationOptions&);
-    void flyTo(const CameraOptions&, const AnimationOptions&);
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&, optional<double> bearing = {}) const;
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}) const;
     CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
 
     // Position
-    void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const AnimationOptions& = {});
+    void moveBy(const ScreenCoordinate&);
+    void setLatLng(const LatLng&);
     LatLng getLatLng(const EdgeInsets& = {}) const;
     void resetPosition(const EdgeInsets& = {});
 
     // Zoom
-    void setZoom(double zoom, const AnimationOptions& = {});
-    void setZoom(double zoom, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setZoom(double zoom, const EdgeInsets&, const AnimationOptions& = {});
+    void setZoom(double zoom);
     double getZoom() const;
-    void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
+    void setLatLngZoom(const LatLng&, double zoom);
     void resetZoom();
 
     // Bounds
@@ -99,17 +92,14 @@ public:
     double getMaxPitch() const;
 
     // Rotation
-    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    void setBearing(double degrees, const AnimationOptions& = {});
-    void setBearing(double degrees, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setBearing(double degrees, const EdgeInsets&, const AnimationOptions& = {});
+    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second);
+    void setBearing(double degrees);
     double getBearing() const;
-    void resetNorth(const AnimationOptions& = {{mbgl::Milliseconds(500)}});
-    void resetNorth(const EdgeInsets&, const AnimationOptions& = {{mbgl::Milliseconds(500)}});
+    void resetNorth();
+    void resetNorth(const EdgeInsets&);
 
     // Pitch
-    void setPitch(double pitch, const AnimationOptions& = {});
-    void setPitch(double pitch, optional<ScreenCoordinate>, const AnimationOptions& = {});
+    void setPitch(double pitch);
     double getPitch() const;
 
     // North Orientation

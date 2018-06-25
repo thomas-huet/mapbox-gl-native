@@ -68,13 +68,6 @@ public:
     float getCameraToCenterDistance() const;
     float getPitch() const;
 
-    // State
-    bool isChanging() const;
-    bool isRotating() const;
-    bool isScaling() const;
-    bool isPanning() const;
-    bool isGestureInProgress() const;
-
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
@@ -118,12 +111,6 @@ private:
 private:
     ConstrainMode constrainMode;
     ViewportMode viewportMode;
-
-    // animation state
-    bool rotating = false;
-    bool scaling = false;
-    bool panning = false;
-    bool gestureInProgress = false;
 
     // map position
     double x = 0, y = 0;
