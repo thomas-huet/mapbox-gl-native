@@ -1,6 +1,6 @@
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 

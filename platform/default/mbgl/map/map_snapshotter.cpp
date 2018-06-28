@@ -3,11 +3,11 @@
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/event.hpp>
-#include <mbgl/map/transform.hpp>
 
 namespace mbgl {
 
@@ -45,19 +45,19 @@ private:
 };
 
 MapSnapshotter::Impl::Impl(FileSource& fileSource,
-           Scheduler& scheduler,
-           const std::pair<bool, std::string> style,
-           const Size& size,
-           const float pixelRatio,
-           const optional<CameraOptions> cameraOptions,
-           const optional<LatLngBounds> region,
-           const optional<std::string> programCacheDir)
-    : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler) {
+                           Scheduler& scheduler,
+                           const std::pair<bool, std::string> style,
+                           const Size& size,
+                           const float pixelRatio,
+                           const optional<CameraOptions> cameraOptions,
+                           const optional<LatLngBounds> region,
+                           const optional<std::string> programCacheDir)
+    : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir),
+      map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler) {
 
     if (style.first) {
         map.getStyle().loadJSON(style.second);
-    } else{
+    } else {
         map.getStyle().loadURL(style.second);
     }
 
@@ -77,32 +77,32 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
         // Create lambda that captures the current transform state
         // and can be used to translate for geographic to screen
         // coordinates
-        assert (frontend.getTransformState());
-        PointForFn pointForFn { [=, center=map.getLatLng(), transformState = *frontend.getTransformState()] (const LatLng& latLng) {
-            LatLng unwrappedLatLng = latLng.wrapped();
-            unwrappedLatLng.unwrapForShortestPath(center);
-            Transform transform { transformState };
-            return transform.latLngToScreenCoordinate(unwrappedLatLng);
-        }};
-
-        // Collect all source attributions
-        std::vector<std::string> attributions;
-        for (auto source : map.getStyle().getSources()) {
-            auto attribution = source->getAttribution();
-            if (attribution) {
-                attributions.push_back(*attribution);
-            }
+        assert(frontend.getTransformState());
+        PointForFn pointForFn{[=, center = map.getLatLng(),
+                               transformState = *frontend.getTransformState()](
+            const LatLng& latLng){ LatLng unwrappedLatLng = latLng.wrapped();
+        unwrappedLatLng.unwrapForShortestPath(center);
+        Transform transform{ transformState };
+        return transform.latLngToScreenCoordinate(unwrappedLatLng);
         }
+};
 
-        // Invoke callback
-        callback.invoke(
-                &MapSnapshotter::Callback::operator(),
+// Collect all source attributions
+std::vector<std::string> attributions;
+for (auto source : map.getStyle().getSources()) {
+    auto attribution = source->getAttribution();
+    if (attribution) {
+        attributions.push_back(*attribution);
+    }
+}
+
+// Invoke callback
+callback.invoke(&MapSnapshotter::Callback::operator(),
                 error,
                 error ? PremultipliedImage() : frontend.readStillImage(),
                 std::move(attributions),
-                std::move(pointForFn)
-        );
-    });
+                std::move(pointForFn));
+});
 }
 
 void MapSnapshotter::Impl::setStyleURL(std::string styleURL) {
@@ -118,7 +118,7 @@ void MapSnapshotter::Impl::setStyleJSON(std::string styleJSON) {
 }
 
 std::string MapSnapshotter::Impl::getStyleJSON() const {
-   return map.getStyle().getJSON();
+    return map.getStyle().getJSON();
 }
 
 void MapSnapshotter::Impl::setSize(Size size) {
@@ -157,7 +157,15 @@ MapSnapshotter::MapSnapshotter(FileSource& fileSource,
                                const optional<CameraOptions> cameraOptions,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir)
-   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, scheduler, style, size, pixelRatio, cameraOptions, region, programCacheDir)) {
+    : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter",
+                                                                fileSource,
+                                                                scheduler,
+                                                                style,
+                                                                size,
+                                                                pixelRatio,
+                                                                cameraOptions,
+                                                                region,
+                                                                programCacheDir)) {
 }
 
 MapSnapshotter::~MapSnapshotter() = default;

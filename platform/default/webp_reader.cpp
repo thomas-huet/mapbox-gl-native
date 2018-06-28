@@ -1,9 +1,8 @@
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/premultiply.hpp>
 
-extern "C"
-{
+extern "C" {
 #include <webp/decode.h>
 }
 

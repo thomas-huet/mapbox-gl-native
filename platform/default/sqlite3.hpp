@@ -1,17 +1,17 @@
 #pragma once
 
+#include <chrono>
+#include <mapbox/variant.hpp>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
-#include <chrono>
-#include <memory>
-#include <mapbox/variant.hpp>
 
 namespace mapbox {
 namespace sqlite {
 
 enum OpenFlag : int {
-    ReadOnly        = 0b001,
+    ReadOnly = 0b001,
     ReadWriteCreate = 0b110,
 };
 
@@ -48,14 +48,12 @@ public:
     Exception(int err, const char* msg)
         : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
     }
-    Exception(ResultCode err, const char* msg)
-        : std::runtime_error(msg), code(err) {
+    Exception(ResultCode err, const char* msg) : std::runtime_error(msg), code(err) {
     }
     Exception(int err, const std::string& msg)
         : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
     }
-    Exception(ResultCode err, const std::string& msg)
-        : std::runtime_error(msg), code(err) {
+    Exception(ResultCode err, const std::string& msg) : std::runtime_error(msg), code(err) {
     }
     const ResultCode code = ResultCode::OK;
 };
@@ -69,19 +67,20 @@ class Transaction;
 class Database {
 private:
     Database(std::unique_ptr<DatabaseImpl>);
-    Database(const Database &) = delete;
-    Database &operator=(const Database &) = delete;
+    Database(const Database&) = delete;
+    Database& operator=(const Database&) = delete;
 
 public:
-    static mapbox::util::variant<Database, Exception> tryOpen(const std::string &filename, int flags = 0);
-    static Database open(const std::string &filename, int flags = 0);
+    static mapbox::util::variant<Database, Exception> tryOpen(const std::string& filename,
+                                                              int flags = 0);
+    static Database open(const std::string& filename, int flags = 0);
 
-    Database(Database &&);
+    Database(Database&&);
     ~Database();
-    Database &operator=(Database &&);
+    Database& operator=(Database&&);
 
     void setBusyTimeout(std::chrono::milliseconds);
-    void exec(const std::string &sql);
+    void exec(const std::string& sql);
 
 private:
     std::unique_ptr<DatabaseImpl> impl;
@@ -90,7 +89,8 @@ private:
     friend class Transaction;
 };
 
-// A Statement object represents a prepared statement that can be run repeatedly run with a Query object.
+// A Statement object represents a prepared statement that can be run repeatedly run with a Query
+// object.
 class Statement {
 public:
     Statement(Database& db, const char* sql);
@@ -157,11 +157,7 @@ private:
     Transaction& operator=(const Transaction&) = delete;
 
 public:
-    enum Mode {
-        Deferred,
-        Immediate,
-        Exclusive
-    };
+    enum Mode { Deferred, Immediate, Exclusive };
 
     Transaction(Database&, Mode = Deferred);
     ~Transaction();
@@ -173,6 +169,5 @@ private:
     DatabaseImpl& dbImpl;
     bool needRollback = true;
 };
-
 }
 }

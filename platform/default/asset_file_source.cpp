@@ -1,14 +1,14 @@
 #include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/util.hpp>
-#include <mbgl/util/io.hpp>
 
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 namespace {
 
@@ -20,8 +20,7 @@ namespace mbgl {
 
 class AssetFileSource::Impl {
 public:
-    Impl(ActorRef<Impl>, std::string root_)
-        : root(std::move(root_)) {
+    Impl(ActorRef<Impl>, std::string root_) : root(std::move(root_)) {
     }
 
     void request(const std::string& url, ActorRef<FileSourceRequest> req) {
@@ -48,8 +47,7 @@ public:
                 response.data = std::make_shared<std::string>(util::read_file(path));
             } catch (...) {
                 response.error = std::make_unique<Response::Error>(
-                    Response::Error::Reason::Other,
-                    util::toString(std::current_exception()));
+                    Response::Error::Reason::Other, util::toString(std::current_exception()));
             }
         }
 
@@ -66,7 +64,8 @@ AssetFileSource::AssetFileSource(const std::string& root)
 
 AssetFileSource::~AssetFileSource() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
+                                                       Callback callback) {
     auto req = std::make_unique<FileSourceRequest>(std::move(callback));
 
     impl->actor().invoke(&Impl::request, resource.url, req->actor());

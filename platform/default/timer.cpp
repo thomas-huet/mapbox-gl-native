@@ -20,12 +20,10 @@ public:
     }
 
     ~Impl() {
-        uv_close(handle(), [](uv_handle_t* h) {
-            delete reinterpret_cast<uv_timer_t*>(h);
-        });
+        uv_close(handle(), [](uv_handle_t* h) { delete reinterpret_cast<uv_timer_t*>(h); });
     }
 
-    void start(uint64_t timeout, uint64_t repeat, std::function<void ()>&& cb_) {
+    void start(uint64_t timeout, uint64_t repeat, std::function<void()>&& cb_) {
         cb = std::move(cb_);
         if (uv_timer_start(timer, timerCallback, timeout, repeat) != 0) {
             throw std::runtime_error("Failed to start timer.");
@@ -53,16 +51,14 @@ private:
     std::function<void()> cb;
 };
 
-Timer::Timer()
-    : impl(std::make_unique<Impl>()) {
+Timer::Timer() : impl(std::make_unique<Impl>()) {
 }
 
 Timer::~Timer() = default;
 
 void Timer::start(Duration timeout, Duration repeat, std::function<void()>&& cb) {
     impl->start(std::chrono::duration_cast<Milliseconds>(timeout).count(),
-                std::chrono::duration_cast<Milliseconds>(repeat).count(),
-                std::move(cb));
+                std::chrono::duration_cast<Milliseconds>(repeat).count(), std::move(cb));
 }
 
 void Timer::stop() {

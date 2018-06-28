@@ -1,5 +1,5 @@
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -14,9 +14,7 @@ ThreadPool::ThreadPool(std::size_t count) {
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
 
-                cv.wait(lock, [this] {
-                    return !queue.empty() || terminate;
-                });
+                cv.wait(lock, [this] { return !queue.empty() || terminate; });
 
                 if (terminate) {
                     return;

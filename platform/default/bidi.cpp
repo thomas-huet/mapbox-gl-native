@@ -21,7 +21,8 @@ public:
     UBiDi* bidiLine = nullptr;
 };
 
-BiDi::BiDi() : impl(std::make_unique<BiDiImpl>()) {}
+BiDi::BiDi() : impl(std::make_unique<BiDiImpl>()) {
+}
 BiDi::~BiDi() = default;
 
 // Takes UTF16 input in logical order and applies Arabic shaping to the input while maintaining
@@ -29,20 +30,21 @@ BiDi::~BiDi() = default;
 std::u16string applyArabicShaping(const std::u16string& input) {
     UErrorCode errorCode = U_ZERO_ERROR;
 
-    const int32_t outputLength =
-        u_shapeArabic(mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()), nullptr, 0,
-                      (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
-                          (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
-                      &errorCode);
+    const int32_t outputLength = u_shapeArabic(
+        mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()),
+        nullptr, 0, (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
+                        (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
+        &errorCode);
 
     // Pre-flighting will always set U_BUFFER_OVERFLOW_ERROR
     errorCode = U_ZERO_ERROR;
 
     std::u16string outputText(outputLength, 0);
 
-    u_shapeArabic(mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()), mbgl::utf16char_cast<UChar*>(&outputText[0]), outputLength,
-                  (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
-                      (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
+    u_shapeArabic(mbgl::utf16char_cast<const UChar*>(input.c_str()),
+                  static_cast<int32_t>(input.size()), mbgl::utf16char_cast<UChar*>(&outputText[0]),
+                  outputLength, (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
+                                    (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
                   &errorCode);
 
     // If the algorithm fails for any reason, fall back to non-transformed text
@@ -57,7 +59,8 @@ void BiDi::mergeParagraphLineBreaks(std::set<size_t>& lineBreakPoints) {
     for (int32_t i = 0; i < paragraphCount; i++) {
         UErrorCode errorCode = U_ZERO_ERROR;
         int32_t paragraphEndIndex;
-        ubidi_getParagraphByIndex(impl->bidiText, i, nullptr, &paragraphEndIndex, nullptr, &errorCode);
+        ubidi_getParagraphByIndex(impl->bidiText, i, nullptr, &paragraphEndIndex, nullptr,
+                                  &errorCode);
 
         if (U_FAILURE(errorCode)) {
             throw std::runtime_error(std::string("ProcessedBiDiText::mergeParagraphLineBreaks: ") +
@@ -91,8 +94,8 @@ std::vector<std::u16string> BiDi::processText(const std::u16string& input,
                                               std::set<std::size_t> lineBreakPoints) {
     UErrorCode errorCode = U_ZERO_ERROR;
 
-    ubidi_setPara(impl->bidiText, mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()),
-                  UBIDI_DEFAULT_LTR, nullptr, &errorCode);
+    ubidi_setPara(impl->bidiText, mbgl::utf16char_cast<const UChar*>(input.c_str()),
+                  static_cast<int32_t>(input.size()), UBIDI_DEFAULT_LTR, nullptr, &errorCode);
 
     if (U_FAILURE(errorCode)) {
         throw std::runtime_error(std::string("BiDi::processText: ") + u_errorName(errorCode));
@@ -103,7 +106,8 @@ std::vector<std::u16string> BiDi::processText(const std::u16string& input,
 
 std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
     UErrorCode errorCode = U_ZERO_ERROR;
-    ubidi_setLine(impl->bidiText, static_cast<int32_t>(start), static_cast<int32_t>(end), impl->bidiLine, &errorCode);
+    ubidi_setLine(impl->bidiText, static_cast<int32_t>(start), static_cast<int32_t>(end),
+                  impl->bidiLine, &errorCode);
 
     if (U_FAILURE(errorCode)) {
         throw std::runtime_error(std::string("BiDi::getLine (setLine): ") + u_errorName(errorCode));

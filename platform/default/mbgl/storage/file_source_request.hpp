@@ -4,8 +4,8 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/async_request.hpp>
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace mbgl {
 

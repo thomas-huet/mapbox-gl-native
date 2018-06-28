@@ -6,30 +6,35 @@
 
 #include <args/args.hxx>
 
+#include <atomic>
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
-#include <csignal>
-#include <atomic>
 #include <sstream>
 
 using namespace std::literals::chrono_literals;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     args::ArgumentParser argumentParser("Mapbox GL offline tool");
-    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
+    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", { 'h', "help" });
 
-    args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token", {'t', "token"});
-    args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
-    args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output database file name", {'o', "output"});
-    args::ValueFlag<std::string> apiBaseValue(argumentParser, "URL", "API Base URL", {'a', "apiBaseURL"});
+    args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token",
+                                            { 't', "token" });
+    args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet",
+                                            { 's', "style" });
+    args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output database file name",
+                                             { 'o', "output" });
+    args::ValueFlag<std::string> apiBaseValue(argumentParser, "URL", "API Base URL",
+                                              { 'a', "apiBaseURL" });
 
-    args::ValueFlag<double> northValue(argumentParser, "degrees", "North latitude", {"north"});
-    args::ValueFlag<double> westValue(argumentParser, "degrees", "West longitude", {"west"});
-    args::ValueFlag<double> southValue(argumentParser, "degrees", "South latitude", {"south"});
-    args::ValueFlag<double> eastValue(argumentParser, "degrees", "East longitude", {"east"});
-    args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", {"minZoom"});
-    args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", {"maxZoom"});
-    args::ValueFlag<double> pixelRatioValue(argumentParser, "number", "Pixel ratio", {"pixelRatio"});
+    args::ValueFlag<double> northValue(argumentParser, "degrees", "North latitude", { "north" });
+    args::ValueFlag<double> westValue(argumentParser, "degrees", "West longitude", { "west" });
+    args::ValueFlag<double> southValue(argumentParser, "degrees", "South latitude", { "south" });
+    args::ValueFlag<double> eastValue(argumentParser, "degrees", "East longitude", { "east" });
+    args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", { "minZoom" });
+    args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", { "maxZoom" });
+    args::ValueFlag<double> pixelRatioValue(argumentParser, "number", "Pixel ratio",
+                                            { "pixelRatio" });
 
     try {
         argumentParser.ParseCLI(argc, argv);
@@ -46,7 +51,8 @@ int main(int argc, char *argv[]) {
         exit(2);
     }
 
-    std::string style = styleValue ? args::get(styleValue) : mbgl::util::default_styles::streets.url;
+    std::string style =
+        styleValue ? args::get(styleValue) : mbgl::util::default_styles::streets.url;
 
     // Bay area
     const double north = northValue ? args::get(northValue) : 37.2;
@@ -60,9 +66,11 @@ int main(int argc, char *argv[]) {
     const std::string output = outputValue ? args::get(outputValue) : "offline.db";
 
     const char* tokenEnv = getenv("MAPBOX_ACCESS_TOKEN");
-    const std::string token = tokenValue ? args::get(tokenValue) : (tokenEnv ? tokenEnv : std::string());
-    
-    const std::string apiBaseURL = apiBaseValue ? args::get(apiBaseValue) : mbgl::util::API_BASE_URL;
+    const std::string token =
+        tokenValue ? args::get(tokenValue) : (tokenEnv ? tokenEnv : std::string());
+
+    const std::string apiBaseURL =
+        apiBaseValue ? args::get(apiBaseValue) : mbgl::util::API_BASE_URL;
 
     using namespace mbgl;
 
@@ -80,10 +88,7 @@ int main(int argc, char *argv[]) {
     class Observer : public OfflineRegionObserver {
     public:
         Observer(OfflineRegion& region_, DefaultFileSource& fileSource_, util::RunLoop& loop_)
-            : region(region_),
-              fileSource(fileSource_),
-              loop(loop_),
-              start(util::now()) {
+            : region(region_), fileSource(fileSource_), loop(loop_), start(util::now()) {
         }
 
         void statusChanged(OfflineRegionStatus status) override {
@@ -104,8 +109,7 @@ int main(int argc, char *argv[]) {
                       << " resources"
                       << (status.requiredResourceCountIsPrecise ? "; " : " (indeterminate); ")
                       << status.completedResourceSize << " bytes downloaded"
-                      << " (" << bytesPerSecond << " bytes/sec)"
-                      << std::endl;
+                      << " (" << bytesPerSecond << " bytes/sec)" << std::endl;
 
             if (status.complete()) {
                 std::cout << "Finished" << std::endl;
@@ -134,9 +138,10 @@ int main(int argc, char *argv[]) {
         }
     };
 
-    std::signal(SIGINT, [] (int) { stop(); });
+    std::signal(SIGINT, [](int) { stop(); });
 
-    fileSource.createOfflineRegion(definition, metadata, [&] (std::exception_ptr error, optional<OfflineRegion> region_) {
+    fileSource.createOfflineRegion(definition, metadata, [&](std::exception_ptr error,
+                                                             optional<OfflineRegion> region_) {
         if (error) {
             std::cerr << "Error creating region: " << util::toString(error) << std::endl;
             loop.stop();
@@ -144,7 +149,8 @@ int main(int argc, char *argv[]) {
         } else {
             assert(region_);
             region = std::make_unique<OfflineRegion>(std::move(*region_));
-            fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(*region, fileSource, loop));
+            fileSource.setOfflineRegionObserver(
+                *region, std::make_unique<Observer>(*region, fileSource, loop));
             fileSource.setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
         }
     });

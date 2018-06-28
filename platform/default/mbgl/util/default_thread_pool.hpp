@@ -21,7 +21,7 @@ private:
     std::queue<std::weak_ptr<Mailbox>> queue;
     std::mutex mutex;
     std::condition_variable cv;
-    bool terminate { false };
+    bool terminate{ false };
 };
 
 } // namespace mbgl

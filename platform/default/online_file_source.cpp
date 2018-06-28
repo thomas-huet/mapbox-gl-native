@@ -1,33 +1,33 @@
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/logging.hpp>
 
 #include <mbgl/actor/mailbox.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/mapbox.hpp>
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/http_timeout.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
-#include <mbgl/util/http_timeout.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <list>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace mbgl {
 
 class OnlineFileRequest : public AsyncRequest {
 public:
-    using Callback = std::function<void (Response)>;
+    using Callback = std::function<void(Response)>;
 
     OnlineFileRequest(Resource, Callback, OnlineFileSource::Impl&);
     ~OnlineFileRequest() override;
@@ -76,9 +76,11 @@ public:
             // Request the ResourceTransform actor a new url and replace the resource url with the
             // transformed one before proceeding to schedule the request.
             resourceTransform->invoke(&ResourceTransform::transform, request->resource.kind,
-                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) mutable {
-                    ref.invoke(&OnlineFileRequest::setTransformedURL, std::move(url));
-                });
+                                      std::move(request->resource.url),
+                                      [ref = request->actor()](const std::string&& url) mutable {
+                                          ref.invoke(&OnlineFileRequest::setTransformedURL,
+                                                     std::move(url));
+                                      });
         } else {
             request->schedule();
         }
@@ -191,21 +193,22 @@ private:
      */
     std::unordered_set<OnlineFileRequest*> allRequests;
     std::list<OnlineFileRequest*> pendingRequestsList;
-    std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
+    std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator>
+        pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
     bool online = true;
     HTTPFileSource httpFileSource;
-    util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
+    util::AsyncTask reachability{ std::bind(&Impl::networkIsReachableAgain, this) };
 };
 
-OnlineFileSource::OnlineFileSource()
-    : impl(std::make_unique<Impl>()) {
+OnlineFileSource::OnlineFileSource() : impl(std::make_unique<Impl>()) {
 }
 
 OnlineFileSource::~OnlineFileSource() = default;
 
-std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource,
+                                                        Callback callback) {
     Resource res = resource;
 
     switch (resource.kind) {
@@ -242,10 +245,10 @@ void OnlineFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>
     impl->setResourceTransform(std::move(transform));
 }
 
-OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, OnlineFileSource::Impl& impl_)
-    : impl(impl_),
-      resource(std::move(resource_)),
-      callback(std::move(callback_)) {
+OnlineFileRequest::OnlineFileRequest(Resource resource_,
+                                     Callback callback_,
+                                     OnlineFileSource::Impl& impl_)
+    : impl(impl_), resource(std::move(resource_)), callback(std::move(callback_)) {
     impl.add(this);
 }
 
@@ -262,9 +265,8 @@ OnlineFileRequest::~OnlineFileRequest() {
     impl.remove(this);
 }
 
-Timestamp interpolateExpiration(const Timestamp& current,
-                                optional<Timestamp> prior,
-                                bool& expired) {
+Timestamp
+interpolateExpiration(const Timestamp& current, optional<Timestamp> prior, bool& expired) {
     auto now = util::now();
     if (current > now) {
         return current;
@@ -305,9 +307,9 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
 
     // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
     // consecutive errors we've encountered, and on the expiration time, if present.
-    Duration timeout = std::min(
-                            http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
-                            http::expirationTimeout(expires, expiredRequests));
+    Duration timeout =
+        std::min(http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
+                 http::expirationTimeout(expires, expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -322,9 +324,7 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
         timeout = Duration::max();
     }
 
-    timer.start(timeout, Duration::zero(), [&] {
-        impl.activateOrQueueRequest(this);
-    });
+    timer.start(timeout, Duration::zero(), [&] { impl.activateOrQueueRequest(this); });
 }
 
 void OnlineFileRequest::completed(Response response) {
@@ -392,8 +392,8 @@ void OnlineFileRequest::networkIsReachableAgain() {
 }
 
 void OnlineFileRequest::setTransformedURL(const std::string&& url) {
-     resource.url = std::move(url);
-     schedule();
+    resource.url = std::move(url);
+    schedule();
 }
 
 ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {

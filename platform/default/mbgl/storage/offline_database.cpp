@@ -1,18 +1,17 @@
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 #include "sqlite3.hpp"
 
 namespace mbgl {
 
 OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
-    : path(std::move(path_)),
-      maximumCacheSize(maximumCacheSize_) {
+    : path(std::move(path_)), maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
 }
 
@@ -43,7 +42,8 @@ void OfflineDatabase::ensureSchema() {
 
     try {
         assert(result.is<mapbox::sqlite::Database>());
-        db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
+        db = std::make_unique<mapbox::sqlite::Database>(
+            std::move(result.get<mapbox::sqlite::Database>()));
         db->setBusyTimeout(Milliseconds::max());
         db->exec("PRAGMA foreign_keys = ON");
 
@@ -55,14 +55,14 @@ void OfflineDatabase::ensureSchema() {
             break;
         case 2:
             migrateToVersion3();
-            // fall through
+        // fall through
         case 3:
         case 4:
             migrateToVersion5();
-            // fall through
+        // fall through
         case 5:
             migrateToVersion6();
-            // fall through
+        // fall through
         case 6:
             // happy path; we're done
             return;
@@ -82,12 +82,14 @@ void OfflineDatabase::ensureSchema() {
     }
 
     try {
-        #include "offline_schema.cpp.include"
+#include "offline_schema.cpp.include"
 
-        // When downgrading the database, or when the database is corrupt, we've deleted the old database handle,
+        // When downgrading the database, or when the database is corrupt, we've deleted the old
+        // database handle,
         // so we need to reopen it.
         if (!db) {
-            db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate));
+            db = std::make_unique<mapbox::sqlite::Database>(
+                mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate));
             db->setBusyTimeout(Milliseconds::max());
             db->exec("PRAGMA foreign_keys = ON");
         }
@@ -98,7 +100,8 @@ void OfflineDatabase::ensureSchema() {
         db->exec(schema);
         db->exec("PRAGMA user_version = 6");
     } catch (...) {
-        Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
+        Log::Error(Event::Database, "Unexpected error creating database schema: %s",
+                   util::toString(std::current_exception()).c_str());
         throw;
     }
 }
@@ -189,7 +192,8 @@ std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const R
     return result;
 }
 
-std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
+std::pair<bool, uint64_t>
+OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
     if (response.error) {
         return { false, 0 };
     }
@@ -213,13 +217,13 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        inserted = putTile(*resource.tileData, response,
-                compressed ? compressedData : response.data ? *response.data : "",
-                compressed);
+        inserted =
+            putTile(*resource.tileData, response,
+                    compressed ? compressedData : response.data ? *response.data : "", compressed);
     } else {
         inserted = putResource(resource, response,
-                compressed ? compressedData : response.data ? *response.data : "",
-                compressed);
+                               compressed ? compressedData : response.data ? *response.data : "",
+                               compressed);
     }
 
     return { inserted, size };
@@ -228,7 +232,8 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
     // Update accessed timestamp used for LRU eviction.
     {
-        mapbox::sqlite::Query accessedQuery{ getStatement("UPDATE resources SET accessed = ?1 WHERE url = ?2") };
+        mapbox::sqlite::Query accessedQuery{ getStatement(
+            "UPDATE resources SET accessed = ?1 WHERE url = ?2") };
         accessedQuery.bind(1, util::now());
         accessedQuery.bind(2, resource.url);
         accessedQuery.run();
@@ -251,10 +256,10 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     Response response;
     uint64_t size = 0;
 
-    response.etag           = query.get<optional<std::string>>(0);
-    response.expires        = query.get<optional<Timestamp>>(1);
+    response.etag = query.get<optional<std::string>>(0);
+    response.expires = query.get<optional<Timestamp>>(1);
     response.mustRevalidate = query.get<bool>(2);
-    response.modified       = query.get<optional<Timestamp>>(3);
+    response.modified = query.get<optional<Timestamp>>(3);
 
     auto data = query.get<optional<std::string>>(4);
     if (!data) {
@@ -412,10 +417,10 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     Response response;
     uint64_t size = 0;
 
-    response.etag            = query.get<optional<std::string>>(0);
-    response.expires         = query.get<optional<Timestamp>>(1);
-    response.mustRevalidate  = query.get<bool>(2);
-    response.modified        = query.get<optional<Timestamp>>(3);
+    response.etag = query.get<optional<std::string>>(0);
+    response.expires = query.get<optional<Timestamp>>(1);
+    response.mustRevalidate = query.get<bool>(2);
+    response.modified = query.get<optional<Timestamp>>(3);
 
     optional<std::string> data = query.get<optional<std::string>>(4);
     if (!data) {
@@ -565,10 +570,9 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() {
     std::vector<OfflineRegion> result;
 
     while (query.run()) {
-        result.push_back(OfflineRegion(
-            query.get<int64_t>(0),
-            decodeOfflineRegionDefinition(query.get<std::string>(1)),
-            query.get<std::vector<uint8_t>>(2)));
+        result.push_back(OfflineRegion(query.get<int64_t>(0),
+                                       decodeOfflineRegionDefinition(query.get<std::string>(1)),
+                                       query.get<std::vector<uint8_t>>(2)));
     }
 
     return result;
@@ -589,7 +593,8 @@ OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& defin
     return OfflineRegion(query.lastInsertRowId(), definition, metadata);
 }
 
-OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
+OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID,
+                                                      const OfflineRegionMetadata& metadata) {
     // clang-format off
     mapbox::sqlite::Query query{ getStatement(
                                   "UPDATE regions SET description = ?1 "
@@ -616,7 +621,8 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     offlineMapboxTileCount = {};
 }
 
-optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
+optional<std::pair<Response, uint64_t>>
+OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
     auto response = getInternal(resource);
 
     if (response) {
@@ -636,14 +642,18 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
     return response;
 }
 
-uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+uint64_t OfflineDatabase::putRegionResource(int64_t regionID,
+                                            const Resource& resource,
+                                            const Response& response) {
     mapbox::sqlite::Transaction transaction(*db);
     auto size = putRegionResourceInternal(regionID, resource, response);
     transaction.commit();
     return size;
 }
 
-void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>& resources, OfflineRegionStatus& status) {
+void OfflineDatabase::putRegionResources(int64_t regionID,
+                                         const std::list<std::tuple<Resource, Response>>& resources,
+                                         OfflineRegionStatus& status) {
     mapbox::sqlite::Transaction transaction(*db);
 
     for (const auto& elem : resources) {
@@ -669,7 +679,9 @@ void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::
     transaction.commit();
 }
 
-uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
+uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID,
+                                                    const Resource& resource,
+                                                    const Response& response) {
     if (exceedsOfflineMapboxTileCountLimit(resource)) {
         throw MapboxTileLimitExceededException();
     }
@@ -677,10 +689,8 @@ uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Reso
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
 
-    if (offlineMapboxTileCount
-        && resource.kind == Resource::Kind::Tile
-        && util::mapbox::isMapboxURL(resource.url)
-        && previouslyUnused) {
+    if (offlineMapboxTileCount && resource.kind == Resource::Kind::Tile &&
+        util::mapbox::isMapboxURL(resource.url) && previouslyUnused) {
         *offlineMapboxTileCount += 1;
     }
 
@@ -777,10 +787,10 @@ OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
 OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
     OfflineRegionStatus result;
 
-    std::tie(result.completedResourceCount, result.completedResourceSize)
-        = getCompletedResourceCountAndSize(regionID);
-    std::tie(result.completedTileCount, result.completedTileSize)
-        = getCompletedTileCountAndSize(regionID);
+    std::tie(result.completedResourceCount, result.completedResourceSize) =
+        getCompletedResourceCountAndSize(regionID);
+    std::tie(result.completedTileCount, result.completedTileSize) =
+        getCompletedTileCountAndSize(regionID);
 
     result.completedResourceCount += result.completedTileCount;
     result.completedResourceSize += result.completedTileSize;
@@ -945,9 +955,8 @@ uint64_t OfflineDatabase::getOfflineMapboxTileCount() {
 }
 
 bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resource) {
-    return resource.kind == Resource::Kind::Tile
-        && util::mapbox::isMapboxURL(resource.url)
-        && offlineMapboxTileCountLimitExceeded();
+    return resource.kind == Resource::Kind::Tile && util::mapbox::isMapboxURL(resource.url) &&
+           offlineMapboxTileCountLimitExceeded();
 }
 
 } // namespace mbgl

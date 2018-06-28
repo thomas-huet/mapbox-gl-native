@@ -1,13 +1,13 @@
-#include <mbgl/test.hpp>
-#include <unistd.h>
-#include <cstring>
 #include <cerrno>
 #include <cstdio>
+#include <cstring>
+#include <mbgl/test.hpp>
+#include <unistd.h>
 
 #define xstr(s) str(s)
 #define str(s) #s
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 #ifdef WORK_DIRECTORY
     const int result = chdir(xstr(WORK_DIRECTORY));
     if (result != 0) {

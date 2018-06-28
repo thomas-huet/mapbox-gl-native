@@ -1,19 +1,20 @@
 #pragma once
 
-#include <mbgl/util/image.hpp>
-#include <mbgl/util/thread.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <exception>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace mbgl {
 
-template<class> class ActorRef;
+template <class>
+class ActorRef;
 struct CameraOptions;
 class FileSource;
 class Size;
@@ -51,9 +52,10 @@ public:
     void setRegion(const LatLngBounds&);
     LatLngBounds getRegion() const;
 
-    using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
+    using PointForFn = std::function<ScreenCoordinate(const LatLng&)>;
     using Attributions = std::vector<std::string>;
-    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
+    using Callback =
+        std::function<void(std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
     void snapshot(ActorRef<Callback>);
 
 private:

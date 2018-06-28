@@ -1,7 +1,7 @@
 #include <mbgl/util/utf.hpp>
 
-#include <memory>
 #include <locale>
+#include <memory>
 
 // GCC 4.9 compatibility
 #if !defined(__GNUC__) || __GNUC__ >= 5

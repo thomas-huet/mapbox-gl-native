@@ -4,8 +4,8 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <stdexcept>
 #include <cassert>
+#include <stdexcept>
 
 #include <pthread.h>
 
@@ -20,7 +20,7 @@ public:
 
 template <class T>
 ThreadLocal<T>::ThreadLocal() : impl(std::make_unique<Impl>()) {
-    int ret = pthread_key_create(&impl->key, [](void *) {});
+    int ret = pthread_key_create(&impl->key, [](void*) {});
 
     if (ret) {
         throw std::runtime_error("Failed to init local storage key.");

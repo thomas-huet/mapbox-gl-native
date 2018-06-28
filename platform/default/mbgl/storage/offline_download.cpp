@@ -1,17 +1,17 @@
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/storage/http_file_source.hpp>
-#include <mbgl/style/parser.hpp>
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/sources/raster_dem_source.hpp>
-#include <mbgl/style/sources/geojson_source.hpp>
-#include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/parser.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -78,7 +78,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     for (const auto& source : parser.sources) {
         SourceType type = source->getType();
 
-        auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
+        auto handleTiledSource = [&](const variant<std::string, Tileset>& urlOrTileset,
+                                     const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
                 result.requiredResourceCount +=
                     definition.tileCount(type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
@@ -88,7 +89,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
                     style::conversion::Error error;
-                    optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
+                    optional<Tileset> tileset =
+                        style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
                     if (tileset) {
                         result.requiredResourceCount +=
                             definition.tileCount(type, tileSize, (*tileset).zoomRange);
@@ -111,7 +113,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
             handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
             break;
         }
-        
+
         case SourceType::RasterDEM: {
             const auto& rasterDEMSource = *source->as<RasterDEMSource>();
             handleTiledSource(rasterDEMSource.getURLOrTileset(), rasterDEMSource.getTileSize());
@@ -165,7 +167,8 @@ void OfflineDownload::activateDownload() {
         for (const auto& source : parser.sources) {
             SourceType type = source->getType();
 
-            auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
+            auto handleTiledSource = [&](const variant<std::string, Tileset>& urlOrTileset,
+                                         const uint16_t tileSize) {
                 if (urlOrTileset.is<Tileset>()) {
                     queueTiles(type, tileSize, urlOrTileset.get<Tileset>());
                 } else {
@@ -176,7 +179,8 @@ void OfflineDownload::activateDownload() {
 
                     ensureResource(Resource::source(url), [=](Response sourceResponse) {
                         style::conversion::Error error;
-                        optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
+                        optional<Tileset> tileset =
+                            style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
                         if (tileset) {
                             util::mapbox::canonicalizeTileset(*tileset, url, type, tileSize);
                             queueTiles(type, tileSize, *tileset);
@@ -202,7 +206,7 @@ void OfflineDownload::activateDownload() {
                 handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
                 break;
             }
-            
+
             case SourceType::RasterDEM: {
                 const auto& rasterDEMSource = *source->as<RasterDEMSource>();
                 handleTiledSource(rasterDEMSource.getURLOrTileset(), rasterDEMSource.getTileSize());
@@ -236,7 +240,8 @@ void OfflineDownload::activateDownload() {
         if (!parser.glyphURL.empty()) {
             for (const auto& fontStack : parser.fontStacks()) {
                 for (char16_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
-                    queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
+                    queueResource(Resource::glyphs(parser.glyphURL, fontStack,
+                                                   getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
                 }
             }
         }
@@ -273,7 +278,8 @@ void OfflineDownload::continueDownload() {
         return;
     }
 
-    while (!resourcesRemaining.empty() && requests.size() < HTTPFileSource::maximumConcurrentRequests()) {
+    while (!resourcesRemaining.empty() &&
+           requests.size() < HTTPFileSource::maximumConcurrentRequests()) {
         ensureResource(resourcesRemaining.front());
         resourcesRemaining.pop_front();
     }
@@ -293,8 +299,8 @@ void OfflineDownload::queueResource(Resource resource) {
 void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tileset& tileset) {
     for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
         status.requiredResourceCount++;
-        resourcesRemaining.push_back(
-            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z, tileset.scheme));
+        resourcesRemaining.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x,
+                                                    tile.y, tile.z, tileset.scheme));
     }
 }
 
@@ -304,11 +310,12 @@ void OfflineDownload::ensureResource(const Resource& resource,
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
 
-        auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
+        auto getResourceSizeInDatabase = [&]() -> optional<int64_t> {
             if (!callback) {
                 return offlineDatabase.hasRegionResource(id, resource);
             }
-            optional<std::pair<Response, uint64_t>> response = offlineDatabase.getRegionResource(id, resource);
+            optional<std::pair<Response, uint64_t>> response =
+                offlineDatabase.getRegionResource(id, resource);
             if (!response) {
                 return {};
             }

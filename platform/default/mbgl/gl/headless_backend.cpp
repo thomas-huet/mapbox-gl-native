@@ -1,5 +1,5 @@
-#include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 
 #include <cassert>
@@ -21,12 +21,11 @@ public:
     gl::Framebuffer framebuffer;
 };
 
-HeadlessBackend::HeadlessBackend(Size size_)
-    : size(size_) {
+HeadlessBackend::HeadlessBackend(Size size_) : size(size_) {
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    BackendScope guard { *this };
+    BackendScope guard{ *this };
     view.reset();
     context.reset();
 }

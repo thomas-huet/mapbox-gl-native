@@ -1,17 +1,17 @@
 #pragma once
 
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/offline.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/mapbox.hpp>
 
-#include <unordered_map>
+#include <list>
 #include <memory>
 #include <string>
-#include <list>
+#include <unordered_map>
 
 namespace mapbox {
 namespace sqlite {
@@ -26,8 +26,9 @@ namespace mbgl {
 class Response;
 class TileID;
 
-struct MapboxTileLimitExceededException :  util::Exception {
-    MapboxTileLimitExceededException() : util::Exception("Mapbox tile limit exceeded") {}
+struct MapboxTileLimitExceededException : util::Exception {
+    MapboxTileLimitExceededException() : util::Exception("Mapbox tile limit exceeded") {
+    }
 };
 
 class OfflineDatabase : private util::noncopyable {
@@ -44,8 +45,7 @@ public:
 
     std::vector<OfflineRegion> listRegions();
 
-    OfflineRegion createRegion(const OfflineRegionDefinition&,
-                               const OfflineRegionMetadata&);
+    OfflineRegion createRegion(const OfflineRegionDefinition&, const OfflineRegionMetadata&);
 
     OfflineRegionMetadata updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
@@ -55,7 +55,9 @@ public:
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
     optional<int64_t> hasRegionResource(int64_t regionID, const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
-    void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
+    void putRegionResources(int64_t regionID,
+                            const std::list<std::tuple<Resource, Response>>&,
+                            OfflineRegionStatus&);
 
     OfflineRegionDefinition getRegionDefinition(int64_t regionID);
     OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
@@ -75,17 +77,15 @@ private:
     void migrateToVersion5();
     void migrateToVersion6();
 
-    mapbox::sqlite::Statement& getStatement(const char *);
+    mapbox::sqlite::Statement& getStatement(const char*);
 
     optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
     optional<int64_t> hasTile(const Resource::TileData&);
-    bool putTile(const Resource::TileData&, const Response&,
-                 const std::string&, bool compressed);
+    bool putTile(const Resource::TileData&, const Response&, const std::string&, bool compressed);
 
     optional<std::pair<Response, uint64_t>> getResource(const Resource&);
     optional<int64_t> hasResource(const Resource&);
-    bool putResource(const Resource&, const Response&,
-                     const std::string&, bool compressed);
+    bool putResource(const Resource&, const Response&, const std::string&, bool compressed);
 
     uint64_t putRegionResourceInternal(int64_t regionID, const Resource&, const Response&);
 
@@ -101,10 +101,10 @@ private:
 
     const std::string path;
     std::unique_ptr<mapbox::sqlite::Database> db;
-    std::unordered_map<const char *, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
+    std::unordered_map<const char*, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
 
     template <class T>
-    T getPragma(const char *);
+    T getPragma(const char*);
 
     uint64_t maximumCacheSize;
 

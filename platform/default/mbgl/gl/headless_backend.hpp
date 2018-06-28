@@ -2,8 +2,8 @@
 
 #include <mbgl/renderer/renderer_backend.hpp>
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace mbgl {
 
@@ -24,7 +24,8 @@ public:
         virtual ~Impl() = default;
         virtual gl::ProcAddress getExtensionFunctionPointer(const char*) = 0;
         virtual void activateContext() = 0;
-        virtual void deactivateContext() {}
+        virtual void deactivateContext() {
+        }
     };
 
 private:

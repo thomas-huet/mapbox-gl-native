@@ -3,10 +3,10 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/resource.hpp>
 
-#include <list>
-#include <unordered_set>
-#include <memory>
 #include <deque>
+#include <list>
+#include <memory>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -27,7 +27,10 @@ class Parser;
  */
 class OfflineDownload {
 public:
-    OfflineDownload(int64_t id, OfflineRegionDefinition&&, OfflineDatabase& offline, FileSource& online);
+    OfflineDownload(int64_t id,
+                    OfflineRegionDefinition&&,
+                    OfflineDatabase& offline,
+                    FileSource& online);
     ~OfflineDownload();
 
     void setObserver(std::unique_ptr<OfflineRegionObserver>);
@@ -45,7 +48,7 @@ private:
      * While the request is in progress, it is recorded in `requests`. If the download
      * is deactivated, all in progress requests are cancelled.
      */
-    void ensureResource(const Resource&, std::function<void (Response)> = {});
+    void ensureResource(const Resource&, std::function<void(Response)> = {});
 
     void onMapboxTileCountLimitExceeded();
 

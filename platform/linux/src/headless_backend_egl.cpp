@@ -13,7 +13,9 @@ namespace mbgl {
 class EGLDisplayConfig {
 private:
     // Key for singleton construction.
-    struct Key { explicit Key() = default; };
+    struct Key {
+        explicit Key() = default;
+    };
 
 public:
     EGLDisplayConfig(Key) {
@@ -35,14 +37,17 @@ public:
 
         const EGLint attribs[] = {
 #if MBGL_USE_GLES2
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_RENDERABLE_TYPE,
+            EGL_OPENGL_ES2_BIT,
 #endif
-            EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+            EGL_SURFACE_TYPE,
+            EGL_PBUFFER_BIT,
             EGL_NONE
         };
 
         // Note: we're choosing an arbitrary pixel format, since we're not using the default surface
-        // anyway; all rendering will be directed to framebuffers which have their own configuration.
+        // anyway; all rendering will be directed to framebuffers which have their own
+        // configuration.
         if (!eglChooseConfig(display, attribs, &config, 1, &numConfigs) || numConfigs != 1) {
             throw std::runtime_error("Failed to choose ARGB config.\n");
         }
@@ -73,12 +78,10 @@ public:
         // use OpenGL ES 2.0 which has the ability to create shader and program
         // objects and also to write vertex and fragment shaders in the OpenGL ES
         // Shading Language.
-        const EGLint attribs[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
-            EGL_NONE
-        };
+        const EGLint attribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
 
-        eglContext = eglCreateContext(eglDisplay->display, eglDisplay->config, EGL_NO_CONTEXT, attribs);
+        eglContext =
+            eglCreateContext(eglDisplay->display, eglDisplay->config, EGL_NO_CONTEXT, attribs);
         if (eglContext == EGL_NO_CONTEXT) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error 0x%04x",
                              eglGetError());
@@ -89,12 +92,8 @@ public:
         // activate the context.
         // Note that to be able to create pbuffer surfaces, we need to choose a config that
         // includes EGL_SURFACE_TYPE, EGL_PBUFFER_BIT in HeadlessDisplay.
-        const EGLint surfAttribs[] = {
-            EGL_WIDTH, 8,
-            EGL_HEIGHT, 8,
-            EGL_LARGEST_PBUFFER, EGL_TRUE,
-            EGL_NONE
-        };
+        const EGLint surfAttribs[] = { EGL_WIDTH,           8,        EGL_HEIGHT, 8,
+                                       EGL_LARGEST_PBUFFER, EGL_TRUE, EGL_NONE };
 
         eglSurface = eglCreatePbufferSurface(eglDisplay->display, eglDisplay->config, surfAttribs);
         if (eglSurface == EGL_NO_SURFACE) {

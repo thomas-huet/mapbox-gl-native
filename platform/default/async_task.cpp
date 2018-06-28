@@ -12,9 +12,7 @@ namespace util {
 
 class AsyncTask::Impl {
 public:
-    Impl(std::function<void()>&& fn)
-        : async(new uv_async_t),
-          task(std::move(fn)) {
+    Impl(std::function<void()>&& fn) : async(new uv_async_t), task(std::move(fn)) {
 
         auto* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
         if (uv_async_init(loop, async, asyncCallback) != 0) {
@@ -26,9 +24,7 @@ public:
     }
 
     ~Impl() {
-        uv_close(handle(), [](uv_handle_t* h) {
-            delete reinterpret_cast<uv_async_t*>(h);
-        });
+        uv_close(handle(), [](uv_handle_t* h) { delete reinterpret_cast<uv_async_t*>(h); });
     }
 
     void maySend() {
@@ -52,8 +48,7 @@ private:
     std::function<void()> task;
 };
 
-AsyncTask::AsyncTask(std::function<void()>&& fn)
-    : impl(std::make_unique<Impl>(std::move(fn))) {
+AsyncTask::AsyncTask(std::function<void()>&& fn) : impl(std::make_unique<Impl>(std::move(fn))) {
 }
 
 AsyncTask::~AsyncTask() = default;

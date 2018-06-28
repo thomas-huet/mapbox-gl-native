@@ -13,7 +13,9 @@ namespace mbgl {
 class GLXDisplayConfig {
 private:
     // Key for singleton construction.
-    struct Key { explicit Key() = default; };
+    struct Key {
+        explicit Key() = default;
+    };
 
 public:
     GLXDisplayConfig(Key) {
