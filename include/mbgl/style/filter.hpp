@@ -1,27 +1,28 @@
 #pragma once
 
-#include <mbgl/util/variant.hpp>
+#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/util/variant.hpp>
 
 #include <string>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 namespace mbgl {
 namespace style {
-    
+
 class Filter {
 public:
     optional<std::shared_ptr<const expression::Expression>> expression;
-    
-    Filter() : expression() {}
-    
+
+    Filter() : expression() {
+    }
+
     Filter(expression::ParseResult _expression) : expression(std::move(*_expression)) {
         assert(!expression || *expression != nullptr);
     }
-    
+
     bool operator()(const expression::EvaluationContext& context) const;
 
     friend bool operator==(const Filter& lhs, const Filter& rhs) {
@@ -31,7 +32,7 @@ public:
             return *(lhs.expression) == *(rhs.expression);
         }
     }
-    
+
     friend bool operator!=(const Filter& lhs, const Filter& rhs) {
         return !(lhs == rhs);
     }

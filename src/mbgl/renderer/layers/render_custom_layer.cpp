@@ -1,11 +1,11 @@
+#include <mbgl/gl/gl.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/map/transform_state.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
@@ -39,14 +39,16 @@ bool RenderCustomLayer::hasTransition() const {
     return false;
 }
 
-std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
+std::unique_ptr<Bucket>
+RenderCustomLayer::createBucket(const BucketParameters&,
+                                const std::vector<const RenderLayer*>&) const {
     assert(false);
     return nullptr;
 }
 
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
     if (host != impl().host) {
-        //If the context changed, deinitialize the previous one before initializing the new one.
+        // If the context changed, deinitialize the previous one before initializing the new one.
         if (host && !contextDestroyed) {
             MBGL_CHECK_ERROR(host->deinitialize());
         }

@@ -13,7 +13,6 @@ namespace style {
 class RasterDEMSource : public RasterSource {
 public:
     RasterDEMSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize);
-
 };
 
 template <>

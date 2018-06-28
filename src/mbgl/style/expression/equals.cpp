@@ -5,18 +5,17 @@ namespace style {
 namespace expression {
 
 Equals::Equals(std::unique_ptr<Expression> lhs_, std::unique_ptr<Expression> rhs_, bool negate_)
-    : Expression(type::Boolean),
-      lhs(std::move(lhs_)),
-      rhs(std::move(rhs_)),
-      negate(negate_) {
+    : Expression(type::Boolean), lhs(std::move(lhs_)), rhs(std::move(rhs_)), negate(negate_) {
 }
 
 EvaluationResult Equals::evaluate(const EvaluationContext& params) const {
     EvaluationResult lhsResult = lhs->evaluate(params);
-    if (!lhsResult) return lhsResult;
+    if (!lhsResult)
+        return lhsResult;
 
     EvaluationResult rhsResult = rhs->evaluate(params);
-    if (!rhsResult) return lhsResult;
+    if (!rhsResult)
+        return lhsResult;
 
     bool result = *lhsResult == *rhsResult;
     if (negate) {
@@ -38,14 +37,12 @@ bool Equals::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> Equals::possibleOutputs() const {
-    return {{ true }, { false }};
+    return { { true }, { false } };
 }
 
 static bool isComparableType(const type::Type& type) {
-    return type == type::String ||
-        type == type::Number ||
-        type == type::Boolean ||
-        type == type::Null;
+    return type == type::String || type == type::Number || type == type::Boolean ||
+           type == type::Null;
 }
 
 using namespace mbgl::style::conversion;
@@ -59,17 +56,20 @@ ParseResult Equals::parse(const Convertible& value, ParsingContext& ctx) {
 
     bool negate = toString(arrayMember(value, 0)) == std::string("!=");
 
-    ParseResult lhs = ctx.parse(arrayMember(value, 1), 1, {type::Value});
-    if (!lhs) return ParseResult();
+    ParseResult lhs = ctx.parse(arrayMember(value, 1), 1, { type::Value });
+    if (!lhs)
+        return ParseResult();
 
-    ParseResult rhs = ctx.parse(arrayMember(value, 2), 2, {type::Value});
-    if (!rhs) return ParseResult();
+    ParseResult rhs = ctx.parse(arrayMember(value, 2), 2, { type::Value });
+    if (!rhs)
+        return ParseResult();
 
     type::Type lhsType = (*lhs)->getType();
     type::Type rhsType = (*rhs)->getType();
 
     if (!isComparableType(lhsType) && !isComparableType(rhsType)) {
-        ctx.error("Expected at least one argument to be a string, number, boolean, or null, but found (" +
+        ctx.error(
+            "Expected at least one argument to be a string, number, boolean, or null, but found (" +
             toString(lhsType) + ", " + toString(rhsType) + ") instead.");
         return ParseResult();
     }

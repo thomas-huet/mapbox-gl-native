@@ -52,7 +52,7 @@ MBGL_CONSTEXPR const char* stringFromError(GLenum err) {
 } // namespace
 
 void checkError(const char* cmd, const char* file, int line) {
-//    fprintf(stderr, "cmd: %s\n", cmd);
+    //    fprintf(stderr, "cmd: %s\n", cmd);
     GLenum err = GL_NO_ERROR;
     if ((err = glGetError()) != GL_NO_ERROR) {
         std::string message = std::string(cmd) + ": Error " + stringFromError(err);

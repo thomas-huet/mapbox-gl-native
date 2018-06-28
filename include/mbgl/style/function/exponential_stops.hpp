@@ -17,9 +17,7 @@ public:
     float base = 1.0f;
 
     ExponentialStops() = default;
-    ExponentialStops(Stops stops_, float base_ = 1.0f)
-        : stops(std::move(stops_)),
-          base(base_) {
+    ExponentialStops(Stops stops_, float base_ = 1.0f) : stops(std::move(stops_)), base(base_) {
     }
 
     optional<T> evaluate(float z) const {
@@ -33,7 +31,8 @@ public:
         } else if (it == stops.begin()) {
             return stops.begin()->second;
         } else {
-            return util::interpolate(std::prev(it)->second, it->second,
+            return util::interpolate(
+                std::prev(it)->second, it->second,
                 util::interpolationFactor(base, { std::prev(it)->first, it->first }, z));
         }
     }
@@ -46,8 +45,7 @@ public:
         return evaluate(*z);
     }
 
-    friend bool operator==(const ExponentialStops& lhs,
-                           const ExponentialStops& rhs) {
+    friend bool operator==(const ExponentialStops& lhs, const ExponentialStops& rhs) {
         return lhs.stops == rhs.stops && lhs.base == rhs.base;
     }
 };

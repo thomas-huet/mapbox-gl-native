@@ -7,7 +7,8 @@ namespace mbgl {
 
 ::std::ostream& operator<<(::std::ostream& os, const CanonicalTileID& rhs) {
     // Uncomment this to create code instead of shorthands.
-    // return os << "CanonicalTileID{ " << uint32_t(rhs.z) << ", " << rhs.x << ", " << rhs.y << " }";
+    // return os << "CanonicalTileID{ " << uint32_t(rhs.z) << ", " << rhs.x << ", " << rhs.y << "
+    // }";
     return os << uint32_t(rhs.z) << "/" << rhs.x << "/" << rhs.y;
 }
 

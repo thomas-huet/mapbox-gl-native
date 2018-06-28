@@ -2,8 +2,8 @@
 
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/image_source.hpp>
-#include <mbgl/util/image.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/image.hpp>
 
 namespace mbgl {
 
@@ -21,6 +21,7 @@ public:
     std::array<LatLng, 4> getCoordinates() const;
 
     optional<std::string> getAttribution() const final;
+
 private:
     std::array<LatLng, 4> coords;
     std::shared_ptr<PremultipliedImage> image;

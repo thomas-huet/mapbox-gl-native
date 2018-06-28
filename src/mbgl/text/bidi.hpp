@@ -1,9 +1,9 @@
 #pragma once
 
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <mbgl/util/noncopyable.hpp>
 

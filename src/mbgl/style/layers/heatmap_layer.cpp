@@ -1,12 +1,12 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 // for constructing default heatmap-color ramp expression from style JSON
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -15,8 +15,7 @@ HeatmapLayer::HeatmapLayer(const std::string& layerID, const std::string& source
     : Layer(makeMutable<Impl>(LayerType::Heatmap, layerID, sourceID)) {
 }
 
-HeatmapLayer::HeatmapLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+HeatmapLayer::HeatmapLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 HeatmapLayer::~HeatmapLayer() = default;
@@ -96,7 +95,6 @@ void HeatmapLayer::setMaxZoom(float maxZoom) {
 }
 
 // Layout properties
-
 
 // Paint properties
 
@@ -183,7 +181,8 @@ TransitionOptions HeatmapLayer::getHeatmapIntensityTransition() const {
 
 HeatmapColorPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
     conversion::Error error;
-    std::string rawValue = R"JSON(["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"])JSON";
+    std::string rawValue =
+        R"JSON(["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"])JSON";
     return *conversion::convertJSON<HeatmapColorPropertyValue>(rawValue, error);
 }
 

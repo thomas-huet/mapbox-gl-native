@@ -1,6 +1,6 @@
-#include <mbgl/gl/value.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/value.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 
 namespace mbgl {
@@ -23,7 +23,7 @@ ClearDepth::Type ClearDepth::Get() {
     return clearDepth;
 }
 
-const ClearColor::Type ClearColor::Default { 0, 0, 0, 0 };
+const ClearColor::Type ClearColor::Default{ 0, 0, 0, 0 };
 
 void ClearColor::Set(const Type& value) {
     MBGL_CHECK_ERROR(glClearColor(value.r, value.g, value.b, value.a));
@@ -206,7 +206,7 @@ BlendFunc::Type BlendFunc::Get() {
              static_cast<ColorMode::BlendFactor>(dfactor) };
 }
 
-const BlendColor::Type BlendColor::Default { 0, 0, 0, 0 };
+const BlendColor::Type BlendColor::Default{ 0, 0, 0, 0 };
 
 void BlendColor::Set(const Type& value) {
     MBGL_CHECK_ERROR(glBlendColor(value.r, value.g, value.b, value.a));
@@ -263,7 +263,8 @@ void Viewport::Set(const Type& value) {
 Viewport::Type Viewport::Get() {
     GLint viewport[4];
     MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-    return { static_cast<int32_t>(viewport[0]), static_cast<int32_t>(viewport[1]),
+    return { static_cast<int32_t>(viewport[0]),
+             static_cast<int32_t>(viewport[1]),
              { static_cast<uint32_t>(viewport[2]), static_cast<uint32_t>(viewport[3]) } };
 }
 
@@ -365,19 +366,20 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
     return binding;
 }
 
-const optional<AttributeBinding> VertexAttribute::Default {};
+const optional<AttributeBinding> VertexAttribute::Default{};
 
-void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
+void VertexAttribute::Set(const optional<AttributeBinding>& binding,
+                          Context& context,
+                          AttributeLocation location) {
     if (binding) {
         context.vertexBuffer = binding->vertexBuffer;
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
         MBGL_CHECK_ERROR(glVertexAttribPointer(
-            location,
-            static_cast<GLint>(binding->attributeSize),
-            static_cast<GLenum>(binding->attributeType),
-            static_cast<GLboolean>(false),
+            location, static_cast<GLint>(binding->attributeSize),
+            static_cast<GLenum>(binding->attributeType), static_cast<GLboolean>(false),
             static_cast<GLsizei>(binding->vertexSize),
-            reinterpret_cast<GLvoid*>(binding->attributeOffset + (binding->vertexSize * binding->vertexOffset))));
+            reinterpret_cast<GLvoid*>(binding->attributeOffset +
+                                      (binding->vertexSize * binding->vertexOffset))));
     } else {
         MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
     }

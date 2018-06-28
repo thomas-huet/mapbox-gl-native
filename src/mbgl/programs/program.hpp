@@ -1,24 +1,20 @@
 #pragma once
 
-#include <mbgl/gl/program.hpp>
 #include <mbgl/gl/features.hpp>
-#include <mbgl/programs/segment.hpp>
-#include <mbgl/programs/binary_program.hpp>
+#include <mbgl/gl/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
-#include <mbgl/style/paint_property.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/shaders/shaders.hpp>
+#include <mbgl/style/paint_property.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <unordered_map>
 
 namespace mbgl {
 
-template <class Shaders,
-          class Primitive,
-          class LayoutAttrs,
-          class Uniforms,
-          class PaintProps>
+template <class Shaders, class Primitive, class LayoutAttrs, class Uniforms, class PaintProps>
 class Program {
 public:
     using LayoutAttributes = LayoutAttrs;
@@ -38,21 +34,20 @@ public:
     ProgramType program;
 
     Program(gl::Context& context, const ProgramParameters& programParameters)
-        : program(ProgramType::createProgram(
-            context,
-            programParameters,
-            Shaders::name,
-            Shaders::vertexSource,
-            Shaders::fragmentSource)) {
+        : program(ProgramType::createProgram(context,
+                                             programParameters,
+                                             Shaders::name,
+                                             Shaders::vertexSource,
+                                             Shaders::fragmentSource)) {
     }
 
-    static typename AllUniforms::Values computeAllUniformValues(
-        const UniformValues& uniformValues,
-        const PaintPropertyBinders& paintPropertyBinders,
-        const typename PaintProperties::PossiblyEvaluated& currentProperties,
-        float currentZoom) {
-        return uniformValues
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    static typename AllUniforms::Values
+    computeAllUniformValues(const UniformValues& uniformValues,
+                            const PaintPropertyBinders& paintPropertyBinders,
+                            const typename PaintProperties::PossiblyEvaluated& currentProperties,
+                            float currentZoom) {
+        return uniformValues.concat(
+            paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
     static typename Attributes::Bindings computeAllAttributeBindings(
@@ -82,21 +77,14 @@ public:
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
             if (vertexArrayIt == segment.vertexArrays.end()) {
-                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+                vertexArrayIt =
+                    segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
             }
 
-            program.draw(
-                context,
-                std::move(drawMode),
-                std::move(depthMode),
-                std::move(stencilMode),
-                std::move(colorMode),
-                allUniformValues,
-                vertexArrayIt->second,
-                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
-                indexBuffer,
-                segment.indexOffset,
-                segment.indexLength);
+            program.draw(context, std::move(drawMode), std::move(depthMode), std::move(stencilMode),
+                         std::move(colorMode), allUniformValues, vertexArrayIt->second,
+                         Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                         indexBuffer, segment.indexOffset, segment.indexLength);
         }
     }
 };
@@ -109,8 +97,7 @@ public:
     using Bitset = typename PaintPropertyBinders::Bitset;
 
     ProgramMap(gl::Context& context_, ProgramParameters parameters_)
-        : context(context_),
-          parameters(std::move(parameters_)) {
+        : context(context_), parameters(std::move(parameters_)) {
     }
 
     Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
@@ -119,10 +106,12 @@ public:
         if (it != programs.end()) {
             return it->second;
         }
-        return programs.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(bits),
-                                std::forward_as_tuple(context,
-                                    parameters.withAdditionalDefines(PaintPropertyBinders::defines(currentProperties)))).first->second;
+        return programs
+            .emplace(std::piecewise_construct, std::forward_as_tuple(bits),
+                     std::forward_as_tuple(context,
+                                           parameters.withAdditionalDefines(
+                                               PaintPropertyBinders::defines(currentProperties))))
+            .first->second;
     }
 
 private:

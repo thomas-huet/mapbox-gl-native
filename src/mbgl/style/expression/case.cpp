@@ -15,7 +15,7 @@ EvaluationResult Case::evaluate(const EvaluationContext& params) const {
             return branch.second->evaluate(params);
         }
     }
-    
+
     return otherwise->evaluate(params);
 }
 
@@ -29,7 +29,8 @@ void Case::eachChild(const std::function<void(const Expression&)>& visit) const 
 
 bool Case::operator==(const Expression& e) const {
     if (auto rhs = dynamic_cast<const Case*>(&e)) {
-        return *otherwise == *(rhs->otherwise) && Expression::childrenEqual(branches, rhs->branches);
+        return *otherwise == *(rhs->otherwise) &&
+               Expression::childrenEqual(branches, rhs->branches);
     }
     return false;
 }
@@ -52,7 +53,8 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 4) {
-        ctx.error("Expected at least 3 arguments, but found only " + util::toString(length - 1) + ".");
+        ctx.error("Expected at least 3 arguments, but found only " + util::toString(length - 1) +
+                  ".");
         return ParseResult();
     }
 
@@ -70,7 +72,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     std::vector<Case::Branch> branches;
     branches.reserve((length - 2) / 2);
     for (size_t i = 1; i + 1 < length; i += 2) {
-        auto test = ctx.parse(arrayMember(value, i), i, {type::Boolean});
+        auto test = ctx.parse(arrayMember(value, i), i, { type::Boolean });
         if (!test) {
             return test;
         }
@@ -79,7 +81,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
         if (!output) {
             return output;
         }
-        
+
         if (!outputType) {
             outputType = (*output)->getType();
         }
@@ -94,9 +96,8 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
         return otherwise;
     }
 
-    return ParseResult(std::make_unique<Case>(*outputType,
-                                  std::move(branches),
-                                  std::move(*otherwise)));
+    return ParseResult(
+        std::make_unique<Case>(*outputType, std::move(branches), std::move(*otherwise)));
 }
 
 } // namespace expression

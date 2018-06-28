@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/renderer/bucket.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/programs/segment.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/line_program.hpp>
+#include <mbgl/programs/segment.hpp>
+#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <vector>
 
@@ -21,8 +21,7 @@ public:
                const std::vector<const RenderLayer*>&,
                const style::LineLayoutProperties::Unevaluated&);
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&) override;
+    void addFeature(const GeometryTileFeature&, const GeometryCollection&) override;
     bool hasData() const override;
 
     void upload(gl::Context&) override;
@@ -44,15 +43,24 @@ private:
     void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
 
     struct TriangleElement {
-        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
+        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {
+        }
         uint16_t a, b, c;
     };
-    void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
-            const Point<double>& normal, double endLeft, double endRight, bool round,
-            std::size_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
-    void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
-            const Point<double>& extrude, bool lineTurnsLeft, std::size_t startVertex,
-            std::vector<TriangleElement>& triangleStore);
+    void addCurrentVertex(const GeometryCoordinate& currentVertex,
+                          double& distance,
+                          const Point<double>& normal,
+                          double endLeft,
+                          double endRight,
+                          bool round,
+                          std::size_t startVertex,
+                          std::vector<LineBucket::TriangleElement>& triangleStore);
+    void addPieSliceVertex(const GeometryCoordinate& currentVertex,
+                           double distance,
+                           const Point<double>& extrude,
+                           bool lineTurnsLeft,
+                           std::size_t startVertex,
+                           std::vector<TriangleElement>& triangleStore);
 
     std::ptrdiff_t e1;
     std::ptrdiff_t e2;

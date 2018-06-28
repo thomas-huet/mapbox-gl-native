@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace mbgl {
 

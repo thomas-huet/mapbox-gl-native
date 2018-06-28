@@ -37,7 +37,8 @@ public:
     /**
      * Render the layer. This method is called once per frame. The implementation should not make
      * any assumptions about the GL state (other than that the correct context is active). It may
-     * make changes to the state, and is not required to reset values such as the depth mask, stencil
+     * make changes to the state, and is not required to reset values such as the depth mask,
+     * stencil
      * mask, and corresponding test flags to their original values.
      * Make sure that you are drawing your fragments with a z value of 1 to take advantage of the
      * opaque fragment culling in case there are opaque layers above your custom layer.
@@ -63,8 +64,7 @@ public:
 
 class CustomLayer : public Layer {
 public:
-    CustomLayer(const std::string& id,
-                std::unique_ptr<CustomLayerHost> host);
+    CustomLayer(const std::string& id, std::unique_ptr<CustomLayerHost> host);
 
     ~CustomLayer() final;
 

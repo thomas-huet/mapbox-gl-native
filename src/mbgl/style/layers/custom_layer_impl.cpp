@@ -3,8 +3,7 @@
 namespace mbgl {
 namespace style {
 
-CustomLayer::Impl::Impl(const std::string& id_,
-                        std::unique_ptr<CustomLayerHost> host_)
+CustomLayer::Impl::Impl(const std::string& id_, std::unique_ptr<CustomLayerHost> host_)
     : Layer::Impl(LayerType::Custom, id_, std::string()) {
     host = std::move(host_);
 }

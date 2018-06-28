@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/tile/raster_tile_worker.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_loader.hpp>
-#include <mbgl/tile/raster_tile_worker.hpp>
-#include <mbgl/actor/actor.hpp>
 
 namespace mbgl {
 
@@ -17,9 +17,7 @@ class Layer;
 
 class RasterTile : public Tile {
 public:
-    RasterTile(const OverscaledTileID&,
-                   const TileParameters&,
-                   const Tileset&);
+    RasterTile(const OverscaledTileID&, const TileParameters&, const Tileset&);
     ~RasterTile() override;
 
     void setNecessity(TileNecessity) final;

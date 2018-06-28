@@ -1,17 +1,17 @@
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
-#include <mbgl/sprite/sprite_loader_worker.hpp>
 #include <mbgl/sprite/sprite_loader_observer.hpp>
+#include <mbgl/sprite/sprite_loader_worker.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
-#include <mbgl/util/logging.hpp>
-#include <mbgl/util/platform.hpp>
-#include <mbgl/util/std.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/actor/actor.hpp>
-#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <cassert>
 
@@ -33,9 +33,7 @@ struct SpriteLoader::Loader {
     Actor<SpriteLoaderWorker> worker;
 };
 
-SpriteLoader::SpriteLoader(float pixelRatio_)
-        : pixelRatio(pixelRatio_)
-        , observer(&nullObserver) {
+SpriteLoader::SpriteLoader(float pixelRatio_) : pixelRatio(pixelRatio_), observer(&nullObserver) {
 }
 
 SpriteLoader::~SpriteLoader() = default;
@@ -49,34 +47,38 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
 
     loader = std::make_unique<Loader>(scheduler, *this);
 
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
+    loader->jsonRequest =
+        fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+            if (res.error) {
+                observer->onSpriteError(
+                    std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
+                return;
+            } else if (res.noContent) {
+                loader->json = std::make_shared<const std::string>();
+                emitSpriteLoadedIfComplete();
+            } else {
+                // Only trigger a sprite loaded event we got new data.
+                loader->json = res.data;
+                emitSpriteLoadedIfComplete();
+            }
+        });
 
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            loader->image = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
+    loader->spriteRequest =
+        fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+            if (res.error) {
+                observer->onSpriteError(
+                    std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
+                return;
+            } else if (res.noContent) {
+                loader->image = std::make_shared<const std::string>();
+                emitSpriteLoadedIfComplete();
+            } else {
+                loader->image = res.data;
+                emitSpriteLoadedIfComplete();
+            }
+        });
 }
 
 void SpriteLoader::emitSpriteLoadedIfComplete() {

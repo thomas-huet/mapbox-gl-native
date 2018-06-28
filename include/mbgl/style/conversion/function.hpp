@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mbgl/style/function/camera_function.hpp>
-#include <mbgl/style/function/source_function.hpp>
-#include <mbgl/style/function/composite_function.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/function/camera_function.hpp>
+#include <mbgl/style/function/composite_function.hpp>
+#include <mbgl/style/function/source_function.hpp>
 #include <mbgl/util/ignore.hpp>
 
 namespace mbgl {
@@ -61,7 +61,7 @@ optional<std::map<D, R>> convertStops(const Convertible& value, Error& error) {
 
 template <class T>
 struct Converter<ExponentialStops<T>> {
-    static constexpr const char * type = "exponential";
+    static constexpr const char* type = "exponential";
 
     optional<ExponentialStops<T>> operator()(const Convertible& value, Error& error) const {
         auto stops = convertStops<float, T>(value, error);
@@ -76,7 +76,7 @@ struct Converter<ExponentialStops<T>> {
 
         optional<float> base = toNumber(*baseValue);
         if (!base) {
-            error = { "function base must be a number"};
+            error = { "function base must be a number" };
             return {};
         }
 
@@ -86,7 +86,7 @@ struct Converter<ExponentialStops<T>> {
 
 template <class T>
 struct Converter<IntervalStops<T>> {
-    static constexpr const char * type = "interval";
+    static constexpr const char* type = "interval";
 
     optional<IntervalStops<T>> operator()(const Convertible& value, Error& error) const {
         auto stops = convertStops<float, T>(value, error);
@@ -122,21 +122,20 @@ struct Converter<CategoricalValue> {
 
 template <class T>
 struct Converter<CategoricalStops<T>> {
-    static constexpr const char * type = "categorical";
+    static constexpr const char* type = "categorical";
 
     optional<CategoricalStops<T>> operator()(const Convertible& value, Error& error) const {
         auto stops = convertStops<CategoricalValue, T>(value, error);
         if (!stops) {
             return {};
         }
-        return CategoricalStops<T>(
-            std::map<CategoricalValue, T>((*stops).begin(), (*stops).end()));
+        return CategoricalStops<T>(std::map<CategoricalValue, T>((*stops).begin(), (*stops).end()));
     }
 };
 
 template <class T>
 struct Converter<IdentityStops<T>> {
-    static constexpr const char * type = "identity";
+    static constexpr const char* type = "identity";
 
     optional<IdentityStops<T>> operator()(const Convertible&, Error&) const {
         return IdentityStops<T>();
@@ -161,7 +160,7 @@ public:
         optional<variant<Ts...>> result;
 
         // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=47226
-        auto tryConvert = [&] (auto* tp) {
+        auto tryConvert = [&](auto* tp) {
             using Stops = std::decay_t<decltype(*tp)>;
             if (type == Converter<Stops>::type) {
                 matched = true;
@@ -172,9 +171,7 @@ public:
             }
         };
 
-        util::ignore({
-            (tryConvert((Ts*)nullptr), 0)...
-        });
+        util::ignore({ (tryConvert((Ts*)nullptr), 0)... });
 
         if (!matched) {
             error = { "unsupported function type" };
@@ -287,15 +284,16 @@ struct Converter<CompositeValue<S>> {
             return {};
         }
 
-        return CompositeValue<S> { *z, *s };
+        return CompositeValue<S>{ *z, *s };
     }
 };
 
 template <class T>
 struct Converter<CompositeExponentialStops<T>> {
-    static constexpr const char * type = "exponential";
+    static constexpr const char* type = "exponential";
 
-    optional<CompositeExponentialStops<T>> operator()(const Convertible& value, Error& error) const {
+    optional<CompositeExponentialStops<T>> operator()(const Convertible& value,
+                                                      Error& error) const {
         auto stops = convertStops<CompositeValue<float>, T>(value, error);
         if (!stops) {
             return {};
@@ -318,7 +316,7 @@ struct Converter<CompositeExponentialStops<T>> {
 
 template <class T>
 struct Converter<CompositeIntervalStops<T>> {
-    static constexpr const char * type = "interval";
+    static constexpr const char* type = "interval";
 
     optional<CompositeIntervalStops<T>> operator()(const Convertible& value, Error& error) const {
         auto stops = convertStops<CompositeValue<float>, T>(value, error);
@@ -337,9 +335,10 @@ struct Converter<CompositeIntervalStops<T>> {
 
 template <class T>
 struct Converter<CompositeCategoricalStops<T>> {
-    static constexpr const char * type = "categorical";
+    static constexpr const char* type = "categorical";
 
-    optional<CompositeCategoricalStops<T>> operator()(const Convertible& value, Error& error) const {
+    optional<CompositeCategoricalStops<T>> operator()(const Convertible& value,
+                                                      Error& error) const {
         auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value, error);
         if (!stops) {
             return {};

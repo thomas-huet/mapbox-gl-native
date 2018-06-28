@@ -1,10 +1,10 @@
 #pragma once
 
-#include <sstream>
-#include <string>
 #include <cassert>
 #include <cstdlib>
 #include <exception>
+#include <sstream>
+#include <string>
 
 // Polyfill needed by Qt when building for Android with GCC
 #if defined(__ANDROID__) && defined(__GLIBCXX__)
@@ -12,20 +12,18 @@
 namespace std {
 
 template <typename T>
-std::string to_string(T value)
-{
+std::string to_string(T value) {
     std::ostringstream oss;
     oss << value;
 
     return oss.str();
 }
 
-inline int stoi(const std::string &str)
-{
+inline int stoi(const std::string& str) {
     return atoi(str.c_str());
 }
 
-inline float stof(const std::string &str) {
+inline float stof(const std::string& str) {
     return static_cast<float>(atof(str.c_str()));
 }
 

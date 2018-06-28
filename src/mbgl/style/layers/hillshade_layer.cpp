@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ HillshadeLayer::HillshadeLayer(const std::string& layerID, const std::string& so
     : Layer(makeMutable<Impl>(LayerType::Hillshade, layerID, sourceID)) {
 }
 
-HillshadeLayer::HillshadeLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+HillshadeLayer::HillshadeLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 HillshadeLayer::~HillshadeLayer() = default;
@@ -40,7 +39,6 @@ void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBu
 const std::string& HillshadeLayer::getSourceID() const {
     return impl().source;
 }
-
 
 // Visibility
 
@@ -71,7 +69,6 @@ void HillshadeLayer::setMaxZoom(float maxZoom) {
 
 // Layout properties
 
-
 // Paint properties
 
 PropertyValue<float> HillshadeLayer::getDefaultHillshadeIlluminationDirection() {
@@ -101,15 +98,18 @@ TransitionOptions HillshadeLayer::getHillshadeIlluminationDirectionTransition() 
     return impl().paint.template get<HillshadeIlluminationDirection>().options;
 }
 
-PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillshadeIlluminationAnchor() {
+PropertyValue<HillshadeIlluminationAnchorType>
+HillshadeLayer::getDefaultHillshadeIlluminationAnchor() {
     return { HillshadeIlluminationAnchorType::Viewport };
 }
 
-PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getHillshadeIlluminationAnchor() const {
+PropertyValue<HillshadeIlluminationAnchorType>
+HillshadeLayer::getHillshadeIlluminationAnchor() const {
     return impl().paint.template get<HillshadeIlluminationAnchor>().value;
 }
 
-void HillshadeLayer::setHillshadeIlluminationAnchor(PropertyValue<HillshadeIlluminationAnchorType> value) {
+void HillshadeLayer::setHillshadeIlluminationAnchor(
+    PropertyValue<HillshadeIlluminationAnchorType> value) {
     if (value == getHillshadeIlluminationAnchor())
         return;
     auto impl_ = mutableImpl();

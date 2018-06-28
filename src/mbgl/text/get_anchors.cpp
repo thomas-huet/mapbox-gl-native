@@ -1,5 +1,5 @@
-#include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/check_max_angle.hpp>
+#include <mbgl/text/get_anchors.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 
@@ -48,11 +48,12 @@ static Anchors resample(const GeometryCoordinates& line,
             // the label would fit before the beginning and end of the line
             // if placed at this point.
             if (x >= 0 && x < util::EXTENT && y >= 0 && y < util::EXTENT &&
-                    markedDistance - halfLabelLength >= 0.0f &&
-                    markedDistance + halfLabelLength <= lineLength) {
+                markedDistance - halfLabelLength >= 0.0f &&
+                markedDistance + halfLabelLength <= lineLength) {
                 Anchor anchor(::round(x), ::round(y), angle, 0.5f, i);
 
-                if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
+                if (!angleWindowSize ||
+                    checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                     anchors.push_back(anchor);
                 }
             }
@@ -67,7 +68,8 @@ static Anchors resample(const GeometryCoordinates& line,
         // This has the most effect for short lines in overscaled tiles, since the
         // initial offset used in overscaled tiles is calculated to align labels with positions in
         // parent tiles instead of placing the label as close to the beginning as possible.
-        anchors = resample(line, distance / 2, spacing, angleWindowSize, maxAngle, labelLength, continuedLine, true);
+        anchors = resample(line, distance / 2, spacing, angleWindowSize, maxAngle, labelLength,
+                           continuedLine, true);
     }
 
     return anchors;
@@ -91,18 +93,19 @@ Anchors getAnchors(const GeometryCoordinates& line,
     // potential label passes text-max-angle check and has enough froom to fit
     // on the line.
 
-    const float angleWindowSize = (textLeft - textRight) != 0.0f ?
-        3.0f / 5.0f * glyphSize * boxScale :
-        0;
+    const float angleWindowSize =
+        (textLeft - textRight) != 0.0f ? 3.0f / 5.0f * glyphSize * boxScale : 0;
 
     const float labelLength = fmax(textRight - textLeft, iconRight - iconLeft);
 
     // Is the line continued from outside the tile boundary?
-    const bool continuedLine = (line[0].x == 0 || line[0].x == util::EXTENT || line[0].y == 0 || line[0].y == util::EXTENT);
+    const bool continuedLine = (line[0].x == 0 || line[0].x == util::EXTENT || line[0].y == 0 ||
+                                line[0].y == util::EXTENT);
 
     // Is the label long, relative to the spacing?
-    // If so, adjust the spacing so there is always a minimum space of `spacing / 4` between label edges.
-    if (spacing - labelLength * boxScale  < spacing / 4) {
+    // If so, adjust the spacing so there is always a minimum space of `spacing / 4` between label
+    // edges.
+    if (spacing - labelLength * boxScale < spacing / 4) {
         spacing = labelLength * boxScale + spacing / 4;
     }
 
@@ -110,14 +113,17 @@ Anchors getAnchors(const GeometryCoordinates& line,
     // Either half the label length plus a fixed extra offset if the line is not continued
     // Or half the spacing if the line is continued.
 
-    // For non-continued lines, add a bit of fixed extra offset to avoid collisions at T intersections.
+    // For non-continued lines, add a bit of fixed extra offset to avoid collisions at T
+    // intersections.
     const float fixedExtraOffset = glyphSize * 2;
 
-    const float offset = !continuedLine ?
-    std::fmod((labelLength / 2 + fixedExtraOffset) * boxScale * overscaling, spacing) :
-    std::fmod(spacing / 2 * overscaling, spacing);
+    const float offset =
+        !continuedLine
+            ? std::fmod((labelLength / 2 + fixedExtraOffset) * boxScale * overscaling, spacing)
+            : std::fmod(spacing / 2 * overscaling, spacing);
 
-    return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength * boxScale, continuedLine, false);
+    return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength * boxScale,
+                    continuedLine, false);
 }
 
 } // namespace mbgl

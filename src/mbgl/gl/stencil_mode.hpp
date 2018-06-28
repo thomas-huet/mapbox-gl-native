@@ -19,32 +19,24 @@ public:
         uint32_t mask;
     };
 
-    using Never        = SimpleTest<0x0200>;
-    using Less         = MaskedTest<0x0201>;
-    using Equal        = MaskedTest<0x0202>;
-    using LessEqual    = MaskedTest<0x0203>;
-    using Greater      = MaskedTest<0x0204>;
-    using NotEqual     = MaskedTest<0x0205>;
+    using Never = SimpleTest<0x0200>;
+    using Less = MaskedTest<0x0201>;
+    using Equal = MaskedTest<0x0202>;
+    using LessEqual = MaskedTest<0x0203>;
+    using Greater = MaskedTest<0x0204>;
+    using NotEqual = MaskedTest<0x0205>;
     using GreaterEqual = MaskedTest<0x0206>;
-    using Always       = SimpleTest<0x0207>;
+    using Always = SimpleTest<0x0207>;
 
-    using Test = variant<
-        Never,
-        Less,
-        Equal,
-        LessEqual,
-        Greater,
-        NotEqual,
-        GreaterEqual,
-        Always>;
+    using Test = variant<Never, Less, Equal, LessEqual, Greater, NotEqual, GreaterEqual, Always>;
 
     enum Op {
-        Zero          = 0x0000,
-        Keep          = 0x1E00,
-        Replace       = 0x1E01,
-        Increment     = 0x1E02,
-        Decrement     = 0x1E03,
-        Invert        = 0x150A,
+        Zero = 0x0000,
+        Keep = 0x1E00,
+        Replace = 0x1E01,
+        Increment = 0x1E02,
+        Decrement = 0x1E03,
+        Invert = 0x150A,
         IncrementWrap = 0x8507,
         DecrementWrap = 0x8508
     };
@@ -58,7 +50,7 @@ public:
     Op pass;
 
     static StencilMode disabled() {
-       return StencilMode { Always(), 0, 0, Keep, Keep, Keep };
+        return StencilMode{ Always(), 0, 0, Keep, Keep, Keep };
     }
 };
 

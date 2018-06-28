@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/property_value.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/style/property_value.hpp>
 #include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {
@@ -22,8 +22,8 @@ public:
     using ResultType = Faded<T>;
 
     CrossFadedPropertyEvaluator(const PropertyEvaluationParameters& parameters_, T defaultValue_)
-        : parameters(parameters_),
-          defaultValue(std::move(defaultValue_)) {}
+        : parameters(parameters_), defaultValue(std::move(defaultValue_)) {
+    }
 
     Faded<T> operator()(const style::Undefined&) const;
     Faded<T> operator()(const T& constant) const;
@@ -38,8 +38,7 @@ private:
 
 namespace util {
 template <typename T>
-struct Interpolator<Faded<T>>
-    : Uninterpolated {};
+struct Interpolator<Faded<T>> : Uninterpolated {};
 } // namespace util
 
 } // namespace mbgl

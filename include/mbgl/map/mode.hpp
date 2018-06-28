@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/util.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <cstdint>
 
@@ -25,12 +25,12 @@ enum class ViewportMode : EnumType {
 };
 
 enum class MapDebugOptions : EnumType {
-    NoDebug     = 0,
+    NoDebug = 0,
     TileBorders = 1 << 1,
     ParseStatus = 1 << 2,
-    Timestamps  = 1 << 3,
-    Collision   = 1 << 4,
-    Overdraw    = 1 << 5,
+    Timestamps = 1 << 3,
+    Collision = 1 << 4,
+    Overdraw = 1 << 5,
 // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5117
 #if not MBGL_USE_GLES2
     StencilClip = 1 << 6,

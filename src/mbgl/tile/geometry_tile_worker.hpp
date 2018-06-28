@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/style/image_impl.hpp>
-#include <mbgl/text/glyph.hpp>
 #include <mbgl/actor/actor_ref.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/immutable.hpp>
-#include <mbgl/style/layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/style/image_impl.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/text/glyph.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <atomic>
 #include <memory>
@@ -37,7 +37,7 @@ public:
     void setLayers(std::vector<Immutable<style::Layer::Impl>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_);
-    
+
     void onGlyphsAvailable(GlyphMap glyphs);
     void onImagesAvailable(ImageMap images, uint64_t imageCorrelationID);
 
@@ -45,12 +45,12 @@ private:
     void coalesced();
     void parse();
     void performSymbolLayout();
-    
+
     void coalesce();
 
     void requestNewGlyphs(const GlyphDependencies&);
     void requestNewImages(const ImageDependencies&);
-   
+
     void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
     bool hasPendingParseResult() const;
@@ -62,16 +62,11 @@ private:
     const std::string sourceID;
     const std::atomic<bool>& obsolete;
     const float pixelRatio;
-    
+
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
-    enum State {
-        Idle,
-        Coalescing,
-        NeedsParse,
-        NeedsSymbolLayout
-    };
+    enum State { Idle, Coalescing, NeedsParse, NeedsSymbolLayout };
 
     State state = Idle;
     uint64_t correlationID = 0;
@@ -87,7 +82,7 @@ private:
     ImageDependencies pendingImageDependencies;
     GlyphMap glyphMap;
     ImageMap imageMap;
-    
+
     bool showCollisionBoxes;
     bool firstLoad = true;
 };

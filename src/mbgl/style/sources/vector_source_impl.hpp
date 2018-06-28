@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 
 namespace mbgl {
 namespace style {

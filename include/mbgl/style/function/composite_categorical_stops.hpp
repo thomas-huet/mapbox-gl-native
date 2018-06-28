@@ -12,8 +12,7 @@ public:
     Stops stops;
 
     CompositeCategoricalStops() = default;
-    CompositeCategoricalStops(Stops stops_)
-        : stops(std::move(stops_)) {
+    CompositeCategoricalStops(Stops stops_) : stops(std::move(stops_)) {
     }
 
     CategoricalStops<T> innerStops(const std::map<CategoricalValue, T>& stops_) const {

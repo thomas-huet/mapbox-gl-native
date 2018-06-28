@@ -1,21 +1,22 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
-template <class T, class...Args>
-optional<T> convertJSON(const std::string& json, Error& error, Args&&...args) {
+template <class T, class... Args>
+optional<T> convertJSON(const std::string& json, Error& error, Args&&... args) {
     JSDocument document;
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
         std::stringstream message;
-        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
+        message << document.GetErrorOffset() << " - "
+                << rapidjson::GetParseError_En(document.GetParseError());
         error = { message.str() };
         return {};
     }

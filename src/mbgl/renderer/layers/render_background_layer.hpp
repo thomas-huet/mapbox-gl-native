@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class RenderBackgroundLayer: public RenderLayer {
+class RenderBackgroundLayer : public RenderLayer {
 public:
     RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl>);
     ~RenderBackgroundLayer() final = default;
@@ -16,7 +16,8 @@ public:
     bool hasTransition() const override;
     void render(PaintParameters&, RenderSource*) override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
     style::BackgroundPaintProperties::Unevaluated unevaluated;

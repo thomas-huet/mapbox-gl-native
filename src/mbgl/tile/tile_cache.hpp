@@ -3,8 +3,8 @@
 #include <mbgl/tile/tile_id.hpp>
 
 #include <list>
-#include <memory>
 #include <map>
+#include <memory>
 
 namespace mbgl {
 
@@ -12,10 +12,13 @@ class Tile;
 
 class TileCache {
 public:
-    TileCache(size_t size_ = 0) : size(size_) {}
+    TileCache(size_t size_ = 0) : size(size_) {
+    }
 
     void setSize(size_t);
-    size_t getSize() const { return size; };
+    size_t getSize() const {
+        return size;
+    };
     void add(const OverscaledTileID& key, std::unique_ptr<Tile> data);
     std::unique_ptr<Tile> pop(const OverscaledTileID& key);
     Tile* get(const OverscaledTileID& key);

@@ -5,7 +5,10 @@
 namespace mbgl {
 namespace gl {
 
-void bindAttributeLocation(Context& context, ProgramID id, AttributeLocation location, const char* name) {
+void bindAttributeLocation(Context& context,
+                           ProgramID id,
+                           AttributeLocation location,
+                           const char* name) {
     // We're using sequentially numberered attribute locations starting with 0. Therefore we can use
     // the location as a proxy for the number of attributes.
     if (location >= context.maximumVertexBindingCount) {
@@ -34,7 +37,8 @@ std::set<std::string> getActiveAttributes(ProgramID id) {
     GLenum type;
 
     for (int32_t i = 0; i < attributeCount; i++) {
-        MBGL_CHECK_ERROR(glGetActiveAttrib(id, i, maxAttributeLength, &actualLength, &size, &type, &attributeName[0]));
+        MBGL_CHECK_ERROR(glGetActiveAttrib(id, i, maxAttributeLength, &actualLength, &size, &type,
+                                           &attributeName[0]));
         activeAttributes.emplace(std::string(attributeName, 0, actualLength));
     }
 

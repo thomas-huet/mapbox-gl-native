@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/util/string.hpp>
 #include <mapbox/geojsonvt.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/util/geometry.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/geometry.hpp>
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace mbgl {
 
@@ -31,25 +31,25 @@ public:
 };
 
 struct CloseShapeAnnotation {
-    ShapeAnnotationGeometry operator()(const mbgl::LineString<double> &geom) const {
+    ShapeAnnotationGeometry operator()(const mbgl::LineString<double>& geom) const {
         return geom;
     }
-    ShapeAnnotationGeometry operator()(const mbgl::MultiLineString<double> &geom) const {
+    ShapeAnnotationGeometry operator()(const mbgl::MultiLineString<double>& geom) const {
         return geom;
     }
-    ShapeAnnotationGeometry operator()(const mbgl::Polygon<double> &geom) const {
+    ShapeAnnotationGeometry operator()(const mbgl::Polygon<double>& geom) const {
         mbgl::Polygon<double> closed = geom;
-        for (auto &ring : closed) {
+        for (auto& ring : closed) {
             if (!ring.empty() && ring.front() != ring.back()) {
                 ring.emplace_back(ring.front());
             }
         }
         return closed;
     }
-    ShapeAnnotationGeometry operator()(const mbgl::MultiPolygon<double> &geom) const {
+    ShapeAnnotationGeometry operator()(const mbgl::MultiPolygon<double>& geom) const {
         mbgl::MultiPolygon<double> closed = geom;
-        for (auto &polygon : closed) {
-            for (auto &ring : polygon) {
+        for (auto& polygon : closed) {
+            for (auto& ring : polygon) {
                 if (!ring.empty() && ring.front() != ring.back()) {
                     ring.emplace_back(ring.front());
                 }

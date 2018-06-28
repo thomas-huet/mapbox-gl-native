@@ -1,13 +1,13 @@
-#include <mbgl/style/parser.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/coordinate.hpp>
-#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/parser.hpp>
+#include <mbgl/style/rapidjson_conversion.hpp>
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
@@ -32,8 +32,8 @@ StyleParseResult Parser::parse(const std::string& json) {
 
     if (document.HasParseError()) {
         std::stringstream message;
-        message <<  document.GetErrorOffset() << " - "
-            << rapidjson::GetParseError_En(document.GetParseError());
+        message << document.GetErrorOffset() << " - "
+                << rapidjson::GetParseError_En(document.GetParseError());
 
         return std::make_exception_ptr(std::runtime_error(message.str()));
     }
@@ -46,7 +46,9 @@ StyleParseResult Parser::parse(const std::string& json) {
         const JSValue& versionValue = document["version"];
         const int version = versionValue.IsNumber() ? versionValue.GetInt() : 0;
         if (version != 8) {
-            Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
+            Log::Warning(Event::ParseStyle, "current renderer implementation only supports style "
+                                            "spec version 8; using an outdated style will cause "
+                                            "rendering errors");
         }
     }
 
@@ -154,7 +156,7 @@ void Parser::parseSources(const JSValue& value) {
     }
 
     for (const auto& property : value.GetObject()) {
-        std::string id { property.name.GetString(), property.name.GetStringLength() };
+        std::string id{ property.name.GetString(), property.name.GetStringLength() };
 
         conversion::Error error;
         optional<std::unique_ptr<Source>> source =
@@ -200,16 +202,15 @@ void Parser::parseLayers(const JSValue& value) {
             continue;
         }
 
-        layersMap.emplace(layerID, std::pair<const JSValue&, std::unique_ptr<Layer>> { layerValue, nullptr });
+        layersMap.emplace(layerID,
+                          std::pair<const JSValue&, std::unique_ptr<Layer>>{ layerValue, nullptr });
         ids.push_back(layerID);
     }
 
     for (const auto& id : ids) {
         auto it = layersMap.find(id);
 
-        parseLayer(it->first,
-                   it->second.first,
-                   it->second.second);
+        parseLayer(it->first, it->second.first, it->second.second);
     }
 
     for (const auto& id : ids) {
@@ -221,7 +222,9 @@ void Parser::parseLayers(const JSValue& value) {
     }
 }
 
-void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<Layer>& layer) {
+void Parser::parseLayer(const std::string& id,
+                        const JSValue& value,
+                        std::unique_ptr<Layer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
@@ -241,18 +244,17 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
             return;
         }
 
-        const std::string ref { refVal.GetString(), refVal.GetStringLength() };
+        const std::string ref{ refVal.GetString(), refVal.GetStringLength() };
         auto it = layersMap.find(ref);
         if (it == layersMap.end()) {
-            Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", id.c_str(), ref.c_str());
+            Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", id.c_str(),
+                         ref.c_str());
             return;
         }
 
         // Recursively parse the referenced layer.
         stack.push_front(id);
-        parseLayer(it->first,
-                   it->second.first,
-                   it->second.second);
+        parseLayer(it->first, it->second.first, it->second.second);
         stack.pop_front();
 
         Layer* reference = it->second.second.get();
@@ -264,7 +266,8 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         conversion::setPaintProperties(*layer, conversion::Convertible(&value));
     } else {
         conversion::Error error;
-        optional<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value, error);
+        optional<std::unique_ptr<Layer>> converted =
+            conversion::convert<std::unique_ptr<Layer>>(value, error);
         if (!converted) {
             Log::Warning(Event::ParseStyle, error.message);
             return;
@@ -279,23 +282,24 @@ std::vector<FontStack> Parser::fontStacks() const {
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>() && !layer->as<SymbolLayer>()->getTextField().isUndefined()) {
             layer->as<SymbolLayer>()->getTextFont().match(
-                [&] (Undefined) {
-                    result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
+                [&](Undefined) {
+                    result.insert({ "Open Sans Regular", "Arial Unicode MS Regular" });
                 },
-                [&] (const FontStack& constant) {
-                    result.insert(constant);
-                },
-                [&] (const auto& function) {
+                [&](const FontStack& constant) { result.insert(constant); },
+                [&](const auto& function) {
                     for (const auto& value : function.possibleOutputs()) {
                         if (value) {
                             result.insert(*value);
                         } else {
-                            Log::Warning(Event::ParseStyle, "Layer '%s' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression.", layer->getID().c_str());
+                            Log::Warning(Event::ParseStyle, "Layer '%s' has an invalid value for "
+                                                            "text-font and will not work offline. "
+                                                            "Output values must be contained as "
+                                                            "literals within the expression.",
+                                         layer->getID().c_str());
                             break;
                         }
                     }
-                }
-            );
+                });
         }
     }
 

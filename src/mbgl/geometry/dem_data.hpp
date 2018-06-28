@@ -4,9 +4,9 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/tileset.hpp>
 
-#include <memory>
 #include <array>
 #include <cassert>
+#include <memory>
 #include <vector>
 
 namespace mbgl {
@@ -32,18 +32,16 @@ public:
     const int32_t border;
     const int32_t stride;
 
+private:
+    PremultipliedImage image;
 
-    private:
-        PremultipliedImage image;
-
-        size_t idx(const int32_t x, const int32_t y) const {
-            assert(x >= -border);
-            assert(x < dim + border);
-            assert(y >= -border);
-            assert(y < dim + border);
-            return (y + border) * stride + (x + border);
-        }
-
+    size_t idx(const int32_t x, const int32_t y) const {
+        assert(x >= -border);
+        assert(x < dim + border);
+        assert(y >= -border);
+        assert(y < dim + border);
+        return (y + border) * stride + (x + border);
+    }
 };
 
 } // namespace mbgl

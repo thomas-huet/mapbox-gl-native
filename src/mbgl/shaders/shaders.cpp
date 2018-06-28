@@ -1,10 +1,10 @@
-#include <mbgl/shaders/shaders.hpp>
-#include <mbgl/shaders/preludes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
+#include <mbgl/shaders/preludes.hpp>
+#include <mbgl/shaders/shaders.hpp>
 
 #include <cassert>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 namespace mbgl {
 namespace shaders {

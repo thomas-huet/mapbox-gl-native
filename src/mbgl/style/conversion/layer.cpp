@@ -1,11 +1,11 @@
-#include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/make_property_setters.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -20,7 +20,7 @@ optional<Error> setLayoutProperty(Layer& layer, const std::string& name, const C
     static const auto setters = makeLayoutPropertySetters();
     auto it = setters.find(name);
     if (it == setters.end()) {
-        return Error { "property not found" };
+        return Error{ "property not found" };
     }
     return it->second(layer, value);
 }
@@ -29,7 +29,7 @@ optional<Error> setPaintProperty(Layer& layer, const std::string& name, const Co
     static const auto setters = makePaintPropertySetters();
     auto it = setters.find(name);
     if (it == setters.end()) {
-        return Error { "property not found" };
+        return Error{ "property not found" };
     }
     return it->second(layer, value);
 }
@@ -42,13 +42,14 @@ optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     if (!isObject(*paintValue)) {
         return { { "paint must be an object" } };
     }
-    return eachMember(*paintValue, [&] (const std::string& k, const Convertible& v) {
+    return eachMember(*paintValue, [&](const std::string& k, const Convertible& v) {
         return setPaintProperty(layer, k, v);
     });
 }
 
 template <class LayerType>
-optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const Convertible& value, Error& error) {
+optional<std::unique_ptr<Layer>>
+convertVectorLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
         error = { "layer must have a source" };
@@ -85,7 +86,8 @@ optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const
     return { std::move(layer) };
 }
 
-static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id, const Convertible& value, Error& error) {
+static optional<std::unique_ptr<Layer>>
+convertRasterLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
         error = { "layer must have a source" };
@@ -101,7 +103,8 @@ static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id
     return { std::make_unique<RasterLayer>(id, *source) };
 }
 
-static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string& id, const Convertible& value, Error& error) {
+static optional<std::unique_ptr<Layer>>
+convertHillshadeLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
         error = { "layer must have a source" };
@@ -117,12 +120,13 @@ static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string&
     return { std::make_unique<HillshadeLayer>(id, *source) };
 }
 
-
-static optional<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string& id, const Convertible&, Error&) {
+static optional<std::unique_ptr<Layer>>
+convertBackgroundLayer(const std::string& id, const Convertible&, Error&) {
     return { std::make_unique<BackgroundLayer>(id) };
 }
 
-optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(const Convertible& value, Error& error) const {
+optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::
+operator()(const Convertible& value, Error& error) const {
     if (!isObject(value)) {
         error = { "layer must be an object" };
         return {};
@@ -209,9 +213,10 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
             error = { "layout must be an object" };
             return {};
         }
-        optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const Convertible& v) {
-            return setLayoutProperty(*layer, k, v);
-        });
+        optional<Error> error_ =
+            eachMember(*layoutValue, [&](const std::string& k, const Convertible& v) {
+                return setLayoutProperty(*layer, k, v);
+            });
         if (error_) {
             error = *error_;
             return {};

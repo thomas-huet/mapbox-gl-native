@@ -1,14 +1,14 @@
 #pragma once
 
+#include <mbgl/style/filter.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/filter.hpp>
 
-#include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
-#include <string>
 #include <limits>
+#include <string>
 
 namespace mbgl {
 
@@ -17,8 +17,10 @@ class RenderLayer;
 namespace style {
 
 /**
- * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be accessible to other parts
- * of the code, but hidden from the public API. Like `Layer`, it is an abstract base class, with derived classes for
+ * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be
+ * accessible to other parts
+ * of the code, but hidden from the public API. Like `Layer`, it is an abstract base class, with
+ * derived classes for
  * each layer type.
  *
  * Members that are public in `Layer` are part of the public API for all layers.

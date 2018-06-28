@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/object.hpp>
+#include <mbgl/gl/texture.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <vector>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 

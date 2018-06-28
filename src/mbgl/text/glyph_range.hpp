@@ -1,9 +1,9 @@
 #pragma once
 
-#include <utility>
+#include <boost/functional/hash.hpp>
 #include <cstdint>
 #include <unordered_set>
-#include <boost/functional/hash.hpp>
+#include <utility>
 
 namespace mbgl {
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <mapbox/geojson.hpp>
 #include <mapbox/geojson/rapidjson.hpp>
@@ -33,12 +33,12 @@ public:
         return value->IsObject();
     }
 
-    static optional<const JSValue*> objectMember(const JSValue* value, const char * name) {
+    static optional<const JSValue*> objectMember(const JSValue* value, const char* name) {
         if (!value->HasMember(name)) {
             return optional<const JSValue*>();
         }
         const JSValue* const& member = &(*value)[name];
-        return {member};
+        return { member };
     }
 
     template <class Fn>
@@ -79,28 +79,30 @@ public:
         if (!value->IsString()) {
             return {};
         }
-        return {{ value->GetString(), value->GetStringLength() }};
+        return { { value->GetString(), value->GetStringLength() } };
     }
 
     static optional<Value> toValue(const JSValue* value) {
         switch (value->GetType()) {
-            case rapidjson::kNullType:
-            case rapidjson::kFalseType:
-                return { false };
+        case rapidjson::kNullType:
+        case rapidjson::kFalseType:
+            return { false };
 
-            case rapidjson::kTrueType:
-                return { true };
+        case rapidjson::kTrueType:
+            return { true };
 
-            case rapidjson::kStringType:
-                return { std::string { value->GetString(), value->GetStringLength() } };
+        case rapidjson::kStringType:
+            return { std::string{ value->GetString(), value->GetStringLength() } };
 
-            case rapidjson::kNumberType:
-                if (value->IsUint64()) return { value->GetUint64() };
-                if (value->IsInt64()) return { value->GetInt64() };
-                return { value->GetDouble() };
+        case rapidjson::kNumberType:
+            if (value->IsUint64())
+                return { value->GetUint64() };
+            if (value->IsInt64())
+                return { value->GetInt64() };
+            return { value->GetDouble() };
 
-            default:
-                return {};
+        default:
+            return {};
         }
     }
 
@@ -114,12 +116,11 @@ public:
     }
 };
 
-template <class T, class...Args>
-optional<T> convert(const JSValue& value, Error& error, Args&&...args) {
+template <class T, class... Args>
+optional<T> convert(const JSValue& value, Error& error, Args&&... args) {
     return convert<T>(Convertible(&value), error, std::forward<Args>(args)...);
 }
 
 } // namespace conversion
 } // namespace style
 } // namespace mbgl
-

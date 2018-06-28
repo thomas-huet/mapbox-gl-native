@@ -34,10 +34,16 @@ public:
     T* get(const std::string&) const;
 
     std::vector<T*> getWrappers() const;
-    ImmutableVector getImpls() const { return impls; }
+    ImmutableVector getImpls() const {
+        return impls;
+    }
 
-    auto begin() const { return wrappers.begin(); }
-    auto end() const { return wrappers.end(); }
+    auto begin() const {
+        return wrappers.begin();
+    }
+    auto end() const {
+        return wrappers.end();
+    }
 
     void clear();
 
@@ -57,8 +63,7 @@ private:
 };
 
 template <class T>
-Collection<T>::Collection()
-    : impls(makeMutable<std::vector<Immutable<Impl>>>()) {
+Collection<T>::Collection() : impls(makeMutable<std::vector<Immutable<Impl>>>()) {
 }
 
 template <class T>
@@ -68,9 +73,9 @@ std::size_t Collection<T>::size() const {
 
 template <class T>
 std::size_t Collection<T>::index(const std::string& id) const {
-    return std::find_if(wrappers.begin(), wrappers.end(), [&](const auto& e) {
-        return e->getID() == id;
-    }) - wrappers.begin();
+    return std::find_if(wrappers.begin(), wrappers.end(),
+                        [&](const auto& e) { return e->getID() == id; }) -
+           wrappers.begin();
 }
 
 template <class T>
@@ -93,9 +98,7 @@ std::vector<T*> Collection<T>::getWrappers() const {
 
 template <class T>
 void Collection<T>::clear() {
-    mutate(impls, [&] (auto& impls_) {
-        impls_.clear();
-    });
+    mutate(impls, [&](auto& impls_) { impls_.clear(); });
 
     wrappers.clear();
 }
@@ -104,9 +107,7 @@ template <class T>
 T* Collection<T>::add(std::unique_ptr<T> wrapper, const optional<std::string>& before) {
     std::size_t i = before ? index(*before) : size();
 
-    mutate(impls, [&] (auto& impls_) {
-        impls_.emplace(impls_.begin() + i, wrapper->baseImpl);
-    });
+    mutate(impls, [&](auto& impls_) { impls_.emplace(impls_.begin() + i, wrapper->baseImpl); });
 
     return wrappers.emplace(wrappers.begin() + i, std::move(wrapper))->get();
 }
@@ -121,9 +122,7 @@ std::unique_ptr<T> Collection<T>::remove(const std::string& id) {
 
     auto source = std::move(wrappers[i]);
 
-    mutate(impls, [&] (auto& impls_) {
-        impls_.erase(impls_.begin() + i);
-    });
+    mutate(impls, [&](auto& impls_) { impls_.erase(impls_.begin() + i); });
 
     wrappers.erase(wrappers.begin() + i);
 
@@ -132,9 +131,8 @@ std::unique_ptr<T> Collection<T>::remove(const std::string& id) {
 
 template <class T>
 void Collection<T>::update(const T& wrapper) {
-    mutate(impls, [&] (auto& impls_) {
-        impls_.at(this->index(wrapper.getID())) = wrapper.baseImpl;
-    });
+    mutate(impls,
+           [&](auto& impls_) { impls_.at(this->index(wrapper.getID())) = wrapper.baseImpl; });
 }
 
 } // namespace style

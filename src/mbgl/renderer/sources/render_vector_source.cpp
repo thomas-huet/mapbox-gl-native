@@ -1,6 +1,6 @@
-#include <mbgl/renderer/sources/render_vector_source.hpp>
-#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -49,17 +49,11 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
         return;
     }
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::Vector,
-                       util::tileSize,
-                       tileset->zoomRange,
-                       tileset->bounds,
-                       [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<VectorTile>(tileID, impl().id, parameters, *tileset);
-                       });
+    tilePyramid.update(
+        layers, needsRendering, needsRelayout, parameters, SourceType::Vector, util::tileSize,
+        tileset->zoomRange, tileset->bounds, [&](const OverscaledTileID& tileID) {
+            return std::make_unique<VectorTile>(tileID, impl().id, parameters, *tileset);
+        });
 }
 
 void RenderVectorSource::startRender(PaintParameters& parameters) {
@@ -84,7 +78,8 @@ RenderVectorSource::queryRenderedFeatures(const ScreenLineString& geometry,
     return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
 }
 
-std::vector<Feature> RenderVectorSource::querySourceFeatures(const SourceQueryOptions& options) const {
+std::vector<Feature>
+RenderVectorSource::querySourceFeatures(const SourceQueryOptions& options) const {
     return tilePyramid.querySourceFeatures(options);
 }
 

@@ -1,17 +1,17 @@
 #pragma once
 
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/source_impl.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/util/mat4.hpp>
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/style/source_impl.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/mat4.hpp>
 
-#include <unordered_map>
-#include <vector>
 #include <map>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 
@@ -67,8 +67,7 @@ public:
                           const RenderedQueryOptions& options,
                           const mat4& projMatrix) const = 0;
 
-    virtual std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const = 0;
+    virtual std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const = 0;
 
     virtual void reduceMemoryUse() = 0;
 

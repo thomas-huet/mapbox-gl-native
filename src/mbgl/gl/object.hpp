@@ -52,9 +52,12 @@ using UniqueProgram = std_experimental::unique_resource<ProgramID, detail::Progr
 using UniqueShader = std_experimental::unique_resource<ShaderID, detail::ShaderDeleter>;
 using UniqueBuffer = std_experimental::unique_resource<BufferID, detail::BufferDeleter>;
 using UniqueTexture = std_experimental::unique_resource<TextureID, detail::TextureDeleter>;
-using UniqueVertexArray = std_experimental::unique_resource<VertexArrayID, detail::VertexArrayDeleter>;
-using UniqueFramebuffer = std_experimental::unique_resource<FramebufferID, detail::FramebufferDeleter>;
-using UniqueRenderbuffer = std_experimental::unique_resource<RenderbufferID, detail::RenderbufferDeleter>;
+using UniqueVertexArray =
+    std_experimental::unique_resource<VertexArrayID, detail::VertexArrayDeleter>;
+using UniqueFramebuffer =
+    std_experimental::unique_resource<FramebufferID, detail::FramebufferDeleter>;
+using UniqueRenderbuffer =
+    std_experimental::unique_resource<RenderbufferID, detail::RenderbufferDeleter>;
 
 } // namespace gl
 } // namespace mbgl

@@ -6,8 +6,7 @@ namespace style {
 bool HeatmapLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
     assert(dynamic_cast<const HeatmapLayer::Impl*>(&other));
     const auto& impl = static_cast<const style::HeatmapLayer::Impl&>(other);
-    return filter     != impl.filter ||
-           visibility != impl.visibility ||
+    return filter != impl.filter || visibility != impl.visibility ||
            paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 

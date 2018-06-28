@@ -5,14 +5,12 @@
 
 #include <boost/functional/hash.hpp>
 
-#include <sstream>
 #include <cmath>
+#include <sstream>
 
 namespace mbgl {
 
-LineAtlas::LineAtlas(const Size size)
-    : image(size),
-      dirty(true) {
+LineAtlas::LineAtlas(const Size size) : image(size), dirty(true) {
 }
 
 LineAtlas::~LineAtlas() = default;

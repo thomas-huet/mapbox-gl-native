@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
+#include <mbgl/style/custom_tile_loader.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
-#include <mbgl/style/custom_tile_loader.hpp>
-#include <mbgl/actor/actor_ref.hpp>
 
 namespace mbgl {
 namespace style {

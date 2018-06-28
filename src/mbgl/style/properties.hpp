@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
-#include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/paint_property_binder.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
-#include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/renderer/transition_parameters.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/indexed_tuple.hpp>
 
 namespace mbgl {
 
@@ -20,8 +20,7 @@ class Transitioning {
 public:
     Transitioning() = default;
 
-    explicit Transitioning(Value value_)
-        : value(std::move(value_)) {
+    explicit Transitioning(Value value_) : value(std::move(value_)) {
     }
 
     Transitioning(Value value_,
@@ -88,11 +87,10 @@ public:
     Value value;
     TransitionOptions options;
 
-    Transitioning<Value> transition(const TransitionParameters& params, Transitioning<Value> prior) const {
-        return Transitioning<Value>(value,
-                                    std::move(prior),
-                                    options.reverseMerge(params.transition),
-                                    params.now);
+    Transitioning<Value> transition(const TransitionParameters& params,
+                                    Transitioning<Value> prior) const {
+        return Transitioning<Value>(value, std::move(prior),
+                                    options.reverseMerge(params.transition), params.now);
     }
 };
 
@@ -108,18 +106,19 @@ public:
         values, where undefined, constant, or camera function values have been fully evaluated, and
         source or composite function values have not.
 
-        Once you also have a particular feature, you can evaluate that set of possibly evaluated values
+        Once you also have a particular feature, you can evaluate that set of possibly evaluated
+       values
         fully, producing a set of fully evaluated values.
 
         This is in theory maximally efficient in terms of avoiding repeated evaluation of camera
         functions, though it's more of a historical accident than a purposeful optimization.
     */
 
-    using          PropertyTypes = TypeList<Ps...>;
-    using    TransitionableTypes = TypeList<typename Ps::TransitionableType...>;
-    using       UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
+    using PropertyTypes = TypeList<Ps...>;
+    using TransitionableTypes = TypeList<typename Ps::TransitionableType...>;
+    using UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
     using PossiblyEvaluatedTypes = TypeList<typename Ps::PossiblyEvaluatedType...>;
-    using         EvaluatedTypes = TypeList<typename Ps::Type...>;
+    using EvaluatedTypes = TypeList<typename Ps::Type...>;
 
     using DataDrivenProperties = FilteredTypeList<PropertyTypes, IsDataDriven>;
     using Binders = PaintPropertyBinders<DataDrivenProperties>;
@@ -130,16 +129,14 @@ public:
     class Evaluated : public Tuple<EvaluatedTypes> {
     public:
         template <class... Us>
-        Evaluated(Us&&... us)
-            : Tuple<EvaluatedTypes>(std::forward<Us>(us)...) {
+        Evaluated(Us&&... us) : Tuple<EvaluatedTypes>(std::forward<Us>(us)...) {
         }
     };
 
     class PossiblyEvaluated : public Tuple<PossiblyEvaluatedTypes> {
     public:
         template <class... Us>
-        PossiblyEvaluated(Us&&... us)
-            : Tuple<PossiblyEvaluatedTypes>(std::forward<Us>(us)...) {
+        PossiblyEvaluated(Us&&... us) : Tuple<PossiblyEvaluatedTypes>(std::forward<Us>(us)...) {
         }
 
         template <class T>
@@ -148,16 +145,14 @@ public:
         }
 
         template <class T>
-        static T evaluate(float z, const GeometryTileFeature& feature,
-                          const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue) {
             return v.match(
-                [&] (const T& t) {
-                    return t;
-                },
-                [&] (const SourceFunction<T>& t) {
-                    return t.evaluate(feature, defaultValue);
-                },
-                [&] (const CompositeFunction<T>& t) {
+                [&](const T& t) { return t; },
+                [&](const SourceFunction<T>& t) { return t.evaluate(feature, defaultValue); },
+                [&](const CompositeFunction<T>& t) {
                     return t.evaluate(z, feature, defaultValue);
                 });
         }
@@ -168,17 +163,14 @@ public:
         }
 
         Evaluated evaluate(float z, const GeometryTileFeature& feature) const {
-            return Evaluated {
-                evaluate<Ps>(z, feature)...
-            };
+            return Evaluated{ evaluate<Ps>(z, feature)... };
         }
     };
 
     class Unevaluated : public Tuple<UnevaluatedTypes> {
     public:
         template <class... Us>
-        Unevaluated(Us&&... us)
-            : Tuple<UnevaluatedTypes>(std::forward<Us>(us)...) {
+        Unevaluated(Us&&... us) : Tuple<UnevaluatedTypes>(std::forward<Us>(us)...) {
         }
 
         bool hasTransition() const {
@@ -190,14 +182,12 @@ public:
         template <class P>
         auto evaluate(const PropertyEvaluationParameters& parameters) const {
             using Evaluator = typename P::EvaluatorType;
-            return this->template get<P>()
-                .evaluate(Evaluator(parameters, P::defaultValue()), parameters.now);
+            return this->template get<P>().evaluate(Evaluator(parameters, P::defaultValue()),
+                                                    parameters.now);
         }
 
         PossiblyEvaluated evaluate(const PropertyEvaluationParameters& parameters) const {
-            return PossiblyEvaluated {
-                evaluate<Ps>(parameters)...
-            };
+            return PossiblyEvaluated{ evaluate<Ps>(parameters)... };
         }
 
         template <class Writer>
@@ -211,26 +201,24 @@ public:
     class Transitionable : public Tuple<TransitionableTypes> {
     public:
         template <class... Us>
-        Transitionable(Us&&... us)
-            : Tuple<TransitionableTypes>(std::forward<Us>(us)...) {
+        Transitionable(Us&&... us) : Tuple<TransitionableTypes>(std::forward<Us>(us)...) {
         }
 
-        Unevaluated transitioned(const TransitionParameters& parameters, Unevaluated&& prior) const {
-            return Unevaluated {
-                this->template get<Ps>()
-                    .transition(parameters, std::move(prior.template get<Ps>()))...
-            };
+        Unevaluated transitioned(const TransitionParameters& parameters,
+                                 Unevaluated&& prior) const {
+            return Unevaluated{ this->template get<Ps>().transition(
+                parameters, std::move(prior.template get<Ps>()))... };
         }
 
         Unevaluated untransitioned() const {
-            return Unevaluated {
-                typename Ps::UnevaluatedType(this->template get<Ps>().value)...
-            };
+            return Unevaluated{ typename Ps::UnevaluatedType(this->template get<Ps>().value)... };
         }
 
         bool hasDataDrivenPropertyDifference(const Transitionable& other) const {
             bool result = false;
-            util::ignore({ (result |= this->template get<Ps>().value.hasDataDrivenPropertyDifference(other.template get<Ps>().value))... });
+            util::ignore(
+                { (result |= this->template get<Ps>().value.hasDataDrivenPropertyDifference(
+                       other.template get<Ps>().value))... });
             return result;
         }
     };

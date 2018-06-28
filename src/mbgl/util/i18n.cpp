@@ -342,7 +342,8 @@ bool allowsWordBreaking(char16_t chr) {
 }
 
 bool charAllowsLetterSpacing(char16_t chr) {
-    return !(isInArabic(chr) || isInArabicSupplement(chr) || isInArabicExtendedA(chr) || isInArabicPresentationFormsA(chr) || isInArabicPresentationFormsB(chr));
+    return !(isInArabic(chr) || isInArabicSupplement(chr) || isInArabicExtendedA(chr) ||
+             isInArabicPresentationFormsA(chr) || isInArabicPresentationFormsB(chr));
 }
 
 bool allowsLetterSpacing(const std::u16string& string) {
@@ -582,13 +583,13 @@ std::u16string verticalizePunctuation(const std::u16string& input) {
 char16_t verticalizePunctuation(char16_t chr) {
     return verticalPunctuation.count(chr) ? verticalPunctuation.at(chr) : 0;
 }
-    
+
 bool charInSupportedScript(char16_t chr) {
     // This is a rough heuristic: whether we "can render" a script
     // actually depends on the properties of the font being used
     // and whether differences from the ideal rendering are considered
     // semantically significant.
-    
+
     // Even in Latin script, we "can't render" combinations such as the fi
     // ligature, but we don't consider that semantically significant.n false;
     if ((chr >= 0x0900 && chr <= 0x0DFF) ||
@@ -604,7 +605,7 @@ bool charInSupportedScript(char16_t chr) {
     }
     return true;
 }
-    
+
 bool isStringInSupportedScript(const std::string& input) {
     auto u16string = util::utf8_to_utf16::convert(input);
     for (char16_t chr : u16string) {

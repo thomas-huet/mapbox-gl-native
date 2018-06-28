@@ -23,32 +23,43 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_,
                                const std::u16string& key_,
-                               const float overscaling) :
-    anchor(anchor_),
-    line(line_),
-    index(index_),
-    hasText(false),
-    hasIcon(shapedIcon),
+                               const float overscaling)
+    : anchor(anchor_),
+      line(line_),
+      index(index_),
+      hasText(false),
+      hasIcon(shapedIcon),
 
-    // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling),
-    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature),
-    featureIndex(featureIndex_),
-    textOffset(textOffset_),
-    iconOffset(iconOffset_),
-    key(key_) {
+      // Create the collision features that will be used to check whether this symbol instance can
+      // be placed
+      textCollisionFeature(line_,
+                           anchor,
+                           shapedTextOrientations.first,
+                           textBoxScale,
+                           textPadding,
+                           textPlacement,
+                           indexedFeature,
+                           overscaling),
+      iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature),
+      featureIndex(featureIndex_),
+      textOffset(textOffset_),
+      iconOffset(iconOffset_),
+      key(key_) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
         iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
     }
     if (shapedTextOrientations.first) {
-        horizontalGlyphQuads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
+        horizontalGlyphQuads =
+            getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
     }
     if (shapedTextOrientations.second) {
-        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
+        verticalGlyphQuads =
+            getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
     }
-    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
+    // 'hasText' depends on finding at least one glyph in the shaping that's also in the
+    // GlyphPositionMap
     hasText = horizontalGlyphQuads.size() > 0 || verticalGlyphQuads.size() > 0;
 
     if (shapedTextOrientations.first && shapedTextOrientations.second) {

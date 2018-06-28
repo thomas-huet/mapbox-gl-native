@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/renderer/bucket.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/programs/segment.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
+#include <mbgl/programs/segment.hpp>
+#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
 
@@ -16,8 +16,7 @@ class FillExtrusionBucket : public Bucket {
 public:
     FillExtrusionBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&) override;
+    void addFeature(const GeometryTileFeature&, const GeometryCollection&) override;
     bool hasData() const override;
 
     void upload(gl::Context&) override;
@@ -30,8 +29,9 @@ public:
 
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
-    
-    std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
+
+    std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders>
+        paintPropertyBinders;
 };
 
 } // namespace mbgl

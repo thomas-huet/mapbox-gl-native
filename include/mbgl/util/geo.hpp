@@ -4,10 +4,10 @@
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <mapbox/geometry/box.hpp>
+#include <mapbox/geometry/line_string.hpp>
 #include <mapbox/geometry/point.hpp>
 #include <mapbox/geometry/point_arithmetic.hpp>
-#include <mapbox/geometry/line_string.hpp>
-#include <mapbox/geometry/box.hpp>
 
 #include <cmath>
 #include <stdexcept>
@@ -19,7 +19,7 @@ class UnwrappedTileID;
 
 using ScreenCoordinate = mapbox::geometry::point<double>;
 using ScreenLineString = mapbox::geometry::line_string<double>;
-using ScreenBox        = mapbox::geometry::box<double>;
+using ScreenBox = mapbox::geometry::box<double>;
 
 class LatLng {
 private:
@@ -29,8 +29,7 @@ private:
 public:
     enum WrapMode : bool { Unwrapped, Wrapped };
 
-    LatLng(double lat_ = 0, double lon_ = 0, WrapMode mode = Unwrapped)
-        : lat(lat_), lon(lon_) {
+    LatLng(double lat_ = 0, double lon_ = 0, WrapMode mode = Unwrapped) : lat(lat_), lon(lon_) {
         if (std::isnan(lat)) {
             throw std::domain_error("latitude must not be NaN");
         }
@@ -48,10 +47,16 @@ public:
         }
     }
 
-    double latitude() const { return lat; }
-    double longitude() const { return lon; }
+    double latitude() const {
+        return lat;
+    }
+    double longitude() const {
+        return lon;
+    }
 
-    LatLng wrapped() const { return { lat, lon, Wrapped }; }
+    LatLng wrapped() const {
+        return { lat, lon, Wrapped };
+    }
 
     void wrap() {
         lon = util::wrap(lon, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
@@ -61,9 +66,12 @@ public:
     // world, unwrap the start longitude to ensure the shortest path is taken.
     void unwrapForShortestPath(const LatLng& end) {
         const double delta = std::abs(end.lon - lon);
-        if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
-        if (lon > 0 && end.lon < 0) lon -= util::DEGREES_MAX;
-        else if (lon < 0 && end.lon > 0) lon += util::DEGREES_MAX;
+        if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX)
+            return;
+        if (lon > 0 && end.lon < 0)
+            lon -= util::DEGREES_MAX;
+        else if (lon < 0 && end.lon > 0)
+            lon += util::DEGREES_MAX;
     }
 
     // Constructs a LatLng object with the top left position of the specified tile.
@@ -83,7 +91,7 @@ class LatLngBounds {
 public:
     // Return a bounds covering the entire (unwrapped) world.
     static LatLngBounds world() {
-        return LatLngBounds({-90, -180}, {90, 180});
+        return LatLngBounds({ -90, -180 }, { 90, 180 });
     }
 
     // Return the bounds consisting of the single point.
@@ -112,29 +120,42 @@ public:
         return (sw.latitude() <= ne.latitude()) && (sw.longitude() <= ne.longitude());
     }
 
-    double south() const { return sw.latitude(); }
-    double west()  const { return sw.longitude(); }
-    double north() const { return ne.latitude(); }
-    double east()  const { return ne.longitude(); }
+    double south() const {
+        return sw.latitude();
+    }
+    double west() const {
+        return sw.longitude();
+    }
+    double north() const {
+        return ne.latitude();
+    }
+    double east() const {
+        return ne.longitude();
+    }
 
-    LatLng southwest() const { return sw; }
-    LatLng northeast() const { return ne; }
-    LatLng southeast() const { return LatLng(south(), east()); }
-    LatLng northwest() const { return LatLng(north(), west()); }
+    LatLng southwest() const {
+        return sw;
+    }
+    LatLng northeast() const {
+        return ne;
+    }
+    LatLng southeast() const {
+        return LatLng(south(), east());
+    }
+    LatLng northwest() const {
+        return LatLng(north(), west());
+    }
 
     LatLng center() const {
-        return LatLng((sw.latitude() + ne.latitude()) / 2,
-                      (sw.longitude() + ne.longitude()) / 2);
+        return LatLng((sw.latitude() + ne.latitude()) / 2, (sw.longitude() + ne.longitude()) / 2);
     }
 
     LatLng constrain(const LatLng& p) const {
         if (contains(p)) {
             return p;
         }
-        return LatLng {
-            util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
-            util::clamp(p.longitude(), sw.longitude(), ne.longitude())
-        };
+        return LatLng{ util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
+                       util::clamp(p.longitude(), sw.longitude(), ne.longitude()) };
     }
 
     void extend(const LatLng& point) {
@@ -150,8 +171,7 @@ public:
     }
 
     bool isEmpty() const {
-        return sw.latitude() > ne.latitude() ||
-               sw.longitude() > ne.longitude();
+        return sw.latitude() > ne.latitude() || sw.longitude() > ne.longitude();
     }
 
     bool crossesAntimeridian() const {
@@ -168,8 +188,8 @@ private:
     LatLng sw;
     LatLng ne;
 
-    LatLngBounds(LatLng sw_, LatLng ne_)
-        : sw(std::move(sw_)), ne(std::move(ne_)) {}
+    LatLngBounds(LatLng sw_, LatLng ne_) : sw(std::move(sw_)), ne(std::move(ne_)) {
+    }
 
     friend bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
         return a.sw == b.sw && a.ne == b.ne;
@@ -213,10 +233,18 @@ public:
         }
     }
 
-    double top() const { return _top; }
-    double left() const { return _left; }
-    double bottom() const { return _bottom; }
-    double right() const { return _right; }
+    double top() const {
+        return _top;
+    }
+    double left() const {
+        return _left;
+    }
+    double bottom() const {
+        return _bottom;
+    }
+    double right() const {
+        return _right;
+    }
 
     bool isFlush() const {
         return _top == 0 && _left == 0 && _bottom == 0 && _right == 0;
@@ -238,7 +266,8 @@ public:
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
 
     friend bool operator==(const EdgeInsets& a, const EdgeInsets& b) {
-        return a._top == b._top && a._left == b._left && a._bottom == b._bottom && a._right == b._right;
+        return a._top == b._top && a._left == b._left && a._bottom == b._bottom &&
+               a._right == b._right;
     }
 
     friend bool operator!=(const EdgeInsets& a, const EdgeInsets& b) {

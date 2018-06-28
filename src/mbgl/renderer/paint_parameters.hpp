@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/renderer/render_pass.hpp>
-#include <mbgl/renderer/render_light.hpp>
-#include <mbgl/renderer/mode.hpp>
-#include <mbgl/map/mode.hpp>
+#include <mbgl/algorithm/generate_clip_ids.hpp>
+#include <mbgl/gl/color_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
+#include <mbgl/map/mode.hpp>
+#include <mbgl/renderer/mode.hpp>
+#include <mbgl/renderer/render_light.hpp>
+#include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/algorithm/generate_clip_ids.hpp>
 
 #include <array>
 
@@ -71,7 +71,7 @@ public:
     uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
-    
+
     float symbolFadeChange;
 };
 

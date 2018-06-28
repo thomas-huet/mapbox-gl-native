@@ -36,8 +36,8 @@ constexpr double DEGREES_MAX = 360;
 constexpr double PITCH_MAX = M_PI / 3;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;
-constexpr float  MIN_ZOOM_F = MIN_ZOOM;
-constexpr float  MAX_ZOOM_F = MAX_ZOOM;
+constexpr float MIN_ZOOM_F = MIN_ZOOM;
+constexpr float MAX_ZOOM_F = MAX_ZOOM;
 constexpr uint8_t DEFAULT_MAX_ZOOM = 22;
 
 constexpr uint8_t DEFAULT_PREFETCH_ZOOM_DELTA = 4;
@@ -45,7 +45,7 @@ constexpr uint8_t DEFAULT_PREFETCH_ZOOM_DELTA = 4;
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
 constexpr Duration DEFAULT_TRANSITION_DURATION = Milliseconds(300);
-constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };
+constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT{ 30 };
 
 constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
 

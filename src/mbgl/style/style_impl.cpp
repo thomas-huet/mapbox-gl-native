@@ -1,26 +1,26 @@
-#include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/observer.hpp>
-#include <mbgl/style/source_impl.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/parser.hpp>
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/observer.hpp>
+#include <mbgl/style/parser.hpp>
+#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/style_impl.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -63,7 +63,8 @@ void Style::Impl::loadURL(const std::string& url_) {
         if (res.error) {
             const std::string message = "loading style failed: " + res.error->message;
             Log::Error(Event::Setup, message.c_str());
-            observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onResourceError(
+                std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified || res.noContent) {
             return;
         } else {
@@ -148,8 +149,12 @@ void Style::Impl::addSource(std::unique_ptr<Source> source) {
 struct SourceIdUsageEvaluator {
     const std::string& sourceId;
 
-    bool operator()(BackgroundLayer&) { return false; }
-    bool operator()(CustomLayer&) { return false; }
+    bool operator()(BackgroundLayer&) {
+        return false;
+    }
+    bool operator()(CustomLayer&) {
+        return false;
+    }
 
     template <class LayerType>
     bool operator()(LayerType& layer) {
@@ -159,7 +164,7 @@ struct SourceIdUsageEvaluator {
 
 std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {
     // Check if source is in use
-    SourceIdUsageEvaluator sourceIdEvaluator {id};
+    SourceIdUsageEvaluator sourceIdEvaluator{ id };
     auto layerIt = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
         return layer->accept(sourceIdEvaluator);
     });
@@ -195,7 +200,7 @@ Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string>
     // TODO: verify source
 
     if (layers.get(layer->getID())) {
-        throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
+        throw std::runtime_error(std::string{ "Layer " } + layer->getID() + " already exists");
     }
 
     layer->setObserver(this);
@@ -256,7 +261,7 @@ bool Style::Impl::isLoaded() const {
         return false;
     }
 
-    for (const auto& source: sources) {
+    for (const auto& source : sources) {
         if (!source->loaded) {
             return false;
         }
@@ -290,8 +295,8 @@ void Style::Impl::onSourceLoaded(Source& source) {
 
 void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
-    Log::Error(Event::Style, "Failed to load source %s: %s",
-               source.getID().c_str(), util::toString(error).c_str());
+    Log::Error(Event::Style, "Failed to load source %s: %s", source.getID().c_str(),
+               util::toString(error).c_str());
     observer->onSourceError(source, error);
     observer->onResourceError(error);
 }

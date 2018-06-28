@@ -1,13 +1,13 @@
 #pragma once
 
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/programs/debug_program.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/programs/debug_program.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 

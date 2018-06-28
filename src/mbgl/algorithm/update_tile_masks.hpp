@@ -2,9 +2,9 @@
 
 #include <mbgl/renderer/tile_mask.hpp>
 
-#include <vector>
-#include <functional>
 #include <algorithm>
+#include <functional>
+#include <vector>
 
 namespace mbgl {
 namespace algorithm {

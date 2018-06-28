@@ -1,9 +1,9 @@
-#include <mbgl/tile/tile.hpp>
-#include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/query.hpp>
-#include <mbgl/util/string.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
@@ -32,20 +32,19 @@ void Tile::dumpDebugLogs() const {
     Log::Info(Event::General, "Tile::complete: %s", isComplete() ? "yes" : "no");
 }
 
-void Tile::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<Feature>>&,
-        const GeometryCoordinates&,
-        const TransformState&,
-        const std::vector<const RenderLayer*>&,
-        const RenderedQueryOptions&,
-        const mat4&) {}
+void Tile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>&,
+                                 const GeometryCoordinates&,
+                                 const TransformState&,
+                                 const std::vector<const RenderLayer*>&,
+                                 const RenderedQueryOptions&,
+                                 const mat4&) {
+}
 
 float Tile::getQueryPadding(const std::vector<const RenderLayer*>&) {
     return 0;
 }
 
-void Tile::querySourceFeatures(
-        std::vector<Feature>&,
-        const SourceQueryOptions&) {}
+void Tile::querySourceFeatures(std::vector<Feature>&, const SourceQueryOptions&) {
+}
 
 } // namespace mbgl

@@ -17,24 +17,18 @@ public:
     Rect<uint16_t> textureRect;
 
     std::array<uint16_t, 2> tl() const {
-        return {{
-            textureRect.x,
-            textureRect.y
-        }};
+        return { { textureRect.x, textureRect.y } };
     }
 
     std::array<uint16_t, 2> br() const {
-        return {{
-            static_cast<uint16_t>(textureRect.x + textureRect.w),
-            static_cast<uint16_t>(textureRect.y + textureRect.h)
-        }};
+        return { { static_cast<uint16_t>(textureRect.x + textureRect.w),
+                   static_cast<uint16_t>(textureRect.y + textureRect.h) } };
     }
 
     std::array<float, 2> displaySize() const {
-        return {{
-            textureRect.w / pixelRatio,
-            textureRect.h / pixelRatio,
-        }};
+        return { {
+            textureRect.w / pixelRatio, textureRect.h / pixelRatio,
+        } };
     }
 };
 

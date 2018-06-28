@@ -1,7 +1,7 @@
-#include <mbgl/renderer/sources/render_raster_source.hpp>
-#include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/algorithm/update_tile_masks.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_raster_source.hpp>
+#include <mbgl/tile/raster_tile.hpp>
 
 namespace mbgl {
 
@@ -46,15 +46,9 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
         return;
     }
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::Raster,
-                       impl().getTileSize(),
-                       tileset->zoomRange,
-                       tileset->bounds,
-                       [&] (const OverscaledTileID& tileID) {
+    tilePyramid.update(layers, needsRendering, needsRelayout, parameters, SourceType::Raster,
+                       impl().getTileSize(), tileset->zoomRange, tileset->bounds,
+                       [&](const OverscaledTileID& tileID) {
                            return std::make_unique<RasterTile>(tileID, parameters, *tileset);
                        });
 }
@@ -78,7 +72,7 @@ RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const std::vector<const RenderLayer*>&,
                                           const RenderedQueryOptions&,
                                           const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOptions&) const {

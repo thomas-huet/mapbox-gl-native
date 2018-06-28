@@ -1,10 +1,10 @@
-#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
-#include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/tile/raster_dem_tile.hpp>
+#include <iostream>
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
-#include <iostream>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
+#include <mbgl/tile/raster_dem_tile.hpp>
 
 namespace mbgl {
 
@@ -24,10 +24,10 @@ bool RenderRasterDEMSource::isLoaded() const {
 }
 
 void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                const std::vector<Immutable<Layer::Impl>>& layers,
-                                const bool needsRendering,
-                                const bool needsRelayout,
-                                const TileParameters& parameters) {
+                                   const std::vector<Immutable<Layer::Impl>>& layers,
+                                   const bool needsRendering,
+                                   const bool needsRelayout,
+                                   const TileParameters& parameters) {
     std::swap(baseImpl, baseImpl_);
 
     enabled = needsRendering;
@@ -49,20 +49,14 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
         return;
     }
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::RasterDEM,
-                       impl().getTileSize(),
-                       tileset->zoomRange,
-                       tileset->bounds,
-                       [&] (const OverscaledTileID& tileID) {
+    tilePyramid.update(layers, needsRendering, needsRelayout, parameters, SourceType::RasterDEM,
+                       impl().getTileSize(), tileset->zoomRange, tileset->bounds,
+                       [&](const OverscaledTileID& tileID) {
                            return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
                        });
 }
 
-void RenderRasterDEMSource::onTileChanged(Tile& tile){
+void RenderRasterDEMSource::onTileChanged(Tile& tile) {
     RasterDEMTile& demtile = static_cast<RasterDEMTile&>(tile);
 
     std::map<DEMTileNeighbors, DEMTileNeighbors> opposites = {
@@ -71,8 +65,8 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
         { DEMTileNeighbors::TopLeft, DEMTileNeighbors::BottomRight },
         { DEMTileNeighbors::TopCenter, DEMTileNeighbors::BottomCenter },
         { DEMTileNeighbors::TopRight, DEMTileNeighbors::BottomLeft },
-        { DEMTileNeighbors::BottomRight,  DEMTileNeighbors::TopLeft },
-        { DEMTileNeighbors::BottomCenter, DEMTileNeighbors:: TopCenter },
+        { DEMTileNeighbors::BottomRight, DEMTileNeighbors::TopLeft },
+        { DEMTileNeighbors::BottomCenter, DEMTileNeighbors::TopCenter },
         { DEMTileNeighbors::BottomLeft, DEMTileNeighbors::TopRight }
     };
 
@@ -84,30 +78,32 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
         const uint32_t nx = (canonical.x + 1 + dim) % dim;
         const int nxw = (canonical.x + 1 == dim) ? tile.id.wrap + 1 : tile.id.wrap;
 
-        auto getNeighbor = [&] (DEMTileNeighbors mask){
-            if (mask == DEMTileNeighbors::Left){
+        auto getNeighbor = [&](DEMTileNeighbors mask) {
+            if (mask == DEMTileNeighbors::Left) {
                 return OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y);
-            } else if (mask == DEMTileNeighbors::Right){
+            } else if (mask == DEMTileNeighbors::Right) {
                 return OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y);
-            } else if (mask == DEMTileNeighbors::TopLeft){
+            } else if (mask == DEMTileNeighbors::TopLeft) {
                 return OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y - 1);
-            } else if (mask == DEMTileNeighbors::TopCenter){
-                return OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x, canonical.y - 1);
-            } else if (mask == DEMTileNeighbors::TopRight){
+            } else if (mask == DEMTileNeighbors::TopCenter) {
+                return OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x,
+                                        canonical.y - 1);
+            } else if (mask == DEMTileNeighbors::TopRight) {
                 return OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y - 1);
-            } else if (mask == DEMTileNeighbors::BottomLeft){
+            } else if (mask == DEMTileNeighbors::BottomLeft) {
                 return OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y + 1);
-            } else if (mask == DEMTileNeighbors::BottomCenter){
-                return OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x, canonical.y + 1);
-            } else if (mask == DEMTileNeighbors::BottomRight){
+            } else if (mask == DEMTileNeighbors::BottomCenter) {
+                return OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x,
+                                        canonical.y + 1);
+            } else if (mask == DEMTileNeighbors::BottomRight) {
                 return OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y + 1);
-            } else{
+            } else {
                 throw std::runtime_error("mask is not a valid tile neighbor");
             }
         };
 
         for (uint8_t i = 0; i < 8; i++) {
-            DEMTileNeighbors mask = DEMTileNeighbors(std::pow(2,i));
+            DEMTileNeighbors mask = DEMTileNeighbors(std::pow(2, i));
             // only backfill if this neighbor has not been previously backfilled
             if ((demtile.neighboringTiles & mask) != mask) {
                 OverscaledTileID neighborid = getNeighbor(mask);
@@ -119,9 +115,9 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
                     // if the border tile has not been backfilled by a previous instance of the main
                     // tile, backfill its corresponding neighbor as well.
                     const DEMTileNeighbors& borderMask = opposites[mask];
-                    if ((borderTile.neighboringTiles & borderMask) != borderMask){
+                    if ((borderTile.neighboringTiles & borderMask) != borderMask) {
                         borderTile.backfillBorder(demtile, borderMask);
-                     }
+                    }
                 }
             }
         }
@@ -144,11 +140,11 @@ std::vector<std::reference_wrapper<RenderTile>> RenderRasterDEMSource::getRender
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
-                                          const TransformState&,
-                                          const std::vector<const RenderLayer*>&,
-                                          const RenderedQueryOptions&,
-                                          const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+                                             const TransformState&,
+                                             const std::vector<const RenderLayer*>&,
+                                             const RenderedQueryOptions&,
+                                             const mat4&) const {
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderRasterDEMSource::querySourceFeatures(const SourceQueryOptions&) const {

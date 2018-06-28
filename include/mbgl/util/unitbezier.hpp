@@ -32,14 +32,15 @@ namespace mbgl {
 namespace util {
 
 struct UnitBezier {
-    // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and (1,1).
+    // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and
+    // (1,1).
     constexpr UnitBezier(double p1x, double p1y, double p2x, double p2y)
-        : cx(3.0 * p1x)
-        , bx(3.0 * (p2x - p1x) - (3.0 * p1x))
-        , ax(1.0 - (3.0 * p1x) - (3.0 * (p2x - p1x) - (3.0 * p1x)))
-        , cy(3.0 * p1y)
-        , by(3.0 * (p2y - p1y) - (3.0 * p1y))
-        , ay(1.0 - (3.0 * p1y) - (3.0 * (p2y - p1y) - (3.0 * p1y))) {
+        : cx(3.0 * p1x),
+          bx(3.0 * (p2x - p1x) - (3.0 * p1x)),
+          ax(1.0 - (3.0 * p1x) - (3.0 * (p2x - p1x) - (3.0 * p1x))),
+          cy(3.0 * p1y),
+          by(3.0 * (p2y - p1y) - (3.0 * p1y)),
+          ay(1.0 - (3.0 * p1y) - (3.0 * (p2y - p1y) - (3.0 * p1y))) {
     }
 
     std::pair<double, double> getP1() const {
@@ -48,8 +49,7 @@ struct UnitBezier {
 
     std::pair<double, double> getP2() const {
         return {
-            (bx + (3.0 * cx / 3.0) + cx) / 3.0,
-            (by + (3.0 * cy / 3.0) + cy) / 3.0,
+            (bx + (3.0 * cx / 3.0) + cx) / 3.0, (by + (3.0 * cy / 3.0) + cy) / 3.0,
         };
     }
 
@@ -78,7 +78,7 @@ struct UnitBezier {
         // First try a few iterations of Newton's method -- normally very fast.
         for (t2 = x, i = 0; i < 8; ++i) {
             x2 = sampleCurveX(t2) - x;
-            if (fabs (x2) < epsilon)
+            if (fabs(x2) < epsilon)
                 return t2;
             d2 = sampleCurveDerivativeX(t2);
             if (fabs(d2) < 1e-6)
@@ -114,10 +114,10 @@ struct UnitBezier {
     double solve(double x, double epsilon) const {
         return sampleCurveY(solveCurveX(x, epsilon));
     }
-    
+
     bool operator==(const UnitBezier& rhs) const {
         return std::tie(cx, bx, ax, cy, by, ay) ==
-            std::tie(rhs.cx, rhs.bx, rhs.ax, rhs.cy, rhs.by, rhs.ay);
+               std::tie(rhs.cx, rhs.bx, rhs.ax, rhs.cy, rhs.by, rhs.ay);
     }
 
 private:

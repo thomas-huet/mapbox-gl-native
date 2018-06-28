@@ -11,7 +11,7 @@ namespace mbgl {
 
 std::atomic<bool> NetworkStatus::online(true);
 std::mutex NetworkStatus::mtx;
-std::unordered_set<util::AsyncTask *> NetworkStatus::observers;
+std::unordered_set<util::AsyncTask*> NetworkStatus::observers;
 
 NetworkStatus::Status NetworkStatus::Get() {
     if (online) {
@@ -24,18 +24,18 @@ NetworkStatus::Status NetworkStatus::Get() {
 void NetworkStatus::Set(Status status) {
     if (status == Status::Offline) {
         online = false;
-    } else if(!online) {
+    } else if (!online) {
         online = true;
         Reachable();
     }
 }
 
-void NetworkStatus::Subscribe(util::AsyncTask *async) {
+void NetworkStatus::Subscribe(util::AsyncTask* async) {
     std::lock_guard<std::mutex> lock(NetworkStatus::mtx);
     observers.insert(async);
 }
 
-void NetworkStatus::Unsubscribe(util::AsyncTask *async) {
+void NetworkStatus::Unsubscribe(util::AsyncTask* async) {
     std::lock_guard<std::mutex> lock(NetworkStatus::mtx);
     observers.erase(async);
 }

@@ -1,17 +1,17 @@
 #pragma once
 
+#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/util/enum.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/enum.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
 #include <array>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 namespace style {
@@ -99,7 +99,7 @@ void stringify(Writer& writer, const std::unordered_map<std::string, T>& m) {
 
 template <class Writer>
 void stringify(Writer& writer, const Value& v) {
-    Value::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
+    Value::visit(v, [&](const auto& v_) { stringify(writer, v_); });
 }
 
 template <class Writer>
@@ -122,13 +122,15 @@ void stringify(Writer& writer, FeatureType type) {
 
 template <class Writer>
 void stringify(Writer& writer, const FeatureIdentifier& id) {
-    FeatureIdentifier::visit(id, [&] (const auto& id_) { stringify(writer, id_); });
+    FeatureIdentifier::visit(id, [&](const auto& id_) { stringify(writer, id_); });
 }
 
 template <class Writer>
 void stringify(Writer& writer, const Filter& filter) {
-    if (!filter.expression) writer.Null();
-    else stringify(writer, (*filter.expression)->serialize());
+    if (!filter.expression)
+        writer.Null();
+    else
+        stringify(writer, (*filter.expression)->serialize());
 }
 
 template <class Writer>
@@ -154,7 +156,7 @@ void stringify(Writer& writer, const CompositeFunction<T>& fn) {
 
 template <class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& v) {
-    v.evaluate([&] (const auto& v_) { stringify(writer, v_); });
+    v.evaluate([&](const auto& v_) { stringify(writer, v_); });
 }
 
 template <class Property, class Writer, class T>
@@ -167,7 +169,7 @@ void stringify(Writer& writer, const PropertyValue<T>& value) {
 
 template <class Writer, class T>
 void stringify(Writer& writer, const DataDrivenPropertyValue<T>& v) {
-    v.evaluate([&] (const auto& v_) { stringify(writer, v_); });
+    v.evaluate([&](const auto& v_) { stringify(writer, v_); });
 }
 
 template <class Property, class Writer, class T>

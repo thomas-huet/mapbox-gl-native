@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID
     : Layer(makeMutable<Impl>(LayerType::Raster, layerID, sourceID)) {
 }
 
-RasterLayer::RasterLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+RasterLayer::RasterLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 RasterLayer::~RasterLayer() = default;
@@ -40,7 +39,6 @@ void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
 const std::string& RasterLayer::getSourceID() const {
     return impl().source;
 }
-
 
 // Visibility
 
@@ -70,7 +68,6 @@ void RasterLayer::setMaxZoom(float maxZoom) {
 }
 
 // Layout properties
-
 
 // Paint properties
 

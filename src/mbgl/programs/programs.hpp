@@ -3,19 +3,19 @@
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/programs/clipping_mask_program.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
+#include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
-#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/heatmap_program.hpp>
 #include <mbgl/programs/heatmap_texture_program.hpp>
-#include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/programs/hillshade_prepare_program.hpp>
+#include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/programs/line_program.hpp>
+#include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/programs/symbol_program.hpp>
-#include <mbgl/programs/debug_program.hpp>
-#include <mbgl/programs/collision_box_program.hpp>
-#include <mbgl/programs/program_parameters.hpp>
 
 namespace mbgl {
 

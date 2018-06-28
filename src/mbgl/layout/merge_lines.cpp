@@ -19,8 +19,8 @@ size_t mergeFromRight(std::vector<SymbolFeature>& features,
     rightIndex.erase(left);
     rightIndex[rightKey] = index;
     features[index].geometry[0].pop_back();
-    features[index].geometry[0].insert(
-        features[index].geometry[0].end(), geom[0].begin(), geom[0].end());
+    features[index].geometry[0].insert(features[index].geometry[0].end(), geom[0].begin(),
+                                       geom[0].end());
     geom[0].clear();
     return index;
 }
@@ -35,8 +35,8 @@ size_t mergeFromLeft(std::vector<SymbolFeature>& features,
     leftIndex.erase(right);
     leftIndex[leftKey] = index;
     geom[0].pop_back();
-    geom[0].insert(
-        geom[0].end(), features[index].geometry[0].begin(), features[index].geometry[0].end());
+    geom[0].insert(geom[0].end(), features[index].geometry[0].begin(),
+                   features[index].geometry[0].end());
     features[index].geometry[0].clear();
     std::swap(features[index].geometry[0], geom[0]);
     return index;

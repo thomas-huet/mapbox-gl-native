@@ -9,11 +9,10 @@ class GeoJSONTileFeature : public GeometryTileFeature {
 public:
     const mapbox::geometry::feature<int16_t>& feature;
 
-    GeoJSONTileFeature(const mapbox::geometry::feature<int16_t>& feature_)
-        : feature(feature_) {
+    GeoJSONTileFeature(const mapbox::geometry::feature<int16_t>& feature_) : feature(feature_) {
     }
 
-    FeatureType getType() const override  {
+    FeatureType getType() const override {
         return apply_visitor(ToFeatureType(), feature.geometry);
     }
 
@@ -85,7 +84,6 @@ public:
     std::unique_ptr<GeometryTileLayer> getLayer(const std::string&) const override {
         return std::make_unique<GeoJSONTileLayer>(features);
     }
-
 
 private:
     std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features;

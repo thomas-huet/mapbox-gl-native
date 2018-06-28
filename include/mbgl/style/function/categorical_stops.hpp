@@ -4,8 +4,8 @@
 #include <mbgl/util/variant.hpp>
 
 #include <cassert>
-#include <utility>
 #include <map>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -23,15 +23,13 @@ public:
     Stops stops;
 
     CategoricalStops() = default;
-    CategoricalStops(Stops stops_)
-        : stops(std::move(stops_)) {
+    CategoricalStops(Stops stops_) : stops(std::move(stops_)) {
         assert(stops.size() > 0);
     }
 
     optional<T> evaluate(const Value&) const;
 
-    friend bool operator==(const CategoricalStops& lhs,
-                           const CategoricalStops& rhs) {
+    friend bool operator==(const CategoricalStops& lhs, const CategoricalStops& rhs) {
         return lhs.stops == rhs.stops;
     }
 };

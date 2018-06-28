@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/text/glyph_atlas.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <vector>
@@ -22,12 +22,13 @@ public:
                WritingModeType writingMode_,
                Point<float> glyphOffset_)
         : tl(std::move(tl_)),
-        tr(std::move(tr_)),
-        bl(std::move(bl_)),
-        br(std::move(br_)),
-        tex(std::move(tex_)),
-        writingMode(writingMode_),
-        glyphOffset(glyphOffset_) {}
+          tr(std::move(tr_)),
+          bl(std::move(bl_)),
+          br(std::move(br_)),
+          tex(std::move(tex_)),
+          writingMode(writingMode_),
+          glyphOffset(glyphOffset_) {
+    }
 
     Point<float> tl;
     Point<float> tr;

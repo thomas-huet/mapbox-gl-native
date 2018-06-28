@@ -1,8 +1,8 @@
-#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <utility>
 
@@ -72,7 +72,8 @@ public:
     std::vector<std::shared_ptr<const AnnotationTileFeatureData>> features;
 };
 
-AnnotationTileLayer::AnnotationTileLayer(std::shared_ptr<AnnotationTileLayerData> layer_) : layer(std::move(layer_)) {
+AnnotationTileLayer::AnnotationTileLayer(std::shared_ptr<AnnotationTileLayerData> layer_)
+    : layer(std::move(layer_)) {
 }
 
 std::size_t AnnotationTileLayer::featureCount() const {

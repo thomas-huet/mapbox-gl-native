@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/event.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/event.hpp>
 
 #include <string>
 
@@ -15,7 +15,7 @@ public:
     stopwatch(EventSeverity severity, Event event = Event::General);
     stopwatch(std::string name, Event event = Event::General);
     stopwatch(std::string name, EventSeverity severity, Event event = Event::General);
-    void report(const std::string &name);
+    void report(const std::string& name);
     ~stopwatch();
 
 private:
@@ -28,10 +28,12 @@ private:
 class stopwatch {
     stopwatch(Event event = Event::General);
     stopwatch(EventSeverity severity, Event event = Event::General);
-    stopwatch(const std::string &name, Event event = Event::General);
-    stopwatch(const std::string &name, EventSeverity severity, Event event = Event::General);
-    void report(const std::string &name) {}
-    ~stopwatch() {}
+    stopwatch(const std::string& name, Event event = Event::General);
+    stopwatch(const std::string& name, EventSeverity severity, Event event = Event::General);
+    void report(const std::string& name) {
+    }
+    ~stopwatch() {
+    }
 };
 #endif
 } // namespace util

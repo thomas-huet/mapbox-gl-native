@@ -1,13 +1,13 @@
-#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/style/conversion/geojson_options.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
-#include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/sources/raster_dem_source.hpp>
-#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/util/geo.hpp>
 
 namespace mbgl {
@@ -15,7 +15,8 @@ namespace style {
 namespace conversion {
 
 // A tile source can either specify a URL to TileJSON, or inline TileJSON.
-static optional<variant<std::string, Tileset>> convertURLOrTileset(const Convertible& value, Error& error) {
+static optional<variant<std::string, Tileset>> convertURLOrTileset(const Convertible& value,
+                                                                   Error& error) {
     auto urlVal = objectMember(value, "url");
     if (!urlVal) {
         optional<Tileset> tileset = convert<Tileset>(value, error);
@@ -34,9 +35,8 @@ static optional<variant<std::string, Tileset>> convertURLOrTileset(const Convert
     return { *url };
 }
 
-static optional<std::unique_ptr<Source>> convertRasterSource(const std::string& id,
-                                                             const Convertible& value,
-                                                             Error& error) {
+static optional<std::unique_ptr<Source>>
+convertRasterSource(const std::string& id, const Convertible& value, Error& error) {
     optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
     if (!urlOrTileset) {
         return {};
@@ -56,9 +56,8 @@ static optional<std::unique_ptr<Source>> convertRasterSource(const std::string& 
     return { std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize) };
 }
 
-static optional<std::unique_ptr<Source>> convertRasterDEMSource(const std::string& id,
-                                                             const Convertible& value,
-                                                             Error& error) {
+static optional<std::unique_ptr<Source>>
+convertRasterDEMSource(const std::string& id, const Convertible& value, Error& error) {
     optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
     if (!urlOrTileset) {
         return {};
@@ -78,9 +77,8 @@ static optional<std::unique_ptr<Source>> convertRasterDEMSource(const std::strin
     return { std::make_unique<RasterDEMSource>(id, std::move(*urlOrTileset), tileSize) };
 }
 
-static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
-                                                             const Convertible& value,
-                                                             Error& error) {
+static optional<std::unique_ptr<Source>>
+convertVectorSource(const std::string& id, const Convertible& value, Error& error) {
     optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
     if (!urlOrTileset) {
         return {};
@@ -89,9 +87,8 @@ static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& 
     return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
 }
 
-static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
-                                                              const Convertible& value,
-                                                              Error& error) {
+static optional<std::unique_ptr<Source>>
+convertGeoJSONSource(const std::string& id, const Convertible& value, Error& error) {
     auto dataValue = objectMember(value, "data");
     if (!dataValue) {
         error = { "GeoJSON source must have a data value" };
@@ -121,35 +118,34 @@ static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string&
     return { std::move(result) };
 }
 
-static optional<std::unique_ptr<Source>> convertImageSource(const std::string& id,
-                                                            const Convertible& value,
-                                                            Error& error) {
+static optional<std::unique_ptr<Source>>
+convertImageSource(const std::string& id, const Convertible& value, Error& error) {
     auto urlValue = objectMember(value, "url");
     if (!urlValue) {
         error = { "Image source must have a url value" };
         return {};
     }
-    
+
     auto urlString = toString(*urlValue);
     if (!urlString) {
         error = { "Image url must be a URL string" };
         return {};
     }
-    
+
     auto coordinatesValue = objectMember(value, "coordinates");
     if (!coordinatesValue) {
         error = { "Image source must have a coordinates values" };
         return {};
     }
-    
+
     if (!isArray(*coordinatesValue) || arrayLength(*coordinatesValue) != 4) {
         error = { "Image coordinates must be an array of four longitude latitude pairs" };
         return {};
     }
-    
+
     std::array<LatLng, 4> coordinates;
-    for (std::size_t i=0; i < 4; i++) {
-        auto latLng = conversion::convert<LatLng>(arrayMember(*coordinatesValue,i), error);
+    for (std::size_t i = 0; i < 4; i++) {
+        auto latLng = conversion::convert<LatLng>(arrayMember(*coordinatesValue, i), error);
         if (!latLng) {
             return {};
         }
@@ -161,7 +157,8 @@ static optional<std::unique_ptr<Source>> convertImageSource(const std::string& i
     return { std::move(result) };
 }
 
-optional<std::unique_ptr<Source>> Converter<std::unique_ptr<Source>>::operator()(const Convertible& value, Error& error, const std::string& id) const {
+optional<std::unique_ptr<Source>> Converter<std::unique_ptr<Source>>::
+operator()(const Convertible& value, Error& error, const std::string& id) const {
     if (!isObject(value)) {
         error = { "source must be an object" };
         return {};

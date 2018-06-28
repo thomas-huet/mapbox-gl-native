@@ -1,20 +1,20 @@
 #pragma once
 
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_observer.hpp>
 
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/range.hpp>
 
+#include <map>
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include <map>
 
 namespace mbgl {
 
@@ -41,7 +41,7 @@ public:
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
                 optional<LatLngBounds> bounds,
-                std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
+                std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile);
 
     void startRender(PaintParameters&);
     void finishRender(PaintParameters&);

@@ -29,7 +29,8 @@ public:
     // Called prior to rendering to update the internally assumed OpenGL state.
     virtual void updateAssumedState() = 0;
 
-    // Called when this backend is used for rendering. Implementations should ensure that a renderable
+    // Called when this backend is used for rendering. Implementations should ensure that a
+    // renderable
     // object is bound and glClear/glDraw* calls can be done. They should also make sure that
     // calling .bind() repeatedly is a no-op and that the appropriate gl::Context values are
     // set to the current state.
@@ -38,7 +39,8 @@ public:
     virtual Size getFramebufferSize() const = 0;
 
 protected:
-    // Called with the name of an OpenGL extension that should be loaded. RendererBackend implementations
+    // Called with the name of an OpenGL extension that should be loaded. RendererBackend
+    // implementations
     // must call the API-specific version that obtains the function pointer for this function,
     // or a null pointer if unsupported/unavailable.
     virtual gl::ProcAddress getExtensionFunctionPointer(const char*) = 0;

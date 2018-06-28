@@ -1,7 +1,7 @@
 #include <mbgl/style/function/identity_stops.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/util/enum.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <array>
 
@@ -18,7 +18,7 @@ optional<std::string> IdentityStops<std::string>::evaluate(const Value& value) c
     if (!value.is<std::string>()) {
         return {};
     }
-    
+
     return value.get<std::string>();
 }
 
@@ -68,7 +68,8 @@ optional<LineJoinType> IdentityStops<LineJoinType>::evaluate(const Value& value)
 }
 
 template <>
-optional<std::array<float, 2>> IdentityStops<std::array<float, 2>>::evaluate(const Value& value) const {
+optional<std::array<float, 2>>
+IdentityStops<std::array<float, 2>>::evaluate(const Value& value) const {
     if (!value.is<std::vector<Value>>()) {
         return {};
     }
@@ -78,10 +79,8 @@ optional<std::array<float, 2>> IdentityStops<std::array<float, 2>>::evaluate(con
         return {};
     }
 
-    std::array<float, 2> array {{
-        *numericValue<float>(vector[0]),
-        *numericValue<float>(vector[1])
-    }};
+    std::array<float, 2> array{ { *numericValue<float>(vector[0]),
+                                  *numericValue<float>(vector[1]) } };
     return array;
 }
 

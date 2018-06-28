@@ -8,28 +8,31 @@ class RendererObserver {
 public:
     virtual ~RendererObserver() = default;
 
-    enum class RenderMode : uint32_t {
-        Partial,
-        Full
-    };
+    enum class RenderMode : uint32_t { Partial, Full };
 
     // Signals that a repaint is required
-    virtual void onInvalidate() {}
+    virtual void onInvalidate() {
+    }
 
     // Resource failed to download / parse
-    virtual void onResourceError(std::exception_ptr) {}
+    virtual void onResourceError(std::exception_ptr) {
+    }
 
     // First frame
-    virtual void onWillStartRenderingMap() {}
+    virtual void onWillStartRenderingMap() {
+    }
 
     // Start of frame, initial is the first frame for this map
-    virtual void onWillStartRenderingFrame() {}
+    virtual void onWillStartRenderingFrame() {
+    }
 
     // End of frame
-    virtual void onDidFinishRenderingFrame(RenderMode) {}
+    virtual void onDidFinishRenderingFrame(RenderMode) {
+    }
 
     // Final frame
-    virtual void onDidFinishRenderingMap() {}
+    virtual void onDidFinishRenderingMap() {
+    }
 };
 
 } // namespace mbgl

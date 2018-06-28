@@ -2,8 +2,8 @@
 
 #include <mbgl/util/image.hpp>
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace mbgl {
@@ -23,6 +23,7 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                bool sdf);
 
 // Parses an image and an associated JSON file and returns the sprite objects.
-std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& image, const std::string& json);
+std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& image,
+                                                       const std::string& json);
 
 } // namespace mbgl

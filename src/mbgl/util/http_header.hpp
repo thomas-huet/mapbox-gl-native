@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <string>
 

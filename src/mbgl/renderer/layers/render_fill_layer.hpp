@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class RenderFillLayer: public RenderLayer {
+class RenderFillLayer : public RenderLayer {
 public:
     RenderFillLayer(Immutable<style::FillLayer::Impl>);
     ~RenderFillLayer() final = default;
@@ -16,15 +16,15 @@ public:
     bool hasTransition() const override;
     void render(PaintParameters&, RenderSource*) override;
 
-    bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&) const override;
+    bool queryIntersectsFeature(const GeometryCoordinates&,
+                                const GeometryTileFeature&,
+                                const float,
+                                const TransformState&,
+                                const float,
+                                const mat4&) const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
     style::FillPaintProperties::Unevaluated unevaluated;

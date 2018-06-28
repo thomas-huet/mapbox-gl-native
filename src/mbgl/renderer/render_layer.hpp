@@ -67,15 +67,17 @@ public:
 
     // Check wether the given geometry intersects
     // with the feature
-    virtual bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&) const { return false; };
+    virtual bool queryIntersectsFeature(const GeometryCoordinates&,
+                                        const GeometryTileFeature&,
+                                        const float,
+                                        const TransformState&,
+                                        const float,
+                                        const mat4&) const {
+        return false;
+    };
 
-    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
+    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                                 const std::vector<const RenderLayer*>&) const = 0;
 
     void setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>);
     // Private implementation

@@ -1,19 +1,19 @@
 #pragma once
 
-#include <mbgl/gl/types.hpp>
-#include <mbgl/gl/object.hpp>
-#include <mbgl/gl/context.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/object.hpp>
+#include <mbgl/gl/types.hpp>
 #include <mbgl/gl/uniform.hpp>
+#include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 
-#include <mbgl/util/io.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/shaders/shaders.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <string>
 
@@ -37,7 +37,8 @@ public:
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
           attributeLocations(Attributes::bindLocations(context, program)) {
 
-        // Re-link program after manually binding only active attributes in Attributes::bindLocations
+        // Re-link program after manually binding only active attributes in
+        // Attributes::bindLocations
         context.linkProgram(program);
 
         // We have to re-initialize the uniforms state from the bindings as the uniform locations
@@ -51,14 +52,15 @@ public:
           uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
           attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
     }
-    
+
     static Program createProgram(gl::Context& context,
                                  const ProgramParameters& programParameters,
                                  const char* name,
                                  const char* vertexSource_,
                                  const char* fragmentSource_) {
         const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
-        const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
+        const std::string fragmentSource =
+            shaders::fragmentSource(programParameters, fragmentSource_);
 
 #if MBGL_HAS_BINARY_PROGRAMS
         optional<std::string> cachePath = programParameters.cachePath(name);
@@ -69,16 +71,14 @@ public:
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
                     const BinaryProgram binaryProgram(std::move(*cachedBinaryProgram));
                     if (binaryProgram.identifier() == identifier) {
-                        return Program { context, binaryProgram };
+                        return Program{ context, binaryProgram };
                     } else {
                         Log::Warning(Event::OpenGL,
-                                     "Cached program %s changed. Recompilation required.",
-                                     name);
+                                     "Cached program %s changed. Recompilation required.", name);
                     }
                 }
             } catch (std::runtime_error& error) {
-                Log::Warning(Event::OpenGL, "Could not load cached program: %s",
-                             error.what());
+                Log::Warning(Event::OpenGL, "Could not load cached program: %s", error.what());
             }
 
             // Compile the shader
@@ -99,7 +99,7 @@ public:
 #endif
 
         (void)name;
-        return Program { context, vertexSource, fragmentSource };
+        return Program{ context, vertexSource, fragmentSource };
     }
 
     template <class BinaryProgram>
@@ -124,7 +124,8 @@ public:
               const IndexBuffer<DrawMode>& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
-        static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
+        static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value,
+                      "incompatible draw mode");
 
         context.setDrawMode(drawMode);
         context.setDepthMode(depthMode);
@@ -135,13 +136,10 @@ public:
 
         Uniforms::bind(uniformsState, uniformValues);
 
-        vertexArray.bind(context,
-                        indexBuffer.buffer,
-                        Attributes::toBindingArray(attributeLocations, attributeBindings));
+        vertexArray.bind(context, indexBuffer.buffer,
+                         Attributes::toBindingArray(attributeLocations, attributeBindings));
 
-        context.draw(drawMode.primitiveType,
-                     indexOffset,
-                     indexLength);
+        context.draw(drawMode.primitiveType, indexOffset, indexLength);
     }
 
 private:

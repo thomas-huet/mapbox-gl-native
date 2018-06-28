@@ -1,14 +1,14 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <array>
-#include <vector>
-#include <map>
 #include <functional>
+#include <map>
+#include <vector>
 
 namespace mbgl {
 namespace gl {
@@ -19,7 +19,8 @@ void bindUniform(UniformLocation, const T&);
 template <class Tag, class T>
 class UniformValue {
 public:
-    explicit UniformValue(T t_) : t(std::move(t_)) {}
+    explicit UniformValue(T t_) : t(std::move(t_)) {
+    }
     T t;
 };
 
@@ -48,7 +49,8 @@ public:
 
     class State {
     public:
-        State(UniformLocation location_) : location(std::move(location_)) {}
+        State(UniformLocation location_) : location(std::move(location_)) {
+        }
 
         void operator=(const Value& value) {
             if (location >= 0 && (!current || *current != value.t)) {
@@ -69,18 +71,30 @@ template <class Tag, class T, size_t N>
 using UniformVector = Uniform<Tag, std::array<T, N>>;
 
 template <class Tag, class T, size_t N>
-using UniformMatrix = Uniform<Tag, std::array<T, N*N>>;
+using UniformMatrix = Uniform<Tag, std::array<T, N * N>>;
 
-#define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_) \
-    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> { static auto name() { return #name_; } }
+#define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_)                                                   \
+    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> {                                       \
+        static auto name() {                                                                       \
+            return #name_;                                                                         \
+        }                                                                                          \
+    }
 
-#define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> { static auto name() { return #name_; } }
+#define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_)                                               \
+    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> {                                   \
+        static auto name() {                                                                       \
+            return #name_;                                                                         \
+        }                                                                                          \
+    }
 
-#define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> { static auto name() { return #name_; } }
+#define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_)                                               \
+    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> {                                   \
+        static auto name() {                                                                       \
+            return #name_;                                                                         \
+        }                                                                                          \
+    }
 
-UniformLocation uniformLocation(ProgramID, const char * name);
+UniformLocation uniformLocation(ProgramID, const char* name);
 
 template <class... Us>
 class Uniforms {
@@ -103,7 +117,7 @@ public:
                    : false)... });
 #endif
 
-        return State { { uniformLocation(id, Us::name()) }... };
+        return State{ { uniformLocation(id, Us::name()) }... };
     }
 
     template <class Program>
@@ -120,7 +134,6 @@ public:
     }
 };
 
-
 namespace detail {
 
 template <class...>
@@ -134,9 +147,8 @@ struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>> {
 } // namespace detail
 
 template <class A, class B>
-using ConcatenateUniforms = typename detail::ConcatenateUniforms<
-    typename A::Types,
-    typename B::Types>::Type;
+using ConcatenateUniforms =
+    typename detail::ConcatenateUniforms<typename A::Types, typename B::Types>::Type;
 
 } // namespace gl
 } // namespace mbgl

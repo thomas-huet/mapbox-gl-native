@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/image_impl.hpp>
-#include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/source_impl.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/variant.hpp>
 

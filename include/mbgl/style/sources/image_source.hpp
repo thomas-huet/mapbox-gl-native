@@ -27,6 +27,7 @@ public:
     const Impl& impl() const;
 
     void loadDescription(FileSource&) final;
+
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;

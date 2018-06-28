@@ -1,16 +1,16 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/math/log2.hpp>
+#include <mbgl/programs/programs.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/programs/programs.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/util/logging.hpp>
-#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
@@ -55,36 +55,23 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
         return;
     }
 
-    static const style::Properties<>::PossiblyEvaluated properties {};
+    static const style::Properties<>::PossiblyEvaluated properties{};
     static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     auto& programInstance = parameters.programs.debug;
 
     for (auto matrix : matrices) {
         programInstance.draw(
-            parameters.context,
-            gl::LineStrip { 4.0f * parameters.pixelRatio },
-            gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
-            gl::ColorMode::unblended(),
-            parameters.staticData.tileBorderIndexBuffer,
-            parameters.staticData.tileBorderSegments,
+            parameters.context, gl::LineStrip{ 4.0f * parameters.pixelRatio },
+            gl::DepthMode::disabled(), gl::StencilMode::disabled(), gl::ColorMode::unblended(),
+            parameters.staticData.tileBorderIndexBuffer, parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
-                DebugProgram::UniformValues {
-                    uniforms::u_matrix::Value{ matrix },
-                    uniforms::u_color::Value{ Color::red() }
-                },
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom()
-            ),
-            programInstance.computeAllAttributeBindings(
-                parameters.staticData.tileVertexBuffer,
-                paintAttributeData,
-                properties
-            ),
-            "image"
-        );
+                DebugProgram::UniformValues{ uniforms::u_matrix::Value{ matrix },
+                                             uniforms::u_color::Value{ Color::red() } },
+                paintAttributeData, properties, parameters.state.getZoom()),
+            programInstance.computeAllAttributeBindings(parameters.staticData.tileVertexBuffer,
+                                                        paintAttributeData, properties),
+            "image");
     }
 }
 
@@ -94,7 +81,7 @@ RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const std::vector<const RenderLayer*>&,
                                          const RenderedQueryOptions&,
                                          const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOptions&) const {
@@ -133,7 +120,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         nePoint.x = std::max(nePoint.x, point.x);
         swPoint.y = std::min(swPoint.y, point.y);
         nePoint.y = std::max(nePoint.y, point.y);
-   }
+    }
 
     // Calculate the optimum zoom level to determine the tile ids to use for transforms
     auto dx = nePoint.x - swPoint.x;
@@ -165,10 +152,9 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         if (tile.wrap != 0 && tileCover[0].canonical.isChildOf(tile.canonical)) {
             tileIds.push_back({ tile.wrap, tileCover[0].canonical });
             hasVisibleTile = true;
-        }
-        else if (!hasVisibleTile) {
-            for (auto coveringTile: tileCover) {
-                if(coveringTile.canonical == tile.canonical ||
+        } else if (!hasVisibleTile) {
+            for (auto coveringTile : tileCover) {
+                if (coveringTile.canonical == tile.canonical ||
                     coveringTile.canonical.isChildOf(tile.canonical) ||
                     tile.canonical.isChildOf(coveringTile.canonical)) {
                     hasVisibleTile = true;
@@ -204,8 +190,8 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { util::EXTENT, 0 }));
     bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, util::EXTENT }));
-    bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { util::EXTENT, util::EXTENT }));
+    bucket->vertices.emplace_back(RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y },
+                                                              { util::EXTENT, util::EXTENT }));
 
     bucket->indices.emplace_back(0, 1, 2);
     bucket->indices.emplace_back(1, 2, 3);

@@ -1,9 +1,9 @@
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/light.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/style/layer.hpp>
 
 namespace mbgl {
 namespace style {

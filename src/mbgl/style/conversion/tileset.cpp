@@ -1,6 +1,6 @@
+#include <mbgl/math/clamp.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 namespace style {
@@ -43,7 +43,9 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
         if (encoding && *encoding == "terrarium") {
             result.encoding = Tileset::DEMEncoding::Terrarium;
         } else if (encoding && *encoding != "mapbox") {
-            error = { "invalid raster-dem encoding type - valid types are 'mapbox' and 'terrarium' " };
+            error = {
+                "invalid raster-dem encoding type - valid types are 'mapbox' and 'terrarium' "
+            };
         }
     }
 
@@ -95,12 +97,12 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
 
         bottom = util::clamp(*bottom, -90.0, 90.0);
         top = util::clamp(*top, -90.0, 90.0);
-        if (top <= bottom){
+        if (top <= bottom) {
             error = { "bounds bottom latitude must be between smaller than top latitude" };
             return {};
         }
 
-        if(*left >= *right) {
+        if (*left >= *right) {
             error = { "bounds left longitude should be less than right longitude" };
             return {};
         }

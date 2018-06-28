@@ -1,5 +1,5 @@
-#include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/util/traits.hpp>
 
 namespace mbgl {

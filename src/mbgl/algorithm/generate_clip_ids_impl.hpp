@@ -30,7 +30,8 @@ void ClipIDGenerator::update(std::vector<std::reference_wrapper<Renderable>> ren
         // can never be children of the current wrap.
         auto child_it = std::next(it);
         const auto children_end = std::lower_bound(
-            child_it, end, UnwrappedTileID{ static_cast<int16_t>(renderable.id.wrap + 1), { 0, 0, 0 } },
+            child_it, end,
+            UnwrappedTileID{ static_cast<int16_t>(renderable.id.wrap + 1), { 0, 0, 0 } },
             [](auto& a, auto& b) { return a.get().id < b; });
         for (; child_it != children_end; ++child_it) {
             auto& childTileID = child_it->get().id;

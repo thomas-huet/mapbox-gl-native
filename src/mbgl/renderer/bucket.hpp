@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <atomic>
 
@@ -21,8 +21,7 @@ public:
     // Feature geometries are also used to populate the feature index.
     // Obtaining these is a costly operation, so we do it only once, and
     // pass-by-const-ref the geometries as a second parameter.
-    virtual void addFeature(const GeometryTileFeature&,
-                            const GeometryCollection&) {};
+    virtual void addFeature(const GeometryTileFeature&, const GeometryCollection&){};
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
@@ -39,7 +38,7 @@ public:
     }
 
 protected:
-    std::atomic<bool> uploaded { false };
+    std::atomic<bool> uploaded{ false };
 };
 
 } // namespace mbgl

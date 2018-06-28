@@ -7,8 +7,11 @@ namespace mbgl {
 template <class T>
 class PaintPropertyStatistics {
 public:
-    optional<T> max() const { return {}; }
-    void add(const T&) {}
+    optional<T> max() const {
+        return {};
+    }
+    void add(const T&) {
+    }
 };
 
 template <>

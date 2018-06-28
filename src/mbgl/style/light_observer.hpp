@@ -9,7 +9,8 @@ class LightObserver {
 public:
     virtual ~LightObserver() = default;
 
-    virtual void onLightChanged(const Light&) {}
+    virtual void onLightChanged(const Light&) {
+    }
 };
 
 } // namespace style

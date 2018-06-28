@@ -20,9 +20,7 @@ template <class Object, class MemberFn, class ArgsTuple>
 class MessageImpl : public Message {
 public:
     MessageImpl(Object& object_, MemberFn memberFn_, ArgsTuple argsTuple_)
-      : object(object_),
-        memberFn(memberFn_),
-        argsTuple(std::move(argsTuple_)) {
+        : object(object_), memberFn(memberFn_), argsTuple(std::move(argsTuple_)) {
     }
 
     void operator()() override {
@@ -42,7 +40,10 @@ public:
 template <class ResultType, class Object, class MemberFn, class ArgsTuple>
 class AskMessageImpl : public Message {
 public:
-    AskMessageImpl(std::promise<ResultType> promise_, Object& object_, MemberFn memberFn_, ArgsTuple argsTuple_)
+    AskMessageImpl(std::promise<ResultType> promise_,
+                   Object& object_,
+                   MemberFn memberFn_,
+                   ArgsTuple argsTuple_)
         : object(object_),
           memberFn(memberFn_),
           argsTuple(std::move(argsTuple_)),
@@ -67,11 +68,14 @@ public:
 template <class Object, class MemberFn, class ArgsTuple>
 class AskMessageImpl<void, Object, MemberFn, ArgsTuple> : public Message {
 public:
-    AskMessageImpl(std::promise<void> promise_, Object& object_, MemberFn memberFn_, ArgsTuple argsTuple_)
-            : object(object_),
-            memberFn(memberFn_),
-            argsTuple(std::move(argsTuple_)),
-            promise(std::move(promise_)) {
+    AskMessageImpl(std::promise<void> promise_,
+                   Object& object_,
+                   MemberFn memberFn_,
+                   ArgsTuple argsTuple_)
+        : object(object_),
+          memberFn(memberFn_),
+          argsTuple(std::move(argsTuple_)),
+          promise(std::move(promise_)) {
     }
 
     void operator()() override {
@@ -95,13 +99,16 @@ namespace actor {
 template <class Object, class MemberFn, class... Args>
 std::unique_ptr<Message> makeMessage(Object& object, MemberFn memberFn, Args&&... args) {
     auto tuple = std::make_tuple(std::forward<Args>(args)...);
-    return std::make_unique<MessageImpl<Object, MemberFn, decltype(tuple)>>(object, memberFn, std::move(tuple));
+    return std::make_unique<MessageImpl<Object, MemberFn, decltype(tuple)>>(object, memberFn,
+                                                                            std::move(tuple));
 }
 
 template <class ResultType, class Object, class MemberFn, class... Args>
-std::unique_ptr<Message> makeMessage(std::promise<ResultType>&& promise, Object& object, MemberFn memberFn, Args&&... args) {
+std::unique_ptr<Message>
+makeMessage(std::promise<ResultType>&& promise, Object& object, MemberFn memberFn, Args&&... args) {
     auto tuple = std::make_tuple(std::forward<Args>(args)...);
-    return std::make_unique<AskMessageImpl<ResultType, Object, MemberFn, decltype(tuple)>>(std::move(promise), object, memberFn, std::move(tuple));
+    return std::make_unique<AskMessageImpl<ResultType, Object, MemberFn, decltype(tuple)>>(
+        std::move(promise), object, memberFn, std::move(tuple));
 }
 
 } // namespace actor

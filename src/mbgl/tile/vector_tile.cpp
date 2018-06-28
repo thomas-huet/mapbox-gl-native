@@ -1,7 +1,7 @@
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/vector_tile_data.hpp>
-#include <mbgl/tile/tile_loader_impl.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
 
 namespace mbgl {
 

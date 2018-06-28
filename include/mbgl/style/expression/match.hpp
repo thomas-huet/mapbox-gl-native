@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/style/conversion.hpp>
 
 #include <memory>
 
@@ -18,12 +18,12 @@ public:
     Match(type::Type type_,
           std::unique_ptr<Expression> input_,
           Branches branches_,
-          std::unique_ptr<Expression> otherwise_
-    ) : Expression(type_),
-        input(std::move(input_)),
-        branches(std::move(branches_)),
-        otherwise(std::move(otherwise_))
-    {}
+          std::unique_ptr<Expression> otherwise_)
+        : Expression(type_),
+          input(std::move(input_)),
+          branches(std::move(branches_)),
+          otherwise(std::move(otherwise_)) {
+    }
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
 
@@ -32,9 +32,12 @@ public:
     bool operator==(const Expression& e) const override;
 
     std::vector<optional<Value>> possibleOutputs() const override;
-    
+
     mbgl::Value serialize() const override;
-    std::string getOperator() const override { return "match"; }
+    std::string getOperator() const override {
+        return "match";
+    }
+
 private:
     std::unique_ptr<Expression> input;
     Branches branches;

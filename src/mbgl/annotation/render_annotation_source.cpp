@@ -1,7 +1,7 @@
-#include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -32,17 +32,12 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     enabled = needsRendering;
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::Annotations,
+    tilePyramid.update(layers, needsRendering, needsRelayout, parameters, SourceType::Annotations,
                        util::tileSize,
                        // Zoom level 16 is typically sufficient for annotations.
                        // See https://github.com/mapbox/mapbox-gl-native/issues/10197
-                       { 0, 16 },
-                       optional<LatLngBounds> {},
-                       [&] (const OverscaledTileID& tileID) {
+                       { 0, 16 }, optional<LatLngBounds>{},
+                       [&](const OverscaledTileID& tileID) {
                            return std::make_unique<AnnotationTile>(tileID, parameters);
                        });
 }

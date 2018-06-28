@@ -1,16 +1,16 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/projection.hpp>
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #include <limits>
 
 namespace mbgl {
@@ -70,7 +70,8 @@ public:
 
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&,
+                                    LatLng::WrapMode = LatLng::Unwrapped) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
@@ -105,7 +106,7 @@ private:
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
     void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setLatLngZoom(const LatLng &latLng, double zoom);
+    void setLatLngZoom(const LatLng& latLng, double zoom);
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:

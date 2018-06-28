@@ -7,9 +7,9 @@
 
 #include <mutex>
 #include <string>
-#include <vector>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace mbgl {
 
@@ -68,11 +68,14 @@ private:
     std::mutex mutex;
 
     bool dirty = false;
-    
+
     AnnotationID nextID = 0;
 
-    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
-    // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that older annotations are below newer annotations.
+    using SymbolAnnotationTree =
+        boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>,
+                                      boost::geometry::index::rstar<16, 4>>;
+    // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that
+    // older annotations are below newer annotations.
     // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
     using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
     using ShapeAnnotationMap = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;

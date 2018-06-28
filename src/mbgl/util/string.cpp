@@ -1,5 +1,5 @@
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/dtoa.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace util {

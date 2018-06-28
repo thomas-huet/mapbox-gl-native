@@ -1,7 +1,7 @@
 #include <mbgl/util/font_stack.hpp>
 
-#include <boost/functional/hash.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace mbgl {
 

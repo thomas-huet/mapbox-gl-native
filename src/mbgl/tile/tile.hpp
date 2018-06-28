@@ -1,21 +1,21 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/feature.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/tile/tile_necessity.hpp>
-#include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_necessity.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/feature.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
-#include <string>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
 #include <unordered_map>
 
 namespace mbgl {
@@ -40,7 +40,8 @@ public:
 
     void setObserver(TileObserver* observer);
 
-    virtual void setNecessity(TileNecessity) {}
+    virtual void setNecessity(TileNecessity) {
+    }
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel();
@@ -48,21 +49,22 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
-    virtual void setShowCollisionBoxes(const bool) {}
-    virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
-    virtual void setMask(TileMask&&) {}
+    virtual void setShowCollisionBoxes(const bool) {
+    }
+    virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {
+    }
+    virtual void setMask(TileMask&&) {
+    }
 
-    virtual void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const std::vector<const RenderLayer*>&,
-            const RenderedQueryOptions& options,
-            const mat4& projMatrix);
+    virtual void
+    queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                          const GeometryCoordinates& queryGeometry,
+                          const TransformState&,
+                          const std::vector<const RenderLayer*>&,
+                          const RenderedQueryOptions& options,
+                          const mat4& projMatrix);
 
-    virtual void querySourceFeatures(
-            std::vector<Feature>& result,
-            const SourceQueryOptions&);
+    virtual void querySourceFeatures(std::vector<Feature>& result, const SourceQueryOptions&);
 
     virtual float getQueryPadding(const std::vector<const RenderLayer*>&);
 
@@ -96,21 +98,24 @@ public:
     bool isComplete() const {
         return loaded && !pending;
     }
-    
+
     // "holdForFade" is used to keep tiles in the render tree after they're no longer
     // ideal tiles in order to allow symbols to fade out
     virtual bool holdForFade() const {
         return false;
     }
     // Set whenever this tile is used as an ideal tile
-    virtual void markRenderedIdeal() {}
+    virtual void markRenderedIdeal() {
+    }
     // Set when the tile is removed from the ideal render set but may still be held for fading
-    virtual void markRenderedPreviously() {}
+    virtual void markRenderedPreviously() {
+    }
     // Placement operation performed while this tile is fading
     // We hold onto a tile for two placements: fading starts with the first placement
     // and will have time to finish by the second placement.
-    virtual void performedFadePlacement() {}
-    
+    virtual void performedFadePlacement() {
+    }
+
     void dumpDebugLogs() const;
 
     OverscaledTileID id;

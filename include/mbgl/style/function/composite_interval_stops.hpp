@@ -14,16 +14,14 @@ public:
     Stops stops;
 
     CompositeIntervalStops() = default;
-    CompositeIntervalStops(Stops stops_)
-        : stops(std::move(stops_)) {
+    CompositeIntervalStops(Stops stops_) : stops(std::move(stops_)) {
     }
 
     IntervalStops<T> innerStops(const std::map<float, T>& stops_) const {
         return IntervalStops<T>(stops_);
     }
 
-    friend bool operator==(const CompositeIntervalStops& lhs,
-                           const CompositeIntervalStops& rhs) {
+    friend bool operator==(const CompositeIntervalStops& lhs, const CompositeIntervalStops& rhs) {
         return lhs.stops == rhs.stops;
     }
 };

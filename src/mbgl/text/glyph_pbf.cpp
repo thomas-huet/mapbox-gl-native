@@ -64,24 +64,23 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 glyph.metrics.width >= 256 || glyph.metrics.height >= 256 ||
                 glyph.metrics.left < -128 || glyph.metrics.left >= 128 ||
                 glyph.metrics.top < -128 || glyph.metrics.top >= 128 ||
-                glyph.metrics.advance >= 256 ||
-                glyph.id < glyphRange.first || glyph.id > glyphRange.second) {
+                glyph.metrics.advance >= 256 || glyph.id < glyphRange.first ||
+                glyph.id > glyphRange.second) {
                 continue;
             }
 
             // If the area of width/height is non-zero, we need to adjust the expected size
             // with the implicit border size, otherwise we expect there to be no bitmap at all.
             if (glyph.metrics.width && glyph.metrics.height) {
-                const Size size {
-                    glyph.metrics.width + 2 * Glyph::borderSize,
-                    glyph.metrics.height + 2 * Glyph::borderSize
-                };
+                const Size size{ glyph.metrics.width + 2 * Glyph::borderSize,
+                                 glyph.metrics.height + 2 * Glyph::borderSize };
 
                 if (size.area() != glyphData.size()) {
                     continue;
                 }
 
-                glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()), glyphData.size());
+                glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()),
+                                          glyphData.size());
             }
 
             result.push_back(std::move(glyph));

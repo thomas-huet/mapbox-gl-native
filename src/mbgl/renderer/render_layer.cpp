@@ -1,17 +1,17 @@
-#include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
@@ -31,13 +31,16 @@ std::unique_ptr<RenderLayer> RenderLayer::create(Immutable<Layer::Impl> impl) {
     case LayerType::Raster:
         return std::make_unique<RenderRasterLayer>(staticImmutableCast<RasterLayer::Impl>(impl));
     case LayerType::Hillshade:
-        return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<HillshadeLayer::Impl>(impl));
+        return std::make_unique<RenderHillshadeLayer>(
+            staticImmutableCast<HillshadeLayer::Impl>(impl));
     case LayerType::Background:
-        return std::make_unique<RenderBackgroundLayer>(staticImmutableCast<BackgroundLayer::Impl>(impl));
+        return std::make_unique<RenderBackgroundLayer>(
+            staticImmutableCast<BackgroundLayer::Impl>(impl));
     case LayerType::Custom:
         return std::make_unique<RenderCustomLayer>(staticImmutableCast<CustomLayer::Impl>(impl));
     case LayerType::FillExtrusion:
-        return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<FillExtrusionLayer::Impl>(impl));
+        return std::make_unique<RenderFillExtrusionLayer>(
+            staticImmutableCast<FillExtrusionLayer::Impl>(impl));
     case LayerType::Heatmap:
         return std::make_unique<RenderHeatmapLayer>(staticImmutableCast<HeatmapLayer::Impl>(impl));
     }
@@ -48,8 +51,7 @@ std::unique_ptr<RenderLayer> RenderLayer::create(Immutable<Layer::Impl> impl) {
 }
 
 RenderLayer::RenderLayer(style::LayerType type_, Immutable<style::Layer::Impl> baseImpl_)
-        : type(type_),
-          baseImpl(baseImpl_) {
+    : type(type_), baseImpl(baseImpl_) {
 }
 
 void RenderLayer::setImpl(Immutable<style::Layer::Impl> impl) {
@@ -65,10 +67,8 @@ bool RenderLayer::hasRenderPass(RenderPass pass) const {
 }
 
 bool RenderLayer::needsRendering(float zoom) const {
-    return passes != RenderPass::None
-           && baseImpl->visibility != style::VisibilityType::None
-           && baseImpl->minZoom <= zoom
-           && baseImpl->maxZoom >= zoom;
+    return passes != RenderPass::None && baseImpl->visibility != style::VisibilityType::None &&
+           baseImpl->minZoom <= zoom && baseImpl->maxZoom >= zoom;
 }
 
 void RenderLayer::setRenderTiles(std::vector<std::reference_wrapper<RenderTile>> tiles) {
@@ -102,5 +102,4 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
     }
 }
 
-} //namespace mbgl
-
+} // namespace mbgl

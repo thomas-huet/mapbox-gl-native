@@ -1,8 +1,8 @@
-#include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/style/layers/fill_layer_impl.hpp>
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <mapbox/earcut.hpp>
@@ -11,12 +11,18 @@
 
 namespace mapbox {
 namespace util {
-template <> struct nth<0, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
+template <>
+struct nth<0, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.x;
+    };
 };
 
-template <> struct nth<1, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
+template <>
+struct nth<1, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.y;
+    };
 };
 } // namespace util
 } // namespace mapbox
@@ -27,14 +33,13 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillBucket::FillBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
+FillBucket::FillBucket(const BucketParameters& parameters,
+                       const std::vector<const RenderLayer*>& layers) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderFillLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+        paintPropertyBinders.emplace(std::piecewise_construct,
+                                     std::forward_as_tuple(layer->getID()),
+                                     std::forward_as_tuple(layer->as<RenderFillLayer>()->evaluated,
+                                                           parameters.tileID.overscaledZ));
     }
 }
 
@@ -60,7 +65,9 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
             if (nVertices == 0)
                 continue;
 
-            if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
+            if (lineSegments.empty() ||
+                lineSegments.back().vertexLength + nVertices >
+                    std::numeric_limits<uint16_t>::max()) {
                 lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
             }
 
@@ -85,7 +92,9 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);
 
-        if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
+        if (triangleSegments.empty() ||
+            triangleSegments.back().vertexLength + totalVertices >
+                std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
@@ -94,8 +103,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         uint16_t triangleIndex = triangleSegment.vertexLength;
 
         for (uint32_t i = 0; i < nIndicies; i += 3) {
-            triangles.emplace_back(triangleIndex + indices[i],
-                                   triangleIndex + indices[i + 1],
+            triangles.emplace_back(triangleIndex + indices[i], triangleIndex + indices[i + 1],
                                    triangleIndex + indices[i + 2]);
         }
 
@@ -129,9 +137,9 @@ float FillBucket::getQueryRadius(const RenderLayer& layer) const {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<RenderFillLayer>()->evaluated.get<FillTranslate>();
+    const std::array<float, 2>& translate =
+        layer.as<RenderFillLayer>()->evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
-
 }
 
 } // namespace mbgl

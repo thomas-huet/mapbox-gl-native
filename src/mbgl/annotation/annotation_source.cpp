@@ -1,12 +1,11 @@
-#include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+#include <mbgl/annotation/annotation_source.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
-AnnotationSource::AnnotationSource()
-    : Source(makeMutable<Impl>()) {
+AnnotationSource::AnnotationSource() : Source(makeMutable<Impl>()) {
 }
 
 AnnotationSource::Impl::Impl()

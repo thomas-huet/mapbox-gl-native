@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/layer.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/layer.hpp>
 
 #include <memory>
 

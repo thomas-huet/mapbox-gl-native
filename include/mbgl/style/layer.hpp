@@ -1,15 +1,15 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/unique_any.hpp>
-#include <mbgl/util/immutable.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/unique_any.hpp>
 
 #include <cassert>
 #include <memory>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace mbgl {
 namespace style {
@@ -27,17 +27,20 @@ class HeatmapLayer;
 class LayerObserver;
 
 /**
- * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
+ * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from
+ * the Mapbox Style
  * Specification.
  *
- * `Layer` is an abstract base class; concrete derived classes are provided for each layer type. `Layer` contains
+ * `Layer` is an abstract base class; concrete derived classes are provided for each layer type.
+ * `Layer` contains
  * functionality that is common to all layer types:
  *
  * * Runtime type information: type predicates and casting
  * * Accessors for properties common to all layer types: ID, visibility, etc.
  * * Cloning and copying
  *
- * All other functionality lives in the derived classes. To instantiate a layer, create an instance of the desired
+ * All other functionality lives in the derived classes. To instantiate a layer, create an instance
+ * of the desired
  * type, passing the ID:
  *
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
@@ -97,7 +100,6 @@ public:
         case LayerType::Heatmap:
             return std::forward<V>(visitor)(*as<HeatmapLayer>());
         }
-
 
         // Not reachable, but placate GCC.
         assert(false);

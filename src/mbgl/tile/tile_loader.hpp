@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 namespace mbgl {
 
@@ -15,10 +15,7 @@ class TileParameters;
 template <typename T>
 class TileLoader : private util::noncopyable {
 public:
-    TileLoader(T&,
-               const OverscaledTileID&,
-               const TileParameters&,
-               const Tileset&);
+    TileLoader(T&, const OverscaledTileID&, const TileParameters&, const Tileset&);
     ~TileLoader();
 
     void setNecessity(TileNecessity newNecessity) {
@@ -33,7 +30,8 @@ public:
     }
 
 private:
-    // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
+    // called when the tile is one of the ideal tiles that we want to show definitely. the tile
+    // source
     // should try to make every effort (e.g. fetch from internet, or revalidate existing resources).
     void makeRequired();
 

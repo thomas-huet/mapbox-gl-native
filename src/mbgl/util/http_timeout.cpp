@@ -1,5 +1,5 @@
-#include <mbgl/util/http_timeout.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/http_timeout.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -7,7 +7,9 @@
 namespace mbgl {
 namespace http {
 
-Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests, optional<Timestamp> retryAfter) {
+Duration errorRetryTimeout(Response::Error::Reason failedRequestReason,
+                           uint32_t failedRequests,
+                           optional<Timestamp> retryAfter) {
 
     if (failedRequestReason == Response::Error::Reason::Server) {
         // Retry after one second three times, then start exponential backoff.

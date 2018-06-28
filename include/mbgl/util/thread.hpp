@@ -36,7 +36,7 @@ namespace util {
 // - A `RunLoop` is created for the `Object` thread.
 // - `Object` can use `Timer` and do asynchronous I/O, like wait for sockets events.
 //
-template<class Object>
+template <class Object>
 class Thread : public Scheduler {
 public:
     template <class... Args>

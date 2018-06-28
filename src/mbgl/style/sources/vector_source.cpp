@@ -1,18 +1,17 @@
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/mapbox.hpp>
+#include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/vector_source_impl.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 namespace mbgl {
 namespace style {
 
 VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_)
-    : Source(makeMutable<Impl>(std::move(id))),
-      urlOrTileset(std::move(urlOrTileset_)) {
+    : Source(makeMutable<Impl>(std::move(id))), urlOrTileset(std::move(urlOrTileset_)) {
 }
 
 VectorSource::~VectorSource() = default;
@@ -47,16 +46,19 @@ void VectorSource::loadDescription(FileSource& fileSource) {
     const std::string& url = urlOrTileset.get<std::string>();
     req = fileSource.request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onSourceError(
+                *this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
+            observer->onSourceError(
+                *this, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
         } else {
             conversion::Error error;
             optional<Tileset> tileset = conversion::convertJSON<Tileset>(*res.data, error);
             if (!tileset) {
-                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(error.message)));
+                observer->onSourceError(*this,
+                                        std::make_exception_ptr(std::runtime_error(error.message)));
                 return;
             }
 

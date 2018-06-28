@@ -1,9 +1,9 @@
-#include <mbgl/util/tile_cover.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
-#include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/tile_cover_impl.hpp>
 
 #include <functional>
 #include <list>
@@ -22,7 +22,8 @@ struct edge {
     double dx = 0, dy = 0;
 
     edge(Point<double> a, Point<double> b) {
-        if (a.y > b.y) std::swap(a, b);
+        if (a.y > b.y)
+            std::swap(a, b);
         x0 = a.x;
         y0 = a.y;
         x1 = b.x;
@@ -38,9 +39,8 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
     double y1 = ::fmin(ymax, std::ceil(e1.y1));
 
     // sort edges by x-coordinate
-    if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
-        (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1) :
-        (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+                                           : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
         std::swap(e0, e1);
     }
 
@@ -57,19 +57,32 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
 }
 
 // scan-line conversion
-static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+static void scanTriangle(const Point<double>& a,
+                         const Point<double>& b,
+                         const Point<double>& c,
+                         int32_t ymin,
+                         int32_t ymax,
+                         ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
 
     // sort edges by y-length
-    if (ab.dy > bc.dy) { std::swap(ab, bc); }
-    if (ab.dy > ca.dy) { std::swap(ab, ca); }
-    if (bc.dy > ca.dy) { std::swap(bc, ca); }
+    if (ab.dy > bc.dy) {
+        std::swap(ab, bc);
+    }
+    if (ab.dy > ca.dy) {
+        std::swap(ab, ca);
+    }
+    if (bc.dy > ca.dy) {
+        std::swap(bc, ca);
+    }
 
     // scan span! scan span!
-    if (ab.dy) scanSpans(ca, ab, ymin, ymax, scanLine);
-    if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
+    if (ab.dy)
+        scanSpans(ca, ab, ymin, ymax, scanLine);
+    if (bc.dy)
+        scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
 } // namespace
@@ -116,9 +129,9 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
     });
 
     // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
-    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
-                return a.x == b.x && a.y == b.y;
-            }), t.end());
+    t.erase(std::unique(t.begin(), t.end(),
+                        [](const ID& a, const ID& b) { return a.x == b.x && a.y == b.y; }),
+            t.end());
 
     std::vector<UnwrappedTileID> result;
     for (const auto& id : t) {
@@ -139,23 +152,19 @@ int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
 }
 
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
-    if (bounds_.isEmpty() ||
-        bounds_.south() >  util::LATITUDE_MAX ||
+    if (bounds_.isEmpty() || bounds_.south() > util::LATITUDE_MAX ||
         bounds_.north() < -util::LATITUDE_MAX) {
         return {};
     }
 
-    LatLngBounds bounds = LatLngBounds::hull(
-        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
-        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+    LatLngBounds bounds =
+        LatLngBounds::hull({ std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+                           { std::min(bounds_.north(), util::LATITUDE_MAX), bounds_.east() });
 
     return tileCover(
-        Projection::project(bounds.northwest(), z),
-        Projection::project(bounds.northeast(), z),
-        Projection::project(bounds.southeast(), z),
-        Projection::project(bounds.southwest(), z),
-        Projection::project(bounds.center(), z),
-        z);
+        Projection::project(bounds.northwest(), z), Projection::project(bounds.northeast(), z),
+        Projection::project(bounds.southeast(), z), Projection::project(bounds.southwest(), z),
+        Projection::project(bounds.center(), z), z);
 }
 
 std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
@@ -163,13 +172,11 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
 
     const double w = state.getSize().width;
     const double h = state.getSize().height;
-    return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
-        z);
+    return tileCover(TileCoordinate::fromScreenCoordinate(state, z, { 0, 0 }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w, 0 }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w, h }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { 0, h }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w / 2, h / 2 }).p, z);
 }
 
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
@@ -185,7 +192,7 @@ std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t
 // Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
 // Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
-uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
+uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom) {
     if (zoom == 0) {
         return 1;
     }
@@ -212,13 +219,12 @@ uint64_t tileCount(const Geometry<double>& geometry, uint8_t z) {
     return tileCount;
 }
 
-TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
-    LatLngBounds bounds = LatLngBounds::hull(
-        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
-        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+TileCover::TileCover(const LatLngBounds& bounds_, int32_t z) {
+    LatLngBounds bounds =
+        LatLngBounds::hull({ std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+                           { std::min(bounds_.north(), util::LATITUDE_MAX), bounds_.east() });
 
-    if (bounds.isEmpty() ||
-        bounds.south() >  util::LATITUDE_MAX ||
+    if (bounds.isEmpty() || bounds.south() > util::LATITUDE_MAX ||
         bounds.north() < -util::LATITUDE_MAX) {
         bounds = LatLngBounds::world();
     }
@@ -228,16 +234,15 @@ TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
     auto se = Projection::project(bounds.southeast(), z);
     auto nw = Projection::project(bounds.northwest(), z);
 
-    Polygon<double> p({ {sw, nw, ne, se, sw} });
+    Polygon<double> p({ { sw, nw, ne, se, sw } });
     impl = std::make_unique<TileCover::Impl>(z, p, false);
 }
 
-TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/)
- : impl( std::make_unique<TileCover::Impl>(z, geom, project)) {
+TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project /* = true*/)
+    : impl(std::make_unique<TileCover::Impl>(z, geom, project)) {
 }
 
 TileCover::~TileCover() {
-
 }
 
 optional<UnwrappedTileID> TileCover::next() {

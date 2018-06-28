@@ -4,8 +4,8 @@
 #include <mbgl/gl/vertex_array.hpp>
 
 #include <cstddef>
-#include <vector>
 #include <map>
+#include <vector>
 
 namespace mbgl {
 
@@ -19,7 +19,8 @@ public:
         : vertexOffset(vertexOffset_),
           indexOffset(indexOffset_),
           vertexLength(vertexLength_),
-          indexLength(indexLength_) {}
+          indexLength(indexLength_) {
+    }
 
     const std::size_t vertexOffset;
     const std::size_t indexOffset;

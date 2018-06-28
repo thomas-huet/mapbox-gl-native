@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
-#include <mbgl/actor/mailbox.hpp>
 
 namespace mbgl {
 
@@ -14,13 +14,13 @@ namespace style {
 class CustomTileLoader;
 } // namespace style
 
-class CustomGeometryTile: public GeometryTile {
+class CustomGeometryTile : public GeometryTile {
 public:
     CustomGeometryTile(const OverscaledTileID&,
-               std::string sourceID,
-               const TileParameters&,
-               const style::CustomGeometrySource::TileOptions,
-               ActorRef<style::CustomTileLoader> loader);
+                       std::string sourceID,
+                       const TileParameters&,
+                       const style::CustomGeometrySource::TileOptions,
+                       ActorRef<style::CustomTileLoader> loader);
     ~CustomGeometryTile() override;
 
     void setTileData(const GeoJSON& data);
@@ -28,9 +28,7 @@ public:
 
     void setNecessity(TileNecessity) final;
 
-    void querySourceFeatures(
-        std::vector<Feature>& result,
-        const SourceQueryOptions&) override;
+    void querySourceFeatures(std::vector<Feature>& result, const SourceQueryOptions&) override;
 
 private:
     bool stale = true;

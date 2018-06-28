@@ -1,22 +1,22 @@
-#include <mbgl/renderer/tile_pyramid.hpp>
-#include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/query.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/math/clamp.hpp>
-#include <mbgl/util/tile_cover.hpp>
-#include <mbgl/util/tile_range.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/query.hpp>
+#include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/tile_pyramid.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/tile_range.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace mbgl {
 
@@ -24,8 +24,7 @@ using namespace style;
 
 static TileObserver nullObserver;
 
-TilePyramid::TilePyramid()
-    : observer(&nullObserver) {
+TilePyramid::TilePyramid() : observer(&nullObserver) {
 }
 
 TilePyramid::~TilePyramid() = default;
@@ -56,9 +55,9 @@ std::vector<std::reference_wrapper<RenderTile>> TilePyramid::getRenderTiles() {
     return { renderTiles.begin(), renderTiles.end() };
 }
 
-Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
-        auto it = tiles.find(tileID);
-        return it == tiles.end() ? cache.get(tileID) : it->second.get();
+Tile* TilePyramid::getTile(const OverscaledTileID& tileID) {
+    auto it = tiles.find(tileID);
+    return it == tiles.end() ? cache.get(tileID) : it->second.get();
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
@@ -69,7 +68,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                          const uint16_t tileSize,
                          const Range<uint8_t> zoomRange,
                          optional<LatLngBounds> bounds,
-                         std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
+                         std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile) {
     // If we need a relayout, abandon any cached tiles; they're now stale.
     if (needsRelayout) {
         cache.clear();
@@ -93,7 +92,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     handleWrapJump(parameters.transformState.getLatLng().longitude());
 
     // Determine the overzooming/underzooming amounts and required tiles.
-    int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
+    int32_t overscaledZoom =
+        util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t tileZoom = overscaledZoom;
     int32_t panZoom = zoomRange.max;
 
@@ -102,7 +102,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     if (overscaledZoom >= zoomRange.min) {
         int32_t idealZoom = std::min<int32_t>(zoomRange.max, overscaledZoom);
-
 
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
@@ -138,7 +137,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     // tiles are used from the cache, but not created.
     optional<util::TileRange> tileRange = {};
     if (bounds) {
-        tileRange = util::TileRange::fromLatLngBounds(*bounds, zoomRange.min, std::min(tileZoom, (int32_t)zoomRange.max));
+        tileRange = util::TileRange::fromLatLngBounds(*bounds, zoomRange.min,
+                                                      std::min(tileZoom, (int32_t)zoomRange.max));
     }
     auto createTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
         if (tileRange && !tileRange->contains(tileID.canonical)) {
@@ -166,7 +166,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         renderTiles.emplace_back(tileID, tile);
         rendered.emplace(tileID);
-        previouslyRenderedTiles.erase(tileID); // Still rendering this tile, no need for special fading logic.
+        previouslyRenderedTiles.erase(
+            tileID); // Still rendering this tile, no need for special fading logic.
         tile.markRenderedIdeal();
     };
 
@@ -174,12 +175,13 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     if (!panTiles.empty()) {
         algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn,
-                [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange, panZoom);
+                                     [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange,
+                                     panZoom);
     }
 
-    algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
-                                 idealTiles, zoomRange, tileZoom);
-    
+    algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn, idealTiles,
+                                 zoomRange, tileZoom);
+
     for (auto previouslyRenderedTile : previouslyRenderedTiles) {
         Tile& tile = *previouslyRenderedTile.second;
         tile.markRenderedPreviously();
@@ -264,12 +266,12 @@ void TilePyramid::handleWrapJump(float lng) {
     }
 }
 
-
-std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
-                                           const TransformState& transformState,
-                                           const std::vector<const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options,
-                                           const mat4& projMatrix) const {
+std::unordered_map<std::string, std::vector<Feature>>
+TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
+                                   const TransformState& transformState,
+                                   const std::vector<const RenderLayer*>& layers,
+                                   const RenderedQueryOptions& options,
+                                   const mat4& projMatrix) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
         return result;
@@ -278,8 +280,10 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
     LineString<double> queryGeometry;
 
     for (const auto& p : geometry) {
-        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(
-            transformState, 0, { p.x, transformState.getSize().height - p.y }).p);
+        queryGeometry.push_back(
+            TileCoordinate::fromScreenCoordinate(transformState, 0,
+                                                 { p.x, transformState.getSize().height - p.y })
+                .p);
     }
 
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
@@ -288,21 +292,25 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
                                                                        renderTiles.end() };
     std::sort(sortedTiles.begin(), sortedTiles.end(), [](const RenderTile& a, const RenderTile& b) {
         return std::tie(a.id.canonical.z, a.id.canonical.y, a.id.wrap, a.id.canonical.x) <
-            std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
+               std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
     });
 
     auto maxPitchScaleFactor = transformState.maxPitchScaleFactor();
 
     for (const RenderTile& renderTile : sortedTiles) {
         const float scale = std::pow(2, transformState.getZoom() - renderTile.id.canonical.z);
-        auto queryPadding = maxPitchScaleFactor * renderTile.tile.getQueryPadding(layers) * util::EXTENT / util::tileSize / scale;
+        auto queryPadding = maxPitchScaleFactor * renderTile.tile.getQueryPadding(layers) *
+                            util::EXTENT / util::tileSize / scale;
 
-        GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
-        if (tileSpaceBoundsMin.x - queryPadding >= util::EXTENT || tileSpaceBoundsMin.y - queryPadding >= util::EXTENT) {
+        GeometryCoordinate tileSpaceBoundsMin =
+            TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
+        if (tileSpaceBoundsMin.x - queryPadding >= util::EXTENT ||
+            tileSpaceBoundsMin.y - queryPadding >= util::EXTENT) {
             continue;
         }
 
-        GeometryCoordinate tileSpaceBoundsMax = TileCoordinate::toGeometryCoordinate(renderTile.id, box.max);
+        GeometryCoordinate tileSpaceBoundsMax =
+            TileCoordinate::toGeometryCoordinate(renderTile.id, box.max);
         if (tileSpaceBoundsMax.x + queryPadding < 0 || tileSpaceBoundsMax.y + queryPadding < 0) {
             continue;
         }
@@ -310,15 +318,12 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
         GeometryCoordinates tileSpaceQueryGeometry;
         tileSpaceQueryGeometry.reserve(queryGeometry.size());
         for (const auto& c : queryGeometry) {
-            tileSpaceQueryGeometry.push_back(TileCoordinate::toGeometryCoordinate(renderTile.id, c));
+            tileSpaceQueryGeometry.push_back(
+                TileCoordinate::toGeometryCoordinate(renderTile.id, c));
         }
 
-        renderTile.tile.queryRenderedFeatures(result,
-                                              tileSpaceQueryGeometry,
-                                              transformState,
-                                              layers,
-                                              options,
-                                              projMatrix);
+        renderTile.tile.queryRenderedFeatures(result, tileSpaceQueryGeometry, transformState,
+                                              layers, options, projMatrix);
     }
 
     return result;

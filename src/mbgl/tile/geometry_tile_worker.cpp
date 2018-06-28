@@ -1,17 +1,17 @@
-#include <mbgl/tile/geometry_tile_worker.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/util/logging.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <unordered_set>
 
@@ -70,11 +70,11 @@ GeometryTileWorker::~GeometryTileWorker() = default;
    At the end of processing, we self-send "coalesced", read all the queued messages
    until we get to "coalesced", and then re-parse if there were one or more "set"s or
    return to the [idle] state if not.
- 
+
    One important goal of the design is to prevent starvation. Under heavy load new
    requests for tiles should not prevent in progress request from completing.
    It is nevertheless possible to restart an in-progress request:
- 
+
     - [Idle] setData -> parse()
         sends getGlyphs, hasPendingSymbolDependencies() is true
         enters [Coalescing], sends coalesced
@@ -87,17 +87,17 @@ GeometryTileWorker::~GeometryTileWorker() = default;
     - [NeedsSymbolLayout] coalesced -> performSymbolLayout()
            Generates result depending on whether dependencies are met
            -> [Idle]
- 
+
    In this situation, we are counting on the idea that even with rapid changes to
    the tile's data, the set of glyphs/images it requires will not keep growing without
    limit.
- 
+
    Although parsing (which populates all non-symbol buckets and requests dependencies
    for symbol buckets) is internally separate from symbol layout, we only return
    results to the foreground when we have completed both steps. Because we _move_
    the result buckets to the foreground, it is necessary to re-generate all buckets from
    scratch for `setShowCollisionBoxes`, even though it only affects symbol layers.
- 
+
    The GL JS equivalent (in worker_tile.js and vector_tile_worker_source.js)
    is somewhat simpler because it relies on getGlyphs/getImages calls that transfer
    an entire set of glyphs/images on every tile load, while the native logic
@@ -107,7 +107,8 @@ GeometryTileWorker::~GeometryTileWorker() = default;
    completed parse.
 */
 
-void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, uint64_t correlationID_) {
+void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_,
+                                 uint64_t correlationID_) {
     try {
         data = std::move(data_);
         correlationID = correlationID_;
@@ -129,7 +130,8 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
     }
 }
 
-void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, uint64_t correlationID_) {
+void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_,
+                                   uint64_t correlationID_) {
     try {
         layers = std::move(layers_);
         correlationID = correlationID_;
@@ -277,7 +279,8 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
     for (auto& fontDependencies : glyphDependencies) {
         auto fontGlyphs = glyphMap.find(fontDependencies.first);
         for (auto glyphID : fontDependencies.second) {
-            if (fontGlyphs == glyphMap.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
+            if (fontGlyphs == glyphMap.end() ||
+                fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
                 pendingGlyphDependencies[fontDependencies.first].insert(glyphID);
             }
         }
@@ -290,24 +293,22 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
 void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
     pendingImageDependencies = imageDependencies;
     if (!pendingImageDependencies.empty()) {
-        parent.invoke(&GeometryTile::getImages, std::make_pair(pendingImageDependencies, ++imageCorrelationID));
+        parent.invoke(&GeometryTile::getImages,
+                      std::make_pair(pendingImageDependencies, ++imageCorrelationID));
     }
 }
 
-static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
+static std::vector<std::unique_ptr<RenderLayer>>
+toRenderLayers(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     renderLayers.reserve(layers.size());
     for (auto& layer : layers) {
         renderLayers.push_back(RenderLayer::create(layer));
 
-        renderLayers.back()->transition(TransitionParameters {
-            Clock::time_point::max(),
-            TransitionOptions()
-        });
+        renderLayers.back()->transition(
+            TransitionParameters{ Clock::time_point::max(), TransitionOptions() });
 
-        renderLayers.back()->evaluate(PropertyEvaluationParameters {
-            zoom
-        });
+        renderLayers.back()->evaluate(PropertyEvaluationParameters{ zoom });
     }
     return renderLayers;
 }
@@ -327,13 +328,14 @@ void GeometryTileWorker::parse() {
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
     buckets.clear();
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
-    BucketParameters parameters { id, pixelRatio };
+    BucketParameters parameters{ id, pixelRatio };
 
     GlyphDependencies glyphDependencies;
     ImageDependencies imageDependencies;
 
     // Create render layers and group by layout
-    std::vector<std::unique_ptr<RenderLayer>> renderLayers = toRenderLayers(*layers, id.overscaledZ);
+    std::vector<std::unique_ptr<RenderLayer>> renderLayers =
+        toRenderLayers(*layers, id.overscaledZ);
     std::vector<std::vector<const RenderLayer*>> groups = groupByLayout(renderLayers);
 
     for (auto& group : groups) {
@@ -372,7 +374,8 @@ void GeometryTileWorker::parse() {
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
                 std::unique_ptr<GeometryTileFeature> feature = geometryLayer->getFeature(i);
 
-                if (!filter(expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() }))
+                if (!filter(expression::EvaluationContext{ static_cast<float>(this->id.overscaledZ),
+                                                           feature.get() }))
                     continue;
 
                 GeometryCollection geometries = feature->getGeometries();
@@ -412,7 +415,7 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
     }
     return !pendingImageDependencies.empty();
 }
-    
+
 bool GeometryTileWorker::hasPendingParseResult() const {
     return bool(featureIndex);
 }
@@ -421,7 +424,7 @@ void GeometryTileWorker::performSymbolLayout() {
     if (!data || !layers || !hasPendingParseResult() || hasPendingSymbolDependencies()) {
         return;
     }
-    
+
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
 
@@ -437,8 +440,7 @@ void GeometryTileWorker::performSymbolLayout() {
                 return;
             }
 
-            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
+            symbolLayout->prepare(glyphMap, glyphAtlas.positions, imageMap, imageAtlas.positions);
         }
 
         symbolLayoutsNeedPreparation = false;
@@ -463,13 +465,12 @@ void GeometryTileWorker::performSymbolLayout() {
     }
 
     firstLoad = false;
-    
-    parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
-        std::move(buckets),
-        std::move(featureIndex),
-        std::move(glyphAtlasImage),
-        std::move(iconAtlasImage)
-    }, correlationID);
+
+    parent.invoke(&GeometryTile::onLayout,
+                  GeometryTile::LayoutResult{ std::move(buckets), std::move(featureIndex),
+                                              std::move(glyphAtlasImage),
+                                              std::move(iconAtlasImage) },
+                  correlationID);
 }
 
 } // namespace mbgl

@@ -1,12 +1,11 @@
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
 
-CustomLayer::CustomLayer(const std::string& layerID,
-                         std::unique_ptr<CustomLayerHost> host)
+CustomLayer::CustomLayer(const std::string& layerID, std::unique_ptr<CustomLayerHost> host)
     : Layer(makeMutable<Impl>(layerID, std::move(host))) {
 }
 

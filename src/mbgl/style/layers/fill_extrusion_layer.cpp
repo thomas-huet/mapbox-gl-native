@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ FillExtrusionLayer::FillExtrusionLayer(const std::string& layerID, const std::st
     : Layer(makeMutable<Impl>(LayerType::FillExtrusion, layerID, sourceID)) {
 }
 
-FillExtrusionLayer::FillExtrusionLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+FillExtrusionLayer::FillExtrusionLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 FillExtrusionLayer::~FillExtrusionLayer() = default;
@@ -93,7 +92,6 @@ void FillExtrusionLayer::setMaxZoom(float maxZoom) {
 
 // Layout properties
 
-
 // Paint properties
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionOpacity() {
@@ -151,7 +149,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionColorTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getFillExtrusionTranslate() const {
@@ -194,7 +192,8 @@ void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<Translate
     observer->onLayerChanged(*this);
 }
 
-void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const TransitionOptions& options) {
+void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(
+    const TransitionOptions& options) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionTranslateAnchor>().options = options;
     baseImpl = std::move(impl_);

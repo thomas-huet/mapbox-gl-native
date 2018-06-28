@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/util/optional.hpp>
 

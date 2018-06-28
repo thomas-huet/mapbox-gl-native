@@ -8,14 +8,12 @@ namespace mbgl {
 namespace style {
 
 optional<CategoricalValue> categoricalValue(const Value& value) {
-    return value.match(
-        [] (bool t) { return optional<CategoricalValue>(t); },
-        [] (uint64_t t) { return optional<CategoricalValue>(int64_t(t)); },
-        [] (int64_t t) { return optional<CategoricalValue>(t); },
-        [] (double t) { return optional<CategoricalValue>(int64_t(t)); },
-        [] (const std::string& t) { return optional<CategoricalValue>(t); },
-        [] (const auto&) { return optional<CategoricalValue>(); }
-    );
+    return value.match([](bool t) { return optional<CategoricalValue>(t); },
+                       [](uint64_t t) { return optional<CategoricalValue>(int64_t(t)); },
+                       [](int64_t t) { return optional<CategoricalValue>(t); },
+                       [](double t) { return optional<CategoricalValue>(int64_t(t)); },
+                       [](const std::string& t) { return optional<CategoricalValue>(t); },
+                       [](const auto&) { return optional<CategoricalValue>(); });
 }
 
 template <class T>

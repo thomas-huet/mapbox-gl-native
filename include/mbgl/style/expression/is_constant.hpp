@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/expression.hpp>
 
 namespace mbgl {
 namespace style {
@@ -16,7 +16,7 @@ bool isGlobalPropertyConstant(const Expression& expression, const T& properties)
             }
         }
     }
-    
+
     bool isConstant = true;
     expression.eachChild([&](const Expression& e) {
         if (isConstant && !isGlobalPropertyConstant(e, properties)) {
@@ -28,7 +28,6 @@ bool isGlobalPropertyConstant(const Expression& expression, const T& properties)
 
 bool isFeatureConstant(const Expression& expression);
 bool isZoomConstant(const Expression& e);
-
 
 } // namespace expression
 } // namespace style

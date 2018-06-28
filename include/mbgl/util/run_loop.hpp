@@ -1,25 +1,24 @@
 #pragma once
 
-#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
-#include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/util/work_task.hpp>
 
 #include <atomic>
 #include <functional>
-#include <utility>
-#include <queue>
 #include <mutex>
+#include <queue>
+#include <utility>
 
 namespace mbgl {
 namespace util {
 
-using LOOP_HANDLE = void *;
+using LOOP_HANDLE = void*;
 
-class RunLoop : public Scheduler,
-                private util::noncopyable {
+class RunLoop : public Scheduler, private util::noncopyable {
 public:
     enum class Type : uint8_t {
         Default,
@@ -32,9 +31,9 @@ public:
     };
 
     enum class Event : uint8_t {
-        None      = 0,
-        Read      = 1,
-        Write     = 2,
+        None = 0,
+        Read = 1,
+        Write = 2,
         ReadWrite = Read | Write,
     };
 
@@ -66,17 +65,15 @@ public:
 
     // Post the cancellable work fn(args...) to this RunLoop.
     template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeCancellable(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
+    std::unique_ptr<AsyncRequest> invokeCancellable(Fn&& fn, Args&&... args) {
+        std::shared_ptr<WorkTask> task =
+            WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
         push(Priority::Default, task);
         return std::make_unique<WorkRequest>(task);
     }
-                    
+
     void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        invoke([mailbox] () {
-            Mailbox::maybeReceive(mailbox);
-        });
+        invoke([mailbox]() { Mailbox::maybeReceive(mailbox); });
     }
 
     class Impl;

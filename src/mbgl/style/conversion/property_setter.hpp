@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/style/layer.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
-#include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/layer.hpp>
 
 #include <string>
 
@@ -14,13 +14,13 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-using PropertySetter = optional<Error> (*) (Layer&, const Convertible&);
+using PropertySetter = optional<Error> (*)(Layer&, const Convertible&);
 
 template <class L, class PropertyValue, void (L::*setter)(PropertyValue)>
 optional<Error> setProperty(Layer& layer, const Convertible& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
-        return Error { "layer doesn't support this property" };
+        return Error{ "layer doesn't support this property" };
     }
 
     Error error;
@@ -37,7 +37,7 @@ template <class L, void (L::*setter)(const TransitionOptions&)>
 optional<Error> setTransition(Layer& layer, const Convertible& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
-        return Error { "layer doesn't support this property" };
+        return Error{ "layer doesn't support this property" };
     }
 
     Error error;

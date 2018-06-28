@@ -1,14 +1,15 @@
+#include <mbgl/gl/context.hpp>
+#include <mbgl/programs/hillshade_prepare_program.hpp>
+#include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
-#include <mbgl/programs/hillshade_program.hpp>
-#include <mbgl/programs/hillshade_prepare_program.hpp>
-#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
-HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_, Tileset::DEMEncoding encoding): demdata(image_, encoding) {
+HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_, Tileset::DEMEncoding encoding)
+    : demdata(image_, encoding) {
 }
 
 HillshadeBucket::HillshadeBucket(DEMData&& demdata_) : demdata(std::move(demdata_)) {
@@ -26,7 +27,6 @@ void HillshadeBucket::upload(gl::Context& context) {
     if (!hasData()) {
         return;
     }
-
 
     const PremultipliedImage* image = demdata.getImage();
     dem = context.createTexture(*image);
@@ -83,14 +83,18 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
             segments.emplace_back(vertices.vertexSize(), indices.indexSize());
         }
 
-        vertices.emplace_back(
-            HillshadeProgram::layoutVertex({ tlVertex.x, tlVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(tlVertex.y) }));
-        vertices.emplace_back(
-            HillshadeProgram::layoutVertex({ brVertex.x, tlVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(tlVertex.y) }));
-        vertices.emplace_back(
-            HillshadeProgram::layoutVertex({ tlVertex.x, brVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(brVertex.y) }));
-        vertices.emplace_back(
-            HillshadeProgram::layoutVertex({ brVertex.x, brVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(brVertex.y) }));
+        vertices.emplace_back(HillshadeProgram::layoutVertex(
+            { tlVertex.x, tlVertex.y },
+            { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(tlVertex.y) }));
+        vertices.emplace_back(HillshadeProgram::layoutVertex(
+            { brVertex.x, tlVertex.y },
+            { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(tlVertex.y) }));
+        vertices.emplace_back(HillshadeProgram::layoutVertex(
+            { tlVertex.x, brVertex.y },
+            { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(brVertex.y) }));
+        vertices.emplace_back(HillshadeProgram::layoutVertex(
+            { brVertex.x, brVertex.y },
+            { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(brVertex.y) }));
 
         auto& segment = segments.back();
         assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());

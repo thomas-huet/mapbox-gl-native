@@ -1,18 +1,17 @@
 #pragma once
 
-#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
-#include <mbgl/style/expression/is_expression.hpp>
-#include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/literal.hpp>
-#include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/value.hpp>
 
 #include <unordered_set>
-
 
 namespace mbgl {
 namespace style {
@@ -23,7 +22,7 @@ struct Converter<DataDrivenPropertyValue<T>> {
 
     optional<DataDrivenPropertyValue<T>> operator()(const Convertible& value, Error& error) const {
         using namespace mbgl::style::expression;
-        
+
         if (isUndefined(value)) {
             return DataDrivenPropertyValue<T>();
         } else if (isExpression(value)) {
@@ -33,10 +32,10 @@ struct Converter<DataDrivenPropertyValue<T>> {
                 error = { ctx.getCombinedErrors() };
                 return {};
             }
-            
+
             bool featureConstant = isFeatureConstant(**expression);
             bool zoomConstant = isZoomConstant(**expression);
-            
+
             if (featureConstant && !zoomConstant) {
                 return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
             } else if (!featureConstant && zoomConstant) {

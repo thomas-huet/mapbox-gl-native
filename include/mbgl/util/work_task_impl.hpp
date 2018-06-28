@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/work_task.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/work_task.hpp>
 
 #include <mutex>
 
@@ -11,9 +11,7 @@ template <class F, class P>
 class WorkTaskImpl : public WorkTask {
 public:
     WorkTaskImpl(F f, P p, std::shared_ptr<std::atomic<bool>> canceled_)
-      : canceled(std::move(canceled_)),
-        func(std::move(f)),
-        params(std::move(p)) {
+        : canceled(std::move(canceled_)), func(std::move(f)), params(std::move(p)) {
     }
 
     void operator()() override {
@@ -57,9 +55,7 @@ std::shared_ptr<WorkTask> WorkTask::make(Fn&& fn, Args&&... args) {
 
     auto tuple = std::make_tuple(std::forward<Args>(args)...);
     return std::make_shared<WorkTaskImpl<std::decay_t<Fn>, decltype(tuple)>>(
-        std::forward<Fn>(fn),
-        std::move(tuple),
-        flag);
+        std::forward<Fn>(fn), std::move(tuple), flag);
 }
 
 } // namespace mbgl

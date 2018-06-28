@@ -1,11 +1,11 @@
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/conversion/stringify.hpp>
+#include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 #include <unordered_map>
 
@@ -31,7 +31,8 @@ std::string layoutKey(const RenderLayer& layer) {
     return s.GetString();
 }
 
-std::vector<std::vector<const RenderLayer*>> groupByLayout(const std::vector<std::unique_ptr<RenderLayer>>& layers) {
+std::vector<std::vector<const RenderLayer*>>
+groupByLayout(const std::vector<std::unique_ptr<RenderLayer>>& layers) {
     std::unordered_map<std::string, std::vector<const RenderLayer*>> map;
     for (auto& layer : layers) {
         map[layoutKey(*layer)].push_back(layer.get());

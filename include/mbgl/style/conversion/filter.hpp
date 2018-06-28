@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/filter.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/filter.hpp>
 
 namespace mbgl {
 namespace style {

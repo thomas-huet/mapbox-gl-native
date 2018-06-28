@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/gl/types.hpp>
+#include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/color_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
-#include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/types.hpp>
 #include <mbgl/util/color.hpp>
-#include <mbgl/util/size.hpp>
 #include <mbgl/util/range.hpp>
+#include <mbgl/util/size.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -86,7 +86,8 @@ struct StencilOp {
         StencilMode::Op dpfail;
         StencilMode::Op dppass;
     };
-    static const constexpr Type Default = { StencilMode::Keep, StencilMode::Keep, StencilMode::Keep };
+    static const constexpr Type Default = { StencilMode::Keep, StencilMode::Keep,
+                                            StencilMode::Keep };
     static void Set(const Type&);
     static Type Get();
 };
@@ -323,7 +324,8 @@ struct PixelTransferStencil {
     static Type Get();
 };
 
-constexpr bool operator!=(const PixelTransferStencil::Type& a, const PixelTransferStencil::Type& b) {
+constexpr bool operator!=(const PixelTransferStencil::Type& a,
+                          const PixelTransferStencil::Type& b) {
     return a.shift != b.shift || a.offset != b.offset;
 }
 

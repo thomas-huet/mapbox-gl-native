@@ -3,7 +3,5 @@
 #include <mbgl/style/layers/fill_layer_properties.hpp>
 
 namespace mbgl {
-namespace style {
-
-} // namespace style
+namespace style {} // namespace style
 } // namespace mbgl

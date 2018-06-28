@@ -12,15 +12,20 @@ namespace util {
 // See https://github.com/mapbox/cpp/blob/master/C%2B%2B%20Structural%20Metaprogramming.md
 // for more details.
 //
-template <class... Ts> void ignore(Ts&&...) {}
+template <class... Ts>
+void ignore(Ts&&...) {
+}
 
 // std::initializer_list overload, for situations where you need sequenced
 // modifications.
 //
-template <class T> void ignore(const std::initializer_list<T>&) {}
+template <class T>
+void ignore(const std::initializer_list<T>&) {
+}
 
 // Handle the zero-argument case.
-inline void ignore(const std::initializer_list<int>&) {}
+inline void ignore(const std::initializer_list<int>&) {
+}
 
 } // namespace util
 } // namespace mbgl

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/text/collision_index.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <string>
 #include <unordered_map>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/text/collision_index.hpp>
-#include <mbgl/layout/symbol_projection.hpp>
 #include <unordered_set>
 
 namespace mbgl {
@@ -24,7 +24,10 @@ public:
 class JointOpacityState {
 public:
     JointOpacityState(bool placedIcon, bool placedText, bool skipFade);
-    JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
+    JointOpacityState(const JointOpacityState& prevOpacityState,
+                      float increment,
+                      bool placedIcon,
+                      bool placedText);
     bool isHidden() const;
     OpacityState icon;
     OpacityState text;
@@ -33,8 +36,8 @@ public:
 class JointPlacement {
 public:
     JointPlacement(bool text_, bool icon_, bool skipFade_)
-        : text(text_), icon(icon_), skipFade(skipFade_)
-    {}
+        : text(text_), icon(icon_), skipFade(skipFade_) {
+    }
 
     const bool text;
     const bool icon;
@@ -44,21 +47,22 @@ public:
     // visible right away.
     const bool skipFade;
 };
-    
+
 struct RetainedQueryData {
     uint32_t bucketInstanceId;
     std::shared_ptr<FeatureIndex> featureIndex;
     OverscaledTileID tileID;
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
-    
+
     RetainedQueryData(uint32_t bucketInstanceId_,
                       std::shared_ptr<FeatureIndex> featureIndex_,
                       OverscaledTileID tileID_)
-        : bucketInstanceId(bucketInstanceId_)
-        , featureIndex(std::move(featureIndex_))
-        , tileID(std::move(tileID_)) {}
+        : bucketInstanceId(bucketInstanceId_),
+          featureIndex(std::move(featureIndex_)),
+          tileID(std::move(tileID_)) {
+    }
 };
-    
+
 class Placement {
 public:
     Placement(const TransformState&);
@@ -70,20 +74,19 @@ public:
 
     void setRecent(TimePoint now);
     void setStale();
-    
-    const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
-private:
 
-    void placeLayerBucket(
-            SymbolBucket&,
-            const mat4& posMatrix,
-            const mat4& textLabelPlaneMatrix,
-            const mat4& iconLabelPlaneMatrix,
-            const float scale,
-            const float pixelRatio,
-            const bool showCollisionBoxes,
-            std::unordered_set<uint32_t>& seenCrossTileIDs,
-            const bool holdingForFade);
+    const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
+
+private:
+    void placeLayerBucket(SymbolBucket&,
+                          const mat4& posMatrix,
+                          const mat4& textLabelPlaneMatrix,
+                          const mat4& iconLabelPlaneMatrix,
+                          const float scale,
+                          const float pixelRatio,
+                          const bool showCollisionBoxes,
+                          std::unordered_set<uint32_t>& seenCrossTileIDs,
+                          const bool holdingForFade);
 
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
 
@@ -97,7 +100,7 @@ private:
     std::unordered_map<uint32_t, JointOpacityState> opacities;
 
     bool stale = false;
-    
+
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
 };
 

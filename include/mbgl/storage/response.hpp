@@ -3,8 +3,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace mbgl {
 

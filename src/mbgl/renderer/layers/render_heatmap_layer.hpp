@@ -3,12 +3,12 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
-class RenderHeatmapLayer: public RenderLayer {
+class RenderHeatmapLayer : public RenderLayer {
 public:
     RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
     ~RenderHeatmapLayer() final = default;
@@ -18,17 +18,17 @@ public:
     bool hasTransition() const override;
     void render(PaintParameters&, RenderSource*) override;
 
-    bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&) const override;
+    bool queryIntersectsFeature(const GeometryCoordinates&,
+                                const GeometryTileFeature&,
+                                const float,
+                                const TransformState&,
+                                const float,
+                                const mat4&) const override;
 
     void updateColorRamp();
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;

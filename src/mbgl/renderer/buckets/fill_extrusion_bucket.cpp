@@ -1,10 +1,10 @@
-#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
+#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <mapbox/earcut.hpp>
 
@@ -34,13 +34,13 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
+FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters,
+                                         const std::vector<const RenderLayer*>& layers) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(std::piecewise_construct,
-                                     std::forward_as_tuple(layer->getID()),
-                                     std::forward_as_tuple(
-                                                           layer->as<RenderFillExtrusionLayer>()->evaluated,
-                                                           parameters.tileID.overscaledZ));
+        paintPropertyBinders.emplace(
+            std::piecewise_construct, std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(layer->as<RenderFillExtrusionLayer>()->evaluated,
+                                  parameters.tileID.overscaledZ));
     }
 }
 
@@ -58,7 +58,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 throw GeometryTooLongException();
         }
 
-        if (totalVertices == 0) continue;
+        if (totalVertices == 0)
+            continue;
 
         std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
@@ -166,7 +167,8 @@ float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionTranslate>();
+    const std::array<float, 2>& translate =
+        layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

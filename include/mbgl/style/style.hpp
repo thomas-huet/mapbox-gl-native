@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/geo.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace mbgl {
 
@@ -40,7 +40,7 @@ public:
     void setTransitionOptions(const TransitionOptions&);
 
     // Light
-          Light* getLight();
+    Light* getLight();
     const Light* getLight() const;
 
     void setLight(std::unique_ptr<Light>);
@@ -51,20 +51,20 @@ public:
     void removeImage(const std::string&);
 
     // Sources
-    std::vector<      Source*> getSources();
+    std::vector<Source*> getSources();
     std::vector<const Source*> getSources() const;
 
-          Source* getSource(const std::string&);
+    Source* getSource(const std::string&);
     const Source* getSource(const std::string&) const;
 
     void addSource(std::unique_ptr<Source>);
     std::unique_ptr<Source> removeSource(const std::string& sourceID);
 
     // Layers
-    std::vector<      Layer*> getLayers();
+    std::vector<Layer*> getLayers();
     std::vector<const Layer*> getLayers() const;
 
-          Layer* getLayer(const std::string&);
+    Layer* getLayer(const std::string&);
     const Layer* getLayer(const std::string&) const;
 
     void addLayer(std::unique_ptr<Layer>, const optional<std::string>& beforeLayerID = {});

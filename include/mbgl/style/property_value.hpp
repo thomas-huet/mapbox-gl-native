@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/util/variant.hpp>
-#include <mbgl/style/undefined.hpp>
 #include <mbgl/style/function/camera_function.hpp>
+#include <mbgl/style/undefined.hpp>
+#include <mbgl/util/variant.hpp>
 
 namespace mbgl {
 namespace style {
@@ -22,17 +22,32 @@ private:
     }
 
 public:
-    PropertyValue()                           : value()         {}
-    PropertyValue(               T  constant) : value(constant) {}
-    PropertyValue(CameraFunction<T> function) : value(function) {}
+    PropertyValue() : value() {
+    }
+    PropertyValue(T constant) : value(constant) {
+    }
+    PropertyValue(CameraFunction<T> function) : value(function) {
+    }
 
-    bool isUndefined()      const { return value.which() == 0; }
-    bool isConstant()       const { return value.which() == 1; }
-    bool isCameraFunction() const { return value.which() == 2; }
-    bool isDataDriven()     const { return false; }
+    bool isUndefined() const {
+        return value.which() == 0;
+    }
+    bool isConstant() const {
+        return value.which() == 1;
+    }
+    bool isCameraFunction() const {
+        return value.which() == 2;
+    }
+    bool isDataDriven() const {
+        return false;
+    }
 
-    const                T & asConstant()       const { return value.template get<               T >(); }
-    const CameraFunction<T>& asCameraFunction() const { return value.template get<CameraFunction<T>>(); }
+    const T& asConstant() const {
+        return value.template get<T>();
+    }
+    const CameraFunction<T>& asCameraFunction() const {
+        return value.template get<CameraFunction<T>>();
+    }
 
     template <typename Evaluator>
     auto evaluate(const Evaluator& evaluator, TimePoint = {}) const {

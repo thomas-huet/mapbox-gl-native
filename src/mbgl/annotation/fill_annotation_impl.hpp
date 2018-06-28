@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/annotation/shape_annotation_impl.hpp>
 
 namespace mbgl {
 

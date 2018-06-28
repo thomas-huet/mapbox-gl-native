@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/expression/expression.hpp>
 
 #include <memory>
 #include <vector>
@@ -15,11 +15,12 @@ namespace expression {
  * "to-color".  Since these coercions can fail at runtime, they accept multiple
  * arguments, only evaluating one at a time until one succeeds.
  */
-class Coercion : public Expression  {
+class Coercion : public Expression {
 public:
     Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_);
 
-    static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
+    static ParseResult parse(const mbgl::style::conversion::Convertible& value,
+                             ParsingContext& ctx);
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
@@ -29,12 +30,12 @@ public:
     std::vector<optional<Value>> possibleOutputs() const override;
 
     std::string getOperator() const override;
+
 private:
-    EvaluationResult (*coerceSingleValue) (const Value& v);
+    EvaluationResult (*coerceSingleValue)(const Value& v);
     std::vector<std::unique_ptr<Expression>> inputs;
 };
 
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

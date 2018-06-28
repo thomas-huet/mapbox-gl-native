@@ -3,13 +3,11 @@
 namespace mbgl {
 namespace style {
 
-VectorSource::Impl::Impl(std::string id_)
-    : Source::Impl(SourceType::Vector, std::move(id_)) {
+VectorSource::Impl::Impl(std::string id_) : Source::Impl(SourceType::Vector, std::move(id_)) {
 }
 
 VectorSource::Impl::Impl(const Impl& other, Tileset tileset_)
-    : Source::Impl(other),
-      tileset(std::move(tileset_)) {
+    : Source::Impl(other), tileset(std::move(tileset_)) {
 }
 
 optional<Tileset> VectorSource::Impl::getTileset() const {

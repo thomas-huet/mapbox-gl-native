@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/tile_pyramid.hpp>
-#include <mbgl/annotation/annotation_source.hpp>
 
 namespace mbgl {
 
@@ -30,8 +30,7 @@ public:
                           const RenderedQueryOptions& options,
                           const mat4& projMatrix) const final;
 
-    std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const final;
+    std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const final;
 
     void reduceMemoryUse() final;
     void dumpDebugLogs() const final;

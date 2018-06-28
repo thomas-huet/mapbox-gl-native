@@ -12,11 +12,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
             return false;
-        } else if (
-            name == "properties" ||
-            name == "geometry-type" ||
-            name == "id"
-        ) {
+        } else if (name == "properties" || name == "geometry-type" || name == "id") {
             return false;
         }
     }
@@ -31,9 +27,8 @@ bool isFeatureConstant(const Expression& expression) {
 }
 
 bool isZoomConstant(const Expression& e) {
-    return isGlobalPropertyConstant(e, std::array<std::string, 1>{{"zoom"}});
+    return isGlobalPropertyConstant(e, std::array<std::string, 1>{ { "zoom" } });
 }
-
 
 } // namespace expression
 } // namespace style

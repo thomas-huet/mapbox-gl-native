@@ -1,6 +1,6 @@
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
 #include <mbgl/style/expression/value.hpp>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 namespace mbgl {
 namespace style {
@@ -19,46 +19,42 @@ type::Type typeOf(const Value& value) {
             for (const auto& item : arr) {
                 const type::Type t = typeOf(item);
                 if (!itemType) {
-                    itemType = {t};
+                    itemType = { t };
                 } else if (*itemType == t) {
                     continue;
                 } else {
-                    itemType = {type::Value};
+                    itemType = { type::Value };
                     break;
                 }
             }
 
             return type::Array(itemType.value_or(type::Value), arr.size());
-        }
-    );
+        });
 }
 
 void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& value) {
-    value.match(
-        [&] (const NullValue&) { writer.Null(); },
-        [&] (bool b) { writer.Bool(b); },
-        [&] (double f) {
-            // make sure integer values are stringified without trailing ".0".
-            f == std::floor(f) ? writer.Int(f) : writer.Double(f);
-        },
-        [&] (const std::string& s) { writer.String(s); },
-        [&] (const Color& c) { writer.String(c.stringify()); },
-        [&] (const std::vector<Value>& arr) {
-            writer.StartArray();
-            for(const auto& item : arr) {
-                writeJSON(writer, item);
-            }
-            writer.EndArray();
-        },
-        [&] (const std::unordered_map<std::string, Value>& obj) {
-            writer.StartObject();
-            for(const auto& entry : obj) {
-                writer.Key(entry.first.c_str());
-                writeJSON(writer, entry.second);
-            }
-            writer.EndObject();
-        }
-    );
+    value.match([&](const NullValue&) { writer.Null(); }, [&](bool b) { writer.Bool(b); },
+                [&](double f) {
+                    // make sure integer values are stringified without trailing ".0".
+                    f == std::floor(f) ? writer.Int(f) : writer.Double(f);
+                },
+                [&](const std::string& s) { writer.String(s); },
+                [&](const Color& c) { writer.String(c.stringify()); },
+                [&](const std::vector<Value>& arr) {
+                    writer.StartArray();
+                    for (const auto& item : arr) {
+                        writeJSON(writer, item);
+                    }
+                    writer.EndArray();
+                },
+                [&](const std::unordered_map<std::string, Value>& obj) {
+                    writer.StartObject();
+                    for (const auto& entry : obj) {
+                        writer.Key(entry.first.c_str());
+                        writeJSON(writer, entry.second);
+                    }
+                    writer.EndObject();
+                });
 }
 
 std::string stringify(const Value& value) {
@@ -72,25 +68,33 @@ struct FromMBGLValue {
     Value operator()(const std::vector<mbgl::Value>& v) {
         std::vector<Value> result;
         result.reserve(v.size());
-        for(const auto& item : v) {
+        for (const auto& item : v) {
             result.emplace_back(toExpressionValue(item));
         }
         return result;
     }
-    
+
     Value operator()(const std::unordered_map<std::string, mbgl::Value>& v) {
         std::unordered_map<std::string, Value> result;
         result.reserve(v.size());
-        for(const auto& entry : v) {
+        for (const auto& entry : v) {
             result.emplace(entry.first, toExpressionValue(entry.second));
         }
         return result;
     }
-    
-    Value operator()(const std::string& s) { return s; }
-    Value operator()(const bool b) { return b; }
-    Value operator()(const NullValue) { return Null; }
-    Value operator()(const double v) { return v; }
+
+    Value operator()(const std::string& s) {
+        return s;
+    }
+    Value operator()(const bool b) {
+        return b;
+    }
+    Value operator()(const NullValue) {
+        return Null;
+    }
+    Value operator()(const double v) {
+        return v;
+    }
     Value operator()(const uint64_t& v) {
         return static_cast<double>(v);
     }
@@ -105,17 +109,13 @@ Value ValueConverter<mbgl::Value>::toExpressionValue(const mbgl::Value& value) {
 
 mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value) {
     return value.match(
-        [&](const Color& color)->mbgl::Value {
+        [&](const Color& color) -> mbgl::Value {
             std::array<double, 4> array = color.toArray();
             return std::vector<mbgl::Value>{
-                std::string("rgba"),
-                array[0],
-                array[1],
-                array[2],
-                array[3],
+                std::string("rgba"), array[0], array[1], array[2], array[3],
             };
         },
-        [&](const std::vector<Value>& values)->mbgl::Value {
+        [&](const std::vector<Value>& values) -> mbgl::Value {
             std::vector<mbgl::Value> converted;
             converted.reserve(values.size());
             for (const Value& v : values) {
@@ -123,16 +123,15 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
             }
             return converted;
         },
-        [&](const std::unordered_map<std::string, Value>& values)->mbgl::Value {
+        [&](const std::unordered_map<std::string, Value>& values) -> mbgl::Value {
             std::unordered_map<std::string, mbgl::Value> converted;
             converted.reserve(values.size());
-            for(const auto& entry : values) {
+            for (const auto& entry : values) {
                 converted.emplace(entry.first, fromExpressionValue(entry.second));
             }
             return converted;
         },
-        [&](const auto& a)->mbgl::Value { return a; }
-    );
+        [&](const auto& a) -> mbgl::Value { return a; });
 }
 
 Value ValueConverter<float>::toExpressionValue(const float value) {
@@ -140,11 +139,9 @@ Value ValueConverter<float>::toExpressionValue(const float value) {
 }
 
 optional<float> ValueConverter<float>::fromExpressionValue(const Value& value) {
-    return value.template is<double>()
-        ? static_cast<float>(value.template get<double>())
-        : optional<float>();
+    return value.template is<double>() ? static_cast<float>(value.template get<double>())
+                                       : optional<float>();
 }
-
 
 template <typename T, typename Container>
 std::vector<Value> toArrayValue(const Container& value) {
@@ -162,26 +159,26 @@ Value ValueConverter<std::array<T, N>>::toExpressionValue(const std::array<T, N>
 }
 
 template <typename T, std::size_t N>
-optional<std::array<T, N>> ValueConverter<std::array<T, N>>::fromExpressionValue(const Value& value) {
+optional<std::array<T, N>>
+ValueConverter<std::array<T, N>>::fromExpressionValue(const Value& value) {
     return value.match(
-        [&] (const std::vector<Value>& v) -> optional<std::array<T, N>> {
-            if (v.size() != N) return optional<std::array<T, N>>();
-                std::array<T, N> result;
-                auto it = result.begin();
-                for(const Value& item : v) {
-                    optional<T> convertedItem = ValueConverter<T>::fromExpressionValue(item);
-                    if (!convertedItem) {
-                        return optional<std::array<T, N>>();
-                    }
-                    *it = *convertedItem;
-                    it = std::next(it);
+        [&](const std::vector<Value>& v) -> optional<std::array<T, N>> {
+            if (v.size() != N)
+                return optional<std::array<T, N>>();
+            std::array<T, N> result;
+            auto it = result.begin();
+            for (const Value& item : v) {
+                optional<T> convertedItem = ValueConverter<T>::fromExpressionValue(item);
+                if (!convertedItem) {
+                    return optional<std::array<T, N>>();
                 }
-                return result;
+                *it = *convertedItem;
+                it = std::next(it);
+            }
+            return result;
         },
-        [&] (const auto&) { return optional<std::array<T, N>>(); }
-    );
+        [&](const auto&) { return optional<std::array<T, N>>(); });
 }
-
 
 template <typename T>
 Value ValueConverter<std::vector<T>>::toExpressionValue(const std::vector<T>& value) {
@@ -191,10 +188,10 @@ Value ValueConverter<std::vector<T>>::toExpressionValue(const std::vector<T>& va
 template <typename T>
 optional<std::vector<T>> ValueConverter<std::vector<T>>::fromExpressionValue(const Value& value) {
     return value.match(
-        [&] (const std::vector<Value>& v) -> optional<std::vector<T>> {
+        [&](const std::vector<Value>& v) -> optional<std::vector<T>> {
             std::vector<T> result;
             result.reserve(v.size());
-            for(const Value& item : v) {
+            for (const Value& item : v) {
                 optional<T> convertedItem = ValueConverter<T>::fromExpressionValue(item);
                 if (!convertedItem) {
                     return optional<std::vector<T>>();
@@ -203,8 +200,7 @@ optional<std::vector<T>> ValueConverter<std::vector<T>>::fromExpressionValue(con
             }
             return result;
         },
-        [&] (const auto&) { return optional<std::vector<T>>(); }
-    );
+        [&](const auto&) { return optional<std::vector<T>>(); });
 }
 
 Value ValueConverter<Position>::toExpressionValue(const mbgl::style::Position& value) {
@@ -217,18 +213,17 @@ optional<Position> ValueConverter<Position>::fromExpressionValue(const Value& v)
 }
 
 template <typename T>
-Value ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::toExpressionValue(const T& value) {
+Value ValueConverter<T, std::enable_if_t<std::is_enum<T>::value>>::toExpressionValue(
+    const T& value) {
     return std::string(Enum<T>::toString(value));
 }
 
 template <typename T>
-optional<T> ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::fromExpressionValue(const Value& value) {
-    return value.match(
-        [&] (const std::string& v) { return Enum<T>::toEnum(v); },
-        [&] (const auto&) { return optional<T>(); }
-    );
+optional<T> ValueConverter<T, std::enable_if_t<std::is_enum<T>::value>>::fromExpressionValue(
+    const Value& value) {
+    return value.match([&](const std::string& v) { return Enum<T>::toEnum(v); },
+                       [&](const auto&) { return optional<T>(); });
 }
-
 
 Value toExpressionValue(const Value& v) {
     return v;
@@ -244,9 +239,8 @@ optional<Value> fromExpressionValue(const Value& v) {
 }
 
 template <typename T>
-std::enable_if_t< !std::is_convertible<T, Value>::value,
-optional<T>> fromExpressionValue(const Value& v)
-{
+std::enable_if_t<!std::is_convertible<T, Value>::value, optional<T>>
+fromExpressionValue(const Value& v) {
     return ValueConverter<T>::fromExpressionValue(v);
 }
 
@@ -255,18 +249,44 @@ type::Type valueTypeToExpressionType() {
     return ValueConverter<T>::expressionType();
 }
 
-template <> type::Type valueTypeToExpressionType<Value>() { return type::Value; }
-template <> type::Type valueTypeToExpressionType<NullValue>() { return type::Null; }
-template <> type::Type valueTypeToExpressionType<bool>() { return type::Boolean; }
-template <> type::Type valueTypeToExpressionType<double>() { return type::Number; }
-template <> type::Type valueTypeToExpressionType<std::string>() { return type::String; }
-template <> type::Type valueTypeToExpressionType<Color>() { return type::Color; }
-template <> type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() { return type::Object; }
-template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return type::Array(type::Value); }
+template <>
+type::Type valueTypeToExpressionType<Value>() {
+    return type::Value;
+}
+template <>
+type::Type valueTypeToExpressionType<NullValue>() {
+    return type::Null;
+}
+template <>
+type::Type valueTypeToExpressionType<bool>() {
+    return type::Boolean;
+}
+template <>
+type::Type valueTypeToExpressionType<double>() {
+    return type::Number;
+}
+template <>
+type::Type valueTypeToExpressionType<std::string>() {
+    return type::String;
+}
+template <>
+type::Type valueTypeToExpressionType<Color>() {
+    return type::Color;
+}
+template <>
+type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() {
+    return type::Object;
+}
+template <>
+type::Type valueTypeToExpressionType<std::vector<Value>>() {
+    return type::Array(type::Value);
+}
 
 // used only for the special (and private) "error" expression
-template <> type::Type valueTypeToExpressionType<type::ErrorType>() { return type::Error; }
-
+template <>
+type::Type valueTypeToExpressionType<type::ErrorType>() {
+    return type::Error;
+}
 
 template Value toExpressionValue(const mbgl::Value&);
 template optional<mbgl::Value> fromExpressionValue<mbgl::Value>(const Value&);
@@ -294,7 +314,8 @@ template optional<std::vector<float>> fromExpressionValue<std::vector<float>>(co
 template Value toExpressionValue(const std::vector<float>&);
 
 template type::Type valueTypeToExpressionType<std::vector<std::string>>();
-template optional<std::vector<std::string>> fromExpressionValue<std::vector<std::string>>(const Value&);
+template optional<std::vector<std::string>>
+fromExpressionValue<std::vector<std::string>>(const Value&);
 template Value toExpressionValue(const std::vector<std::string>&);
 
 template type::Type valueTypeToExpressionType<AlignmentType>();
@@ -338,7 +359,8 @@ template optional<TranslateAnchorType> fromExpressionValue<TranslateAnchorType>(
 template Value toExpressionValue(const TranslateAnchorType&);
 
 template type::Type valueTypeToExpressionType<HillshadeIlluminationAnchorType>();
-template optional<HillshadeIlluminationAnchorType> fromExpressionValue<HillshadeIlluminationAnchorType>(const Value&);
+template optional<HillshadeIlluminationAnchorType>
+fromExpressionValue<HillshadeIlluminationAnchorType>(const Value&);
 template Value toExpressionValue(const HillshadeIlluminationAnchorType&);
 
 template type::Type valueTypeToExpressionType<LightAnchorType>();

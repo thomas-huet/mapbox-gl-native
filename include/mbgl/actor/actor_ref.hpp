@@ -24,8 +24,7 @@ template <class Object>
 class ActorRef {
 public:
     ActorRef(Object& object_, std::weak_ptr<Mailbox> weakMailbox_)
-        : object(&object_),
-          weakMailbox(std::move(weakMailbox_)) {
+        : object(&object_), weakMailbox(std::move(weakMailbox_)) {
     }
 
     template <typename Fn, class... Args>
@@ -45,12 +44,10 @@ public:
 
         if (auto mailbox = weakMailbox.lock()) {
             mailbox->push(
-                    actor::makeMessage(
-                            std::move(promise), *object, fn, std::forward<Args>(args)...
-                    )
-            );
+                actor::makeMessage(std::move(promise), *object, fn, std::forward<Args>(args)...));
         } else {
-            promise.set_exception(std::make_exception_ptr(std::runtime_error("Actor has gone away")));
+            promise.set_exception(
+                std::make_exception_ptr(std::runtime_error("Actor has gone away")));
         }
 
         return future;

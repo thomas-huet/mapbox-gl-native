@@ -1,7 +1,7 @@
+#include <mbgl/gl/context.hpp>
+#include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
-#include <mbgl/programs/raster_program.hpp>
-#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -11,8 +11,7 @@ RasterBucket::RasterBucket(PremultipliedImage&& image_) {
     image = std::make_shared<PremultipliedImage>(std::move(image_));
 }
 
-RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_): image(image_) {
-
+RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_) : image(image_) {
 }
 
 void RasterBucket::upload(gl::Context& context) {
@@ -80,14 +79,18 @@ void RasterBucket::setMask(TileMask&& mask_) {
             segments.emplace_back(vertices.vertexSize(), indices.indexSize());
         }
 
-        vertices.emplace_back(
-            RasterProgram::layoutVertex({ tlVertex.x, tlVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(tlVertex.y) }));
-        vertices.emplace_back(
-            RasterProgram::layoutVertex({ brVertex.x, tlVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(tlVertex.y) }));
-        vertices.emplace_back(
-            RasterProgram::layoutVertex({ tlVertex.x, brVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(brVertex.y) }));
-        vertices.emplace_back(
-            RasterProgram::layoutVertex({ brVertex.x, brVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(brVertex.y) }));
+        vertices.emplace_back(RasterProgram::layoutVertex(
+            { tlVertex.x, tlVertex.y },
+            { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(tlVertex.y) }));
+        vertices.emplace_back(RasterProgram::layoutVertex(
+            { brVertex.x, tlVertex.y },
+            { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(tlVertex.y) }));
+        vertices.emplace_back(RasterProgram::layoutVertex(
+            { tlVertex.x, brVertex.y },
+            { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(brVertex.y) }));
+        vertices.emplace_back(RasterProgram::layoutVertex(
+            { brVertex.x, brVertex.y },
+            { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(brVertex.y) }));
 
         auto& segment = segments.back();
         assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());

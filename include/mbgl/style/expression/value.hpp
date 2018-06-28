@@ -17,28 +17,30 @@ namespace expression {
 
 struct Value;
 
-using ValueBase = variant<
-    NullValue,
-    bool,
-    double,
-    std::string,
-    Color,
-    mapbox::util::recursive_wrapper<std::vector<Value>>,
-    mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>>;
+using ValueBase = variant<NullValue,
+                          bool,
+                          double,
+                          std::string,
+                          Color,
+                          mapbox::util::recursive_wrapper<std::vector<Value>>,
+                          mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>>;
 struct Value : ValueBase {
     using ValueBase::ValueBase;
-    
+
     // Javascript's Number.MAX_SAFE_INTEGER
-    static uint64_t maxSafeInteger() { return 9007199254740991ULL; }
-    
-    static bool isSafeInteger(uint64_t x) { return x <= maxSafeInteger(); };
+    static uint64_t maxSafeInteger() {
+        return 9007199254740991ULL;
+    }
+
+    static bool isSafeInteger(uint64_t x) {
+        return x <= maxSafeInteger();
+    };
     static bool isSafeInteger(int64_t x) {
         return static_cast<uint64_t>(x > 0 ? x : -x) <= maxSafeInteger();
     }
     static bool isSafeInteger(double x) {
         return static_cast<uint64_t>(x > 0 ? x : -x) <= maxSafeInteger();
     }
-    
 };
 
 constexpr NullValue Null = NullValue();
@@ -63,34 +65,30 @@ Value toExpressionValue(const Value&);
 
 // T = Value (just wrap in optional)
 template <typename T>
-std::enable_if_t<std::is_same<T, Value>::value,
-optional<T>> fromExpressionValue(const Value& v)
-{
+std::enable_if_t<std::is_same<T, Value>::value, optional<T>> fromExpressionValue(const Value& v) {
     return optional<T>(v);
 }
 
 // T = member type of Value
 template <typename T>
-std::enable_if_t< std::is_convertible<T, Value>::value && !std::is_same<T, Value>::value,
-optional<T>> fromExpressionValue(const Value& v)
-{
+std::enable_if_t<std::is_convertible<T, Value>::value && !std::is_same<T, Value>::value,
+                 optional<T>>
+fromExpressionValue(const Value& v) {
     return v.template is<T>() ? v.template get<T>() : optional<T>();
 }
 
 // real conversions
-template <typename T, typename Enable = std::enable_if_t< !std::is_convertible<T, Value>::value >>
+template <typename T, typename Enable = std::enable_if_t<!std::is_convertible<T, Value>::value>>
 Value toExpressionValue(const T& value);
 
 template <typename T>
-std::enable_if_t< !std::is_convertible<T, Value>::value,
-optional<T>> fromExpressionValue(const Value& v);
-
-
+std::enable_if_t<!std::is_convertible<T, Value>::value, optional<T>>
+fromExpressionValue(const Value& v);
 
 template <class T, class Enable = void>
 struct ValueConverter {
     using ExpressionType = T;
-    
+
     static Value toExpressionValue(const T& value) {
         return Value(value);
     }
@@ -102,12 +100,14 @@ struct ValueConverter {
 template <>
 struct ValueConverter<float> {
     using ExpressionType = double;
-    static type::Type expressionType() { return type::Number; }
+    static type::Type expressionType() {
+        return type::Number;
+    }
     static Value toExpressionValue(const float value);
     static optional<float> fromExpressionValue(const Value& value);
 };
 
-template<>
+template <>
 struct ValueConverter<mbgl::Value> {
     static Value toExpressionValue(const mbgl::Value& value);
     static mbgl::Value fromExpressionValue(const Value& value);
@@ -136,15 +136,19 @@ struct ValueConverter<std::vector<T>> {
 template <>
 struct ValueConverter<Position> {
     using ExpressionType = std::vector<Value>;
-    static type::Type expressionType() { return type::Array(type::Number, 3); }
+    static type::Type expressionType() {
+        return type::Array(type::Number, 3);
+    }
     static Value toExpressionValue(const mbgl::style::Position& value);
     static optional<Position> fromExpressionValue(const Value& v);
 };
 
 template <typename T>
-struct ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >> {
+struct ValueConverter<T, std::enable_if_t<std::is_enum<T>::value>> {
     using ExpressionType = std::string;
-    static type::Type expressionType() { return type::String; }
+    static type::Type expressionType() {
+        return type::String;
+    }
     static Value toExpressionValue(const T& value);
     static optional<T> fromExpressionValue(const Value& value);
 };

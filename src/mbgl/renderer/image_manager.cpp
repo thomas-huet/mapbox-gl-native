@@ -1,6 +1,6 @@
+#include <mbgl/gl/context.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -112,8 +112,7 @@ static mapbox::ShelfPack::ShelfPackOptions shelfPackOptions() {
     return options;
 }
 
-ImageManager::ImageManager()
-    : shelfPack(64, 64, shelfPackOptions()) {
+ImageManager::ImageManager() : shelfPack(64, 64, shelfPackOptions()) {
 }
 
 ImageManager::~ImageManager() = default;
@@ -150,20 +149,18 @@ optional<ImagePosition> ImageManager::getPattern(const std::string& id) {
 
     // Add 1 pixel wrapped padding on each side of the image.
     PremultipliedImage::copy(src, atlasImage, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
-    PremultipliedImage::copy(src, atlasImage, { 0,     0 }, { x, y + h }, { w, 1 }); // B
+    PremultipliedImage::copy(src, atlasImage, { 0, 0 }, { x, y + h }, { w, 1 });     // B
     PremultipliedImage::copy(src, atlasImage, { w - 1, 0 }, { x - 1, y }, { 1, h }); // L
-    PremultipliedImage::copy(src, atlasImage, { 0,     0 }, { x + w, y }, { 1, h }); // R
+    PremultipliedImage::copy(src, atlasImage, { 0, 0 }, { x + w, y }, { 1, h });     // R
 
     dirty = true;
 
-    return patterns.emplace(id, Pattern { bin, { *bin, *image } }).first->second.position;
+    return patterns.emplace(id, Pattern{ bin, { *bin, *image } }).first->second.position;
 }
 
 Size ImageManager::getPixelSize() const {
-    return Size {
-        static_cast<uint32_t>(shelfPack.width()),
-        static_cast<uint32_t>(shelfPack.height())
-    };
+    return Size{ static_cast<uint32_t>(shelfPack.width()),
+                 static_cast<uint32_t>(shelfPack.height()) };
 }
 
 void ImageManager::upload(gl::Context& context, gl::TextureUnit unit) {

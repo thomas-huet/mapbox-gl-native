@@ -1,13 +1,13 @@
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/url.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tileset.hpp>
+#include <mbgl/util/url.hpp>
 
+#include <cstring>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <iostream>
-#include <cstring>
 
 namespace {
 
@@ -171,7 +171,10 @@ canonicalizeTileURL(const std::string& str, const style::SourceType type, const 
     return result;
 }
 
-void canonicalizeTileset(Tileset& tileset, const std::string& sourceURL, style::SourceType type, uint16_t tileSize) {
+void canonicalizeTileset(Tileset& tileset,
+                         const std::string& sourceURL,
+                         style::SourceType type,
+                         uint16_t tileSize) {
     // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
     if (isMapboxURL(sourceURL)) {
         for (auto& url : tileset.tiles) {

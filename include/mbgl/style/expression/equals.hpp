@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/style/conversion.hpp>
 
 #include <memory>
 
@@ -21,7 +21,10 @@ public:
     EvaluationResult evaluate(const EvaluationContext&) const override;
     std::vector<optional<Value>> possibleOutputs() const override;
 
-    std::string getOperator() const override { return negate ? "!=" : "=="; }
+    std::string getOperator() const override {
+        return negate ? "!=" : "==";
+    }
+
 private:
     std::unique_ptr<Expression> lhs;
     std::unique_ptr<Expression> rhs;

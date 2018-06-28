@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/gl/types.hpp>
 #include <mbgl/gl/primitives.hpp>
+#include <mbgl/gl/types.hpp>
 
 #include <cassert>
 
@@ -15,7 +15,8 @@ public:
     static constexpr std::size_t bufferGroupSize = 1;
     static constexpr PrimitiveType primitiveType = PrimitiveType::Points;
 
-    explicit Points(float pointSize_) : pointSize(pointSize_) {}
+    explicit Points(float pointSize_) : pointSize(pointSize_) {
+    }
 
     float pointSize;
 };

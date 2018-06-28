@@ -22,14 +22,13 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                const double ratio,
                                                const bool sdf) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
-        ratio <= 0 || ratio > 10 ||
-        srcX >= image.size.width || srcY >= image.size.height ||
-        srcX + width > image.size.width || srcY + height > image.size.height) {
-        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
-            width, height, srcX, srcY,
-            image.size.width, image.size.height,
-            util::toString(ratio).c_str());
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 ||
+        srcX >= image.size.width || srcY >= image.size.height || srcX + width > image.size.width ||
+        srcY + height > image.size.height) {
+        Log::Error(Event::Sprite,
+                   "Can't create sprite with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
+                   width, height, srcX, srcY, image.size.width, image.size.height,
+                   util::toString(ratio).c_str());
         return nullptr;
     }
 
@@ -85,14 +84,16 @@ bool getBoolean(const JSValue& value, const char* name, const bool def = false) 
 
 } // namespace
 
-std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage, const std::string& json) {
+std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage,
+                                                       const std::string& json) {
     const PremultipliedImage raster = decodeImage(encodedImage);
 
     JSDocument doc;
     doc.Parse<0>(json.c_str());
     if (doc.HasParseError()) {
         std::stringstream message;
-        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
+        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError())
+                << " at offset " << doc.GetErrorOffset();
         throw std::runtime_error(message.str());
     } else if (!doc.IsObject()) {
         throw std::runtime_error("Sprite JSON root must be an object");

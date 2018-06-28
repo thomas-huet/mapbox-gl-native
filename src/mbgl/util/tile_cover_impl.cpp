@@ -1,11 +1,11 @@
-#include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/tile_cover_impl.hpp>
 
-#include <functional>
-#include <cmath>
-#include <assert.h>
-#include <limits.h>
 #include <algorithm>
+#include <assert.h>
+#include <cmath>
+#include <functional>
+#include <limits.h>
 
 namespace mbgl {
 namespace util {
@@ -17,23 +17,23 @@ struct TileSpan {
     bool winding;
 };
 
-
 // Find the first local minimum going forward in the list.
 void start_list_on_local_minimum(PointList& points) {
     auto prev_pt = std::prev(points.end(), 2);
     auto pt = points.begin();
     auto next_pt = std::next(pt);
     while (pt != points.end()) {
-        if ((pt->y <= prev_pt->y) &&
-            (pt->y < next_pt->y)) {
+        if ((pt->y <= prev_pt->y) && (pt->y < next_pt->y)) {
             break;
         }
         prev_pt = pt;
         pt++;
         next_pt++;
-        if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
+        if (next_pt == points.end()) {
+            next_pt = std::next(points.begin());
+        }
     }
-    //Re-close linear rings with first_pt = last_pt
+    // Re-close linear rings with first_pt = last_pt
     if (points.back() == points.front()) {
         points.pop_back();
     }
@@ -41,16 +41,17 @@ void start_list_on_local_minimum(PointList& points) {
     points.push_back(*points.begin());
 }
 
-//Create a bound towards a local maximum point, starting from pt.
+// Create a bound towards a local maximum point, starting from pt.
 Bound create_bound_towards_maximum(PointList& points, PointList::iterator& pt) {
-    if (std::distance(pt, points.end()) < 2) { return {}; }
+    if (std::distance(pt, points.end()) < 2) {
+        return {};
+    }
     if (std::distance(pt, points.end()) == 2) {
         Bound bnd;
         if (pt->y < std::next(pt)->y) {
             std::copy(pt, points.end(), std::back_inserter(bnd.points));
             bnd.winding = true;
-        }
-        else {
+        } else {
             std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
             bnd.winding = false;
         }
@@ -61,34 +62,39 @@ Bound create_bound_towards_maximum(PointList& points, PointList::iterator& pt) {
     auto prev_pt = pt == points.begin() ? std::prev(points.end(), 2) : std::prev(pt);
     auto next_pt = std::next(pt) == points.end() ? std::next(points.begin()) : std::next(pt);
     while (pt != points.end()) {
-        if ((pt->y >= prev_pt->y) &&
-            (pt->y > next_pt->y )) {
+        if ((pt->y >= prev_pt->y) && (pt->y > next_pt->y)) {
             break;
         }
         prev_pt = pt;
         pt++;
         next_pt++;
-        if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
+        if (next_pt == points.end()) {
+            next_pt = std::next(points.begin());
+        }
     }
 
     Bound bnd;
-    if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
+    if (std::next(pt) == points.end()) {
+        next_pt = points.end();
+        pt++;
+    };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::copy(begin, next_pt, std::back_inserter(bnd.points));
     bnd.winding = true;
     return bnd;
 }
 
-//Create a bound towards a local minimum point, starting from pt.
+// Create a bound towards a local minimum point, starting from pt.
 Bound create_bound_towards_minimum(PointList& points, PointList::iterator& pt) {
-    if (std::distance(pt, points.end()) < 2) { return {}; }
+    if (std::distance(pt, points.end()) < 2) {
+        return {};
+    }
     if (std::distance(pt, points.end()) == 2) {
         Bound bnd;
         if (pt->y < std::next(pt)->y) {
             std::copy(pt, points.end(), std::back_inserter(bnd.points));
             bnd.winding = true;
-        }
-        else {
+        } else {
             std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
             bnd.winding = false;
         }
@@ -99,29 +105,34 @@ Bound create_bound_towards_minimum(PointList& points, PointList::iterator& pt) {
     auto prev_pt = pt == points.begin() ? std::prev(points.end(), 2) : std::prev(pt);
     auto next_pt = std::next(pt) == points.end() ? std::next(points.begin()) : std::next(pt);
     while (pt != points.end()) {
-        if ((pt->y <= prev_pt->y) &&
-            (pt->y < next_pt->y)) {
+        if ((pt->y <= prev_pt->y) && (pt->y < next_pt->y)) {
             break;
         }
         prev_pt = pt;
         pt++;
         next_pt++;
-        if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
+        if (next_pt == points.end()) {
+            next_pt = std::next(points.begin());
+        }
     }
 
     Bound bnd;
-    if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
+    if (std::next(pt) == points.end()) {
+        next_pt = points.end();
+        pt++;
+    };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
-    //For bounds that start at a max, reverse copy so that all bounds start at a min
+    // For bounds that start at a max, reverse copy so that all bounds start at a min
     std::reverse_copy(begin, next_pt, std::back_inserter(bnd.points));
     bnd.winding = false;
     return bnd;
 }
 
-//Build a map of bounds and their starting Y tile coordinate.
+// Build a map of bounds and their starting Y tile coordinate.
 void build_bounds_map(PointList& points, uint32_t maxTile, BoundsMap& et, bool closed = false) {
-    if (points.size() < 2) return;
-    //While traversing closed rings, start the bounds at a local minimum
+    if (points.size() < 2)
+        return;
+    // While traversing closed rings, start the bounds at a local minimum
     if (closed) {
         start_list_on_local_minimum(points);
     }
@@ -133,11 +144,13 @@ void build_bounds_map(PointList& points, uint32_t maxTile, BoundsMap& et, bool c
 
         if (to_max.points.size() > 0) {
             // Projections may result in values beyond the bounds, clamp to max tile coordinates
-            const auto y = static_cast<uint32_t>(std::floor(clamp(to_max.points.front().y, 0.0, (double)maxTile)));
+            const auto y = static_cast<uint32_t>(
+                std::floor(clamp(to_max.points.front().y, 0.0, (double)maxTile)));
             et[y].push_back(to_max);
         }
         if (to_min.points.size() > 0) {
-            const auto y = static_cast<uint32_t>(std::floor(clamp(to_min.points.front().y, 0.0, (double)maxTile)));
+            const auto y = static_cast<uint32_t>(
+                std::floor(clamp(to_min.points.front().y, 0.0, (double)maxTile)));
             et[y].push_back(to_min);
         }
     }
@@ -149,12 +162,12 @@ void update_span(TileSpan& xp, double x) {
     xp.xmax = std::max(xp.xmax, static_cast<int32_t>(std::ceil(x)));
 }
 
-//Build a vector of X tile-coordinates spanned by each bound.
+// Build a vector of X tile-coordinates spanned by each bound.
 std::vector<TileSpan> scan_row(uint32_t y, Bounds& aet) {
     std::vector<TileSpan> tile_range;
     tile_range.reserve(aet.size());
 
-    for(Bound& b: aet) {
+    for (Bound& b : aet) {
         TileSpan xp = { INT_MAX, 0, b.winding };
         double x;
         const auto numEdges = b.points.size() - 1;
@@ -166,11 +179,11 @@ std::vector<TileSpan> scan_row(uint32_t y, Bounds& aet) {
             // If this edge ends beyond the current row, find the x-intercept where
             // it exits the row
             auto& p1 = b.points[b.currentPoint + 1];
-            if (p1.y > y+1) {
-                x = b.interpolate(y+1);
+            if (p1.y > y + 1) {
+                x = b.interpolate(y + 1);
                 update_span(xp, x);
                 break;
-            } else if(b.currentPoint == numEdges - 1) {
+            } else if (b.currentPoint == numEdges - 1) {
                 // For last edge, consider x-intercept at the end of the edge.
                 x = p1.x;
                 update_span(xp, x);
@@ -183,15 +196,15 @@ std::vector<TileSpan> scan_row(uint32_t y, Bounds& aet) {
     // or there are no more edges
     auto bound = aet.begin();
     while (bound != aet.end()) {
-        if ( bound->currentPoint == bound->points.size() - 1 &&
-            bound->points[bound->currentPoint].y <= y+1) {
+        if (bound->currentPoint == bound->points.size() - 1 &&
+            bound->points[bound->currentPoint].y <= y + 1) {
             bound = aet.erase(bound);
         } else {
             bound++;
         }
     }
     // Sort the X-extents of each crossing bound by x_min, x_max
-    std::sort(tile_range.begin(), tile_range.end(), [] (TileSpan& a, TileSpan& b) {
+    std::sort(tile_range.begin(), tile_range.end(), [](TileSpan& a, TileSpan& b) {
         return std::tie(a.xmin, a.xmax) < std::tie(b.xmin, b.xmax);
     });
 
@@ -201,15 +214,16 @@ std::vector<TileSpan> scan_row(uint32_t y, Bounds& aet) {
 struct BuildBoundsMap {
     int32_t zoom;
     bool project = false;
-    BuildBoundsMap(int32_t z, bool p): zoom(z), project(p) {}
+    BuildBoundsMap(int32_t z, bool p) : zoom(z), project(p) {
+    }
 
-    void buildTable(const std::vector<Point<double>>& points, BoundsMap& et, bool closed = false) const {
+    void
+    buildTable(const std::vector<Point<double>>& points, BoundsMap& et, bool closed = false) const {
         PointList projectedPoints;
         if (project) {
             projectedPoints.reserve(points.size());
-            for(const auto&p : points) {
-                projectedPoints.push_back(
-                    Projection::project(LatLng{ p.y, p.x }, zoom));
+            for (const auto& p : points) {
+                projectedPoints.push_back(Projection::project(LatLng{ p.y, p.x }, zoom));
             }
         } else {
             projectedPoints.insert(projectedPoints.end(), points.begin(), points.end());
@@ -218,15 +232,15 @@ struct BuildBoundsMap {
     }
 
     void buildPolygonTable(const Polygon<double>& polygon, BoundsMap& et) const {
-        for(const auto&ring : polygon) {
+        for (const auto& ring : polygon) {
             buildTable(ring, et, true);
         }
     }
-    BoundsMap operator()(const Point<double>&p) const {
+    BoundsMap operator()(const Point<double>& p) const {
         Bound bnd;
         auto point = p;
-        if(project) {
-            point = Projection::project(LatLng{p.y, p.x}, zoom);
+        if (project) {
+            point = Projection::project(LatLng{ p.y, p.x }, zoom);
         }
         bnd.points.insert(bnd.points.end(), 2, point);
         bnd.winding = false;
@@ -238,15 +252,16 @@ struct BuildBoundsMap {
 
     BoundsMap operator()(const MultiPoint<double>& points) const {
         BoundsMap et;
-        for (const Point<double>& p: points) {
+        for (const Point<double>& p : points) {
             Bound bnd;
             auto point = p;
-            if(project) {
-                point = Projection::project(LatLng{p.y, p.x}, zoom);
+            if (project) {
+                point = Projection::project(LatLng{ p.y, p.x }, zoom);
             }
             bnd.points.insert(bnd.points.end(), 2, point);
             bnd.winding = false;
-            const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
+            const auto y =
+                static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
             et[y].push_back(bnd);
         }
         return et;
@@ -260,7 +275,7 @@ struct BuildBoundsMap {
 
     BoundsMap operator()(const MultiLineString<double>& lines) const {
         BoundsMap et;
-        for(const auto&line : lines) {
+        for (const auto& line : lines) {
             buildTable(line, et);
         }
         return et;
@@ -274,7 +289,7 @@ struct BuildBoundsMap {
 
     BoundsMap operator()(const MultiPolygon<double>& polygons) const {
         BoundsMap et;
-        for(const auto& polygon: polygons) {
+        for (const auto& polygon : polygons) {
             buildPolygonTable(polygon, et);
         }
         return et;
@@ -285,20 +300,21 @@ struct BuildBoundsMap {
     }
 };
 
-TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project)
- : zoom(z) {
+TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project) : zoom(z) {
     ToFeatureType toFeatureType;
     isClosed = apply_visitor(toFeatureType, geom) == FeatureType::Polygon;
 
     BuildBoundsMap toBoundsMap(z, project);
     boundsMap = apply_visitor(toBoundsMap, geom);
-    if (boundsMap.size() == 0) return;
+    if (boundsMap.size() == 0)
+        return;
 
-    //Iniitalize the active edge table, and current row span
+    // Iniitalize the active edge table, and current row span
     currentBounds = boundsMap.begin();
     tileY = 0;
     nextRow();
-    if (tileXSpans.empty()) return;
+    if (tileXSpans.empty())
+        return;
     tileX = tileXSpans.front().first;
 }
 
@@ -306,16 +322,17 @@ void TileCover::Impl::nextRow() {
     // Update AET for next row
     if (currentBounds != boundsMap.end()) {
         if (activeBounds.size() == 0 && currentBounds->first > tileY) {
-            //For multi-geoms: use the next row with an edge table starting point
+            // For multi-geoms: use the next row with an edge table starting point
             tileY = currentBounds->first;
         }
         if (tileY == currentBounds->first) {
-            
-            std::move(currentBounds->second.begin(), currentBounds->second.end(), std::back_inserter(activeBounds));
+
+            std::move(currentBounds->second.begin(), currentBounds->second.end(),
+                      std::back_inserter(activeBounds));
             currentBounds++;
         }
     }
-    //Scan aet and update currenRange with x_min, x_max pairs
+    // Scan aet and update currenRange with x_min, x_max pairs
     auto xps = util::scan_row(tileY, activeBounds);
     if (xps.size() == 0) {
         return;
@@ -343,14 +360,15 @@ bool TileCover::Impl::hasNext() const {
 }
 
 optional<UnwrappedTileID> TileCover::Impl::next() {
-    if (!hasNext()) return {};
+    if (!hasNext())
+        return {};
 
     const auto x = tileX;
     const auto y = tileY;
     tileX++;
     if (tileX >= tileXSpans.front().second) {
         tileXSpans.pop();
-        if(tileXSpans.empty()) {
+        if (tileXSpans.empty()) {
             tileY++;
             nextRow();
         }

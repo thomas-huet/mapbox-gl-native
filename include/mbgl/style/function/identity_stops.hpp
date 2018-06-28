@@ -10,8 +10,7 @@ class IdentityStops {
 public:
     optional<T> evaluate(const Value&) const;
 
-    friend bool operator==(const IdentityStops&,
-                           const IdentityStops&) {
+    friend bool operator==(const IdentityStops&, const IdentityStops&) {
         return true;
     }
 };

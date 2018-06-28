@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID
     : Layer(makeMutable<Impl>(LayerType::Symbol, layerID, sourceID)) {
 }
 
-SymbolLayer::SymbolLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+SymbolLayer::SymbolLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 SymbolLayer::~SymbolLayer() = default;
@@ -809,7 +808,7 @@ TransitionOptions SymbolLayer::getIconHaloBlurTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate() const {
@@ -998,7 +997,7 @@ TransitionOptions SymbolLayer::getTextHaloBlurTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate() const {

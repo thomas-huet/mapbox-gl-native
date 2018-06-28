@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/data_driven_property_evaluator.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
 namespace style {

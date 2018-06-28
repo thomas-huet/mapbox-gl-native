@@ -1,11 +1,11 @@
 #pragma once
 
+#include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/style/light.hpp>
-#include <mbgl/style/property_value.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/position.hpp>
 #include <mbgl/style/properties.hpp>
-#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 

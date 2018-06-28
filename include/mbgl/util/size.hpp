@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 namespace mbgl {
 
@@ -15,7 +15,7 @@ public:
     constexpr uint32_t area() const {
         return width * height;
     }
-    
+
     constexpr float aspectRatio() const {
         return static_cast<float>(width) / static_cast<float>(height);
     }

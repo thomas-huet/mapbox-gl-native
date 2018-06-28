@@ -1,15 +1,14 @@
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/immutable.hpp>
-#include <mbgl/util/variant.hpp>
 #include <mbgl/util/longest_common_subsequence.hpp>
+#include <mbgl/util/variant.hpp>
 
 namespace mbgl {
 
 template <class T, class Eq>
-StyleDifference<T> diff(const Immutable<std::vector<T>>& a,
-                        const Immutable<std::vector<T>>& b,
-                        const Eq& eq) {
+StyleDifference<T>
+diff(const Immutable<std::vector<T>>& a, const Immutable<std::vector<T>>& b, const Eq& eq) {
     StyleDifference<T> result;
 
     if (a == b) {
@@ -18,7 +17,8 @@ StyleDifference<T> diff(const Immutable<std::vector<T>>& a,
 
     std::vector<T> lcs;
 
-    longest_common_subsequence(a->begin(), a->end(), b->begin(), b->end(), std::back_inserter(lcs), eq);
+    longest_common_subsequence(a->begin(), a->end(), b->begin(), b->end(), std::back_inserter(lcs),
+                               eq);
 
     auto aIt = a->begin();
     auto bIt = b->begin();
@@ -33,7 +33,7 @@ StyleDifference<T> diff(const Immutable<std::vector<T>>& a,
             bIt++;
         } else {
             if (aIt->get() != bIt->get()) {
-                result.changed.emplace((*bIt)->id, StyleChange<T> { *aIt, *bIt });
+                result.changed.emplace((*bIt)->id, StyleChange<T>{ *aIt, *bIt });
             }
             aIt++;
             bIt++;
@@ -46,24 +46,22 @@ StyleDifference<T> diff(const Immutable<std::vector<T>>& a,
 
 ImageDifference diffImages(const Immutable<std::vector<ImmutableImage>>& a,
                            const Immutable<std::vector<ImmutableImage>>& b) {
-    return diff(a, b, [] (const ImmutableImage& lhs, const ImmutableImage& rhs) {
+    return diff(a, b, [](const ImmutableImage& lhs, const ImmutableImage& rhs) {
         return lhs->id == rhs->id;
     });
 }
 
 SourceDifference diffSources(const Immutable<std::vector<ImmutableSource>>& a,
                              const Immutable<std::vector<ImmutableSource>>& b) {
-    return diff(a, b, [] (const ImmutableSource& lhs, const ImmutableSource& rhs) {
-        return std::tie(lhs->id, lhs->type)
-            == std::tie(rhs->id, rhs->type);
+    return diff(a, b, [](const ImmutableSource& lhs, const ImmutableSource& rhs) {
+        return std::tie(lhs->id, lhs->type) == std::tie(rhs->id, rhs->type);
     });
 }
 
 LayerDifference diffLayers(const Immutable<std::vector<ImmutableLayer>>& a,
                            const Immutable<std::vector<ImmutableLayer>>& b) {
-    return diff(a, b, [] (const ImmutableLayer& lhs, const ImmutableLayer& rhs) {
-        return std::tie(lhs->id, lhs->type)
-            == std::tie(rhs->id, rhs->type);
+    return diff(a, b, [](const ImmutableLayer& lhs, const ImmutableLayer& rhs) {
+        return std::tie(lhs->id, lhs->type) == std::tie(rhs->id, rhs->type);
     });
 }
 

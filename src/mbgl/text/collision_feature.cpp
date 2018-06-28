@@ -1,6 +1,6 @@
+#include <mbgl/math/log2.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/math/log2.hpp>
 
 namespace mbgl {
 
@@ -15,9 +15,10 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_,
                                    const float overscaling)
-        : indexedFeature(std::move(indexedFeature_))
-        , alongLine(placement == style::SymbolPlacementType::Line) {
-    if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
+    : indexedFeature(std::move(indexedFeature_)),
+      alongLine(placement == style::SymbolPlacementType::Line) {
+    if (top == 0 && bottom == 0 && left == 0 && right == 0)
+        return;
 
     const float y1 = top * boxScale - padding;
     const float y2 = bottom * boxScale + padding;
@@ -28,7 +29,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         float height = y2 - y1;
         const double length = x2 - x1;
 
-        if (height <= 0.0f) return;
+        if (height <= 0.0f)
+            return;
 
         height = std::max(10.0f * boxScale, height);
 
@@ -39,8 +41,12 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
     }
 }
 
-void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                                    const int segment, const float labelLength, const float boxSize, const float overscaling) {
+void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line,
+                                    GeometryCoordinate& anchorPoint,
+                                    const int segment,
+                                    const float labelLength,
+                                    const float boxSize,
+                                    const float overscaling) {
     const float step = boxSize / 2;
     const int nBoxes = std::floor(labelLength / step);
     // We calculate line collision circles out to 300% of what would normally be our
@@ -58,7 +64,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
     // box is at the edge of the label.
     const float firstBoxOffset = -boxSize / 2;
 
-    GeometryCoordinate &p = anchorPoint;
+    GeometryCoordinate& p = anchorPoint;
     int index = segment + 1;
     float anchorDistance = firstBoxOffset;
     const float labelStartDistance = -labelLength / 2;
@@ -92,9 +98,11 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
         const float boxOffset = i * step;
         float boxDistanceToAnchor = labelStartDistance + boxOffset;
 
-         // make the distance between pitch padding boxes bigger
-         if (boxOffset < 0) boxDistanceToAnchor += boxOffset;
-         if (boxOffset > labelLength) boxDistanceToAnchor += boxOffset - labelLength;
+        // make the distance between pitch padding boxes bigger
+        if (boxOffset < 0)
+            boxDistanceToAnchor += boxOffset;
+        if (boxOffset > labelLength)
+            boxDistanceToAnchor += boxOffset - labelLength;
 
         if (boxDistanceToAnchor < anchorDistance) {
             // The line doesn't extend far enough back for this box, skip it
@@ -108,7 +116,8 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             index++;
 
             // There isn't enough room before the end of the line.
-            if (index + 1 >= (int)line.size()) return;
+            if (index + 1 >= (int)line.size())
+                return;
 
             segmentLength = util::dist<float>(line[index], line[index + 1]);
         }
@@ -119,22 +128,21 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
         const auto& p0 = line[index];
         const auto& p1 = line[index + 1];
 
-        Point<float> boxAnchor = {
-            p0.x + segmentBoxDistance / segmentLength * (p1.x - p0.x),
-            p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y)
-        };
-        
+        Point<float> boxAnchor = { p0.x + segmentBoxDistance / segmentLength * (p1.x - p0.x),
+                                   p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y) };
+
         // If the box is within boxSize of the anchor, force the box to be used
         // (so even 0-width labels use at least one box)
         // Otherwise, the .8 multiplication gives us a little bit of conservative
         // padding in choosing which boxes to use (see CollisionIndex#placedCollisionCircles)
-        const float paddedAnchorDistance = std::abs(boxDistanceToAnchor - firstBoxOffset) < step ?
-            0 :
-            (boxDistanceToAnchor - firstBoxOffset) * 0.8;
+        const float paddedAnchorDistance = std::abs(boxDistanceToAnchor - firstBoxOffset) < step
+                                               ? 0
+                                               : (boxDistanceToAnchor - firstBoxOffset) * 0.8;
 
-        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance, boxSize / 2);
+        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2,
+                           -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance,
+                           boxSize / 2);
     }
 }
-
 
 } // namespace mbgl

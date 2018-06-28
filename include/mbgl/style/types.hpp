@@ -38,15 +38,9 @@ enum class LineJoinType : uint8_t {
     FlipBevel
 };
 
-enum class HillshadeIlluminationAnchorType : bool {
-    Map,
-    Viewport
-};
+enum class HillshadeIlluminationAnchorType : bool { Map, Viewport };
 
-enum class TranslateAnchorType : bool {
-    Map,
-    Viewport
-};
+enum class TranslateAnchorType : bool { Map, Viewport };
 
 enum class RotateAnchorType : bool {
     Map,
@@ -69,11 +63,7 @@ enum class AlignmentType : uint8_t {
     Auto,
 };
 
-enum class TextJustifyType : uint8_t {
-    Center,
-    Left,
-    Right
-};
+enum class TextJustifyType : uint8_t { Center, Left, Right };
 
 enum class SymbolAnchorType : uint8_t {
     Center,
@@ -93,17 +83,9 @@ enum class TextTransformType : uint8_t {
     Lowercase,
 };
 
-enum class IconTextFitType : uint8_t {
-    None,
-    Both,
-    Width,
-    Height
-};
+enum class IconTextFitType : uint8_t { None, Both, Width, Height };
 
-enum class LightAnchorType: bool {
-    Map,
-    Viewport
-};
+enum class LightAnchorType : bool { Map, Viewport };
 
 } // namespace style
 } // namespace mbgl

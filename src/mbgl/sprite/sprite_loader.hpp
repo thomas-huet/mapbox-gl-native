@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
-#include <string>
-#include <map>
-#include <set>
-#include <vector>
 #include <array>
+#include <map>
 #include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace mbgl {
 

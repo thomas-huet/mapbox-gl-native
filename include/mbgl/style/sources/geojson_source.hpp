@@ -1,9 +1,9 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 

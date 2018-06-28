@@ -1,8 +1,8 @@
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/extension.hpp>
 #include <mbgl/gl/debugging.hpp>
+#include <mbgl/gl/extension.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 
 #include <cassert>
 

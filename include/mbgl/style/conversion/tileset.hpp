@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/util/tileset.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/util/tileset.hpp>
 
 namespace mbgl {
 namespace style {

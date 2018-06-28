@@ -31,13 +31,14 @@ void updateRenderables(GetTileFn getTile,
         assert(idealRenderTileID.canonical.z <= zoomRange.max);
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
-        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.wrap, idealRenderTileID.canonical);
+        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.wrap,
+                                               idealRenderTileID.canonical);
         auto tile = getTile(idealDataTileID);
         if (!tile) {
             tile = createTile(idealDataTileID);
             // For source types where TileJSON.bounds is set, tiles outside the
             // bounds are not created
-            if(tile == nullptr) {
+            if (tile == nullptr) {
                 continue;
             }
         }
@@ -68,7 +69,8 @@ void updateRenderables(GetTileFn getTile,
             } else {
                 // Check all four actual child tiles.
                 for (const auto& childTileID : idealDataTileID.canonical.children()) {
-                    const OverscaledTileID childDataTileID(overscaledZ, idealRenderTileID.wrap, childTileID);
+                    const OverscaledTileID childDataTileID(overscaledZ, idealRenderTileID.wrap,
+                                                           childTileID);
                     tile = getTile(childDataTileID);
                     if (tile && tile->isRenderable()) {
                         retainTile(*tile, TileNecessity::Optional);

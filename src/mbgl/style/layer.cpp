@@ -7,9 +7,7 @@ namespace style {
 
 static LayerObserver nullObserver;
 
-Layer::Layer(Immutable<Impl> impl)
-    : baseImpl(std::move(impl)),
-      observer(&nullObserver) {
+Layer::Layer(Immutable<Impl> impl) : baseImpl(std::move(impl)), observer(&nullObserver) {
 }
 
 Layer::~Layer() = default;

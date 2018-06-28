@@ -22,11 +22,8 @@ std::string getJSONType(const Convertible& value) {
     // conversion succeeds.
     assert(v);
 
-    return v->match(
-        [&] (const std::string&) { return "string"; },
-        [&] (bool) { return "boolean"; },
-        [&] (auto) { return "number"; }
-    );
+    return v->match([&](const std::string&) { return "string"; }, [&](bool) { return "boolean"; },
+                    [&](auto) { return "number"; });
 }
 
 } // namespace conversion

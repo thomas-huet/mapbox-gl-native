@@ -1,34 +1,34 @@
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/transition_parameters.hpp>
-#include <mbgl/renderer/property_evaluation_parameters.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/gl/debugging.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
-#include <mbgl/renderer/style_diff.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/query.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/renderer/image_manager.hpp>
-#include <mbgl/gl/debugging.hpp>
-#include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/renderer/renderer_impl.hpp>
+#include <mbgl/renderer/renderer_observer.hpp>
+#include <mbgl/renderer/style_diff.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/transition_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
@@ -46,21 +46,22 @@ Renderer::Impl::Impl(RendererBackend& backend_,
                      GLContextMode contextMode_,
                      const optional<std::string> programCacheDir_,
                      const optional<std::string> localFontFamily_)
-    : backend(backend_)
-    , scheduler(scheduler_)
-    , fileSource(fileSource_)
-    , observer(&nullObserver())
-    , contextMode(contextMode_)
-    , pixelRatio(pixelRatio_)
-    , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
-    , imageManager(std::make_unique<ImageManager>())
-    , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
-    , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
-    , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
-    , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
-    , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{})) {
+    : backend(backend_),
+      scheduler(scheduler_),
+      fileSource(fileSource_),
+      observer(&nullObserver()),
+      contextMode(contextMode_),
+      pixelRatio(pixelRatio_),
+      programCacheDir(programCacheDir_),
+      glyphManager(std::make_unique<GlyphManager>(
+          fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_))),
+      imageManager(std::make_unique<ImageManager>()),
+      lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
+      imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
+      sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
+      layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
+      renderLight(makeMutable<Light::Impl>()),
+      placement(std::make_unique<Placement>(TransformState{})) {
     glyphManager->setObserver(this);
 }
 
@@ -86,35 +87,30 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Reset zoom history state.
     zoomHistory.first = true;
-    
+
     assert(BackendScope::exists());
-    
+
     updateParameters.annotationManager.updateData();
 
-    const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
+    const bool zoomChanged =
+        zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
 
-    const TransitionParameters transitionParameters {
-        updateParameters.timePoint,
-        TransitionOptions()
-    };
+    const TransitionParameters transitionParameters{ updateParameters.timePoint,
+                                                     TransitionOptions() };
 
-    const PropertyEvaluationParameters evaluationParameters {
-        zoomHistory,
-        updateParameters.timePoint,
-        Duration::zero()
-    };
+    const PropertyEvaluationParameters evaluationParameters{ zoomHistory,
+                                                             updateParameters.timePoint,
+                                                             Duration::zero() };
 
-    const TileParameters tileParameters {
-        updateParameters.pixelRatio,
-        updateParameters.debugOptions,
-        updateParameters.transformState,
-        scheduler,
-        fileSource,
-        updateParameters.annotationManager,
-        *imageManager,
-        *glyphManager,
-        updateParameters.prefetchZoomDelta
-    };
+    const TileParameters tileParameters{ updateParameters.pixelRatio,
+                                         updateParameters.debugOptions,
+                                         updateParameters.transformState,
+                                         scheduler,
+                                         fileSource,
+                                         updateParameters.annotationManager,
+                                         *imageManager,
+                                         *glyphManager,
+                                         updateParameters.prefetchZoomDelta };
 
     glyphManager->setURL(updateParameters.glyphURL);
 
@@ -129,7 +125,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (lightChanged || zoomChanged || renderLight.hasTransition()) {
         renderLight.evaluate(evaluationParameters);
     }
-
 
     const ImageDifference imageDiff = diffImages(imageImpls, updateParameters.images);
     imageImpls = updateParameters.images;
@@ -150,7 +145,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     imageManager->setLoaded(updateParameters.spriteLoaded);
-
 
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
     layerImpls = updateParameters.layers;
@@ -189,7 +183,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-
     const SourceDifference sourceDiff = diffSources(sourceImpls, updateParameters.sources);
     sourceImpls = updateParameters.sources;
 
@@ -205,7 +198,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderSources.emplace(entry.first, std::move(renderSource));
     }
 
-    const bool hasImageDiff = !(imageDiff.added.empty() && imageDiff.removed.empty() && imageDiff.changed.empty());
+    const bool hasImageDiff =
+        !(imageDiff.added.empty() && imageDiff.removed.empty() && imageDiff.changed.empty());
 
     // Update all sources.
     for (const auto& source : *sourceImpls) {
@@ -214,13 +208,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         bool needsRelayout = false;
 
         for (const auto& layer : *layerImpls) {
-            if (layer->type == LayerType::Background ||
-                layer->type == LayerType::Custom ||
+            if (layer->type == LayerType::Background || layer->type == LayerType::Custom ||
                 layer->source != source->id) {
                 continue;
             }
 
-            if (!needsRendering && getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
+            if (!needsRendering &&
+                getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
                 needsRendering = true;
             }
 
@@ -231,29 +225,20 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             filteredLayers.push_back(layer);
         }
 
-        renderSources.at(source->id)->update(source,
-                                             filteredLayers,
-                                             needsRendering,
-                                             needsRelayout,
-                                             tileParameters);
+        renderSources.at(source->id)
+            ->update(source, filteredLayers, needsRendering, needsRelayout, tileParameters);
     }
 
     transformState = updateParameters.transformState;
 
     if (!staticData) {
-        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
+        staticData =
+            std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
     }
 
-    PaintParameters parameters {
-        backend.getContext(),
-        pixelRatio,
-        contextMode,
-        backend,
-        updateParameters,
-        renderLight.getEvaluated(),
-        *staticData,
-        *imageManager,
-        *lineAtlas
+    PaintParameters parameters{
+        backend.getContext(),       pixelRatio,  contextMode,   backend,   updateParameters,
+        renderLight.getEvaluated(), *staticData, *imageManager, *lineAtlas
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
@@ -287,10 +272,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && (
-                layer->is<RenderFillExtrusionLayer>() ||
-                layer->is<RenderHillshadeLayer>() ||
-                layer->is<RenderHeatmapLayer>())) {
+        if (!parameters.staticData.has3D &&
+            (layer->is<RenderFillExtrusionLayer>() || layer->is<RenderHillshadeLayer>() ||
+             layer->is<RenderHeatmapLayer>())) {
 
             parameters.staticData.has3D = true;
         }
@@ -301,20 +285,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (parameters.contextMode == GLContextMode::Unique
-                    && layerImpl.get() == layerImpls->at(0).get()
-                    && paint.get<BackgroundPattern>().from.empty()) {
+            if (parameters.contextMode == GLContextMode::Unique &&
+                layerImpl.get() == layerImpls->at(0).get() &&
+                paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
                 backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
-                // This is a textured background, or not the bottommost layer. We need to render it with a quad.
-                order.emplace_back(RenderItem { *layer, nullptr });
+                // This is a textured background, or not the bottommost layer. We need to render it
+                // with a quad.
+                order.emplace_back(RenderItem{ *layer, nullptr });
             }
             continue;
         }
 
         if (layer->is<RenderCustomLayer>()) {
-            order.emplace_back(RenderItem { *layer, nullptr });
+            order.emplace_back(RenderItem{ *layer, nullptr });
             continue;
         }
 
@@ -330,22 +315,26 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (symbolLayer) {
             // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
             // on top of each other, with lower symbols being drawn on top of higher symbols.
-            std::sort(sortedTiles.begin(), sortedTiles.end(), [&](const RenderTile& a, const RenderTile& b) {
-                Point<float> pa(a.id.canonical.x, a.id.canonical.y);
-                Point<float> pb(b.id.canonical.x, b.id.canonical.y);
+            std::sort(sortedTiles.begin(), sortedTiles.end(),
+                      [&](const RenderTile& a, const RenderTile& b) {
+                          Point<float> pa(a.id.canonical.x, a.id.canonical.y);
+                          Point<float> pb(b.id.canonical.x, b.id.canonical.y);
 
-                auto par = util::rotate(pa, parameters.state.getAngle());
-                auto pbr = util::rotate(pb, parameters.state.getAngle());
+                          auto par = util::rotate(pa, parameters.state.getAngle());
+                          auto pbr = util::rotate(pb, parameters.state.getAngle());
 
-                return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
-            });
+                          return std::tie(b.id.canonical.z, par.y, par.x) <
+                                 std::tie(a.id.canonical.z, pbr.y, pbr.x);
+                      });
         } else {
             std::sort(sortedTiles.begin(), sortedTiles.end(),
                       [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
-            // Don't render non-symbol layers for tiles that we're only holding on to for symbol fading
-            sortedTiles.erase(std::remove_if(sortedTiles.begin(), sortedTiles.end(),
-                                             [](const auto& tile) { return tile.get().tile.holdForFade(); }),
-                              sortedTiles.end());
+            // Don't render non-symbol layers for tiles that we're only holding on to for symbol
+            // fading
+            sortedTiles.erase(
+                std::remove_if(sortedTiles.begin(), sortedTiles.end(),
+                               [](const auto& tile) { return tile.get().tile.holdForFade(); }),
+                sortedTiles.end());
         }
 
         std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
@@ -367,7 +356,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
         layer->setRenderTiles(std::move(sortedTilesForInsertion));
-        order.emplace_back(RenderItem { *layer, source });
+        order.emplace_back(RenderItem{ *layer, source });
     }
 
     bool symbolBucketsChanged = false;
@@ -376,7 +365,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             const float lng = parameters.state.getLatLng().longitude();
-            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>(), lng)) symbolBucketsChanged = true;
+            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>(), lng))
+                symbolBucketsChanged = true;
         }
     }
 
@@ -386,16 +376,17 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     auto newPlacement = std::make_unique<Placement>(parameters.state);
     std::set<std::string> usedSymbolLayers;
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
-	if (it->layer.is<RenderSymbolLayer>()) {
-	    usedSymbolLayers.insert(it->layer.getID());
-	    newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
-	}
+        if (it->layer.is<RenderSymbolLayer>()) {
+            usedSymbolLayers.insert(it->layer.getID());
+            newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix,
+                                     parameters.debugOptions & MapDebugOptions::Collision);
+        }
     }
 
     newPlacement->commit(*placement, parameters.timePoint);
     crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
     placement = std::move(newPlacement);
-    
+
     updateFadingTiles();
 
     parameters.symbolFadeChange = 1.0;
@@ -415,7 +406,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
-        
+
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
@@ -424,8 +415,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    // - 3D PASS -------------------------------------------------------------------------------------
-    // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
+    // - 3D PASS
+    // -------------------------------------------------------------------------------------
+    // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the
+    // same
     // depth rbo between them.
     if (parameters.staticData.has3D) {
         parameters.staticData.backendSize = parameters.backend.getFramebufferSize();
@@ -436,7 +429,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (!parameters.staticData.depthRenderbuffer ||
             parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
             parameters.staticData.depthRenderbuffer =
-                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
+                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(
+                    parameters.staticData.backendSize);
         }
         parameters.staticData.depthRenderbuffer->shouldClear(true);
 
@@ -472,42 +466,28 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
-        static const Properties<>::PossiblyEvaluated properties {};
+        static const Properties<>::PossiblyEvaluated properties{};
         static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
             auto& program = parameters.staticData.programs.clippingMask;
 
             program.draw(
-                parameters.context,
-                gl::Triangles(),
-                gl::DepthMode::disabled(),
-                gl::StencilMode {
-                    gl::StencilMode::Always(),
-                    static_cast<int32_t>(clipID.second.reference.to_ulong()),
-                    0b11111111,
-                    gl::StencilMode::Keep,
-                    gl::StencilMode::Keep,
-                    gl::StencilMode::Replace
-                },
-                gl::ColorMode::disabled(),
-                parameters.staticData.quadTriangleIndexBuffer,
+                parameters.context, gl::Triangles(), gl::DepthMode::disabled(),
+                gl::StencilMode{ gl::StencilMode::Always(),
+                                 static_cast<int32_t>(clipID.second.reference.to_ulong()),
+                                 0b11111111, gl::StencilMode::Keep, gl::StencilMode::Keep,
+                                 gl::StencilMode::Replace },
+                gl::ColorMode::disabled(), parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
                 program.computeAllUniformValues(
-                    ClippingMaskProgram::UniformValues {
+                    ClippingMaskProgram::UniformValues{
                         uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
                     },
-                    paintAttributeData,
-                    properties,
-                    parameters.state.getZoom()
-                ),
-                program.computeAllAttributeBindings(
-                    parameters.staticData.tileVertexBuffer,
-                    paintAttributeData,
-                    properties
-                ),
-                "clipping"
-            );
+                    paintAttributeData, properties, parameters.state.getZoom()),
+                program.computeAllAttributeBindings(parameters.staticData.tileVertexBuffer,
+                                                    paintAttributeData, properties),
+                "clipping");
         }
     }
 
@@ -524,7 +504,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         const auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(
+            viewport.size, false);
 
         // Scale the Stencil buffer to cover the entire color space.
         auto it = image.data.get();
@@ -544,7 +525,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Actually render the layers
 
-    parameters.depthRangeSize = 1 - (order.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
+    parameters.depthRangeSize =
+        1 - (order.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
@@ -609,7 +591,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(
+            viewport.size, false);
 
         parameters.context.pixelZoom = { 1, 1 };
         parameters.context.rasterPos = { -1, -1, 0, 1 };
@@ -630,9 +613,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.context.bindVertexArray = 0;
     }
 
-    observer->onDidFinishRenderingFrame(
-        loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial
-    );
+    observer->onDidFinishRenderingFrame(loaded ? RendererObserver::RenderMode::Full
+                                               : RendererObserver::RenderMode::Partial);
 
     if (!loaded) {
         renderState = RenderState::Partial;
@@ -645,7 +627,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     parameters.context.performCleanup();
 }
 
-std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
+std::vector<Feature>
+Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry,
+                                      const RenderedQueryOptions& options) const {
     std::vector<const RenderLayer*> layers;
     if (options.layerIDs) {
         for (const auto& layerID : *options.layerIDs) {
@@ -661,41 +645,46 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
 
     return queryRenderedFeatures(geometry, options, layers);
 }
-    
-void Renderer::Impl::queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
-                                          const ScreenLineString& geometry,
-                                          const std::vector<const RenderLayer*>& layers,
-                                          const RenderedQueryOptions& options) const {
-    
+
+void Renderer::Impl::queryRenderedSymbols(
+    std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
+    const ScreenLineString& geometry,
+    const std::vector<const RenderLayer*>& layers,
+    const RenderedQueryOptions& options) const {
+
     auto renderedSymbols = placement->getCollisionIndex().queryRenderedSymbols(geometry);
     std::vector<std::reference_wrapper<const RetainedQueryData>> bucketQueryData;
     for (auto entry : renderedSymbols) {
         bucketQueryData.push_back(placement->getQueryData(entry.first));
     }
     // Although symbol query is global, symbol results are only sortable within a bucket
-    // For a predictable global sort order, we sort the buckets based on their corresponding tile position
-    std::sort(bucketQueryData.begin(), bucketQueryData.end(), [](const RetainedQueryData& a, const RetainedQueryData& b) {
-        return
-            std::tie(a.tileID.canonical.z, a.tileID.canonical.y, a.tileID.wrap, a.tileID.canonical.x) <
-            std::tie(b.tileID.canonical.z, b.tileID.canonical.y, b.tileID.wrap, b.tileID.canonical.x);
+    // For a predictable global sort order, we sort the buckets based on their corresponding tile
+    // position
+    std::sort(bucketQueryData.begin(), bucketQueryData.end(), [](const RetainedQueryData& a,
+                                                                 const RetainedQueryData& b) {
+        return std::tie(a.tileID.canonical.z, a.tileID.canonical.y, a.tileID.wrap,
+                        a.tileID.canonical.x) < std::tie(b.tileID.canonical.z, b.tileID.canonical.y,
+                                                         b.tileID.wrap, b.tileID.canonical.x);
     });
-    
+
     for (auto wrappedQueryData : bucketQueryData) {
         auto& queryData = wrappedQueryData.get();
-        auto bucketSymbols = queryData.featureIndex->lookupSymbolFeatures(renderedSymbols[queryData.bucketInstanceId],
-                                                                          options,
-                                                                          layers,
-                                                                          queryData.tileID,
-                                                                          queryData.featureSortOrder);
-        
+        auto bucketSymbols = queryData.featureIndex->lookupSymbolFeatures(
+            renderedSymbols[queryData.bucketInstanceId], options, layers, queryData.tileID,
+            queryData.featureSortOrder);
+
         for (auto layer : bucketSymbols) {
             auto& resultFeatures = resultsByLayer[layer.first];
-            std::move(layer.second.begin(), layer.second.end(), std::inserter(resultFeatures, resultFeatures.end()));
+            std::move(layer.second.begin(), layer.second.end(),
+                      std::inserter(resultFeatures, resultFeatures.end()));
         }
     }
 }
 
-std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options, const std::vector<const RenderLayer*>& layers) const {
+std::vector<Feature>
+Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry,
+                                      const RenderedQueryOptions& options,
+                                      const std::vector<const RenderLayer*>& layers) const {
     std::unordered_set<std::string> sourceIDs;
     for (const RenderLayer* layer : layers) {
         sourceIDs.emplace(layer->baseImpl->source);
@@ -707,11 +696,13 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
     for (const auto& sourceID : sourceIDs) {
         if (RenderSource* renderSource = getRenderSource(sourceID)) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
-            std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState,
+                                                                     layers, options, projMatrix);
+            std::move(sourceResults.begin(), sourceResults.end(),
+                      std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
-    
+
     queryRenderedSymbols(resultsByLayer, geometry, layers, options);
 
     std::vector<Feature> result;
@@ -740,7 +731,9 @@ std::vector<Feature> Renderer::Impl::queryShapeAnnotations(const ScreenLineStrin
     RenderedQueryOptions options;
     for (const auto& layerImpl : *layerImpls) {
         if (std::mismatch(layerImpl->id.begin(), layerImpl->id.end(),
-                          AnnotationManager::ShapeLayerID.begin(), AnnotationManager::ShapeLayerID.end()).second == AnnotationManager::ShapeLayerID.end()) {
+                          AnnotationManager::ShapeLayerID.begin(),
+                          AnnotationManager::ShapeLayerID.end())
+                .second == AnnotationManager::ShapeLayerID.end()) {
             if (const RenderLayer* layer = getRenderLayer(layerImpl->id)) {
                 shapeAnnotationLayers.emplace_back(layer);
             }
@@ -750,9 +743,11 @@ std::vector<Feature> Renderer::Impl::queryShapeAnnotations(const ScreenLineStrin
     return queryRenderedFeatures(geometry, options, shapeAnnotationLayers);
 }
 
-std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) const {
+std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sourceID,
+                                                         const SourceQueryOptions& options) const {
     const RenderSource* source = getRenderSource(sourceID);
-    if (!source) return {};
+    if (!source)
+        return {};
 
     return source->querySourceFeatures(options);
 }
@@ -821,7 +816,7 @@ void Renderer::Impl::updateFadingTiles() {
 }
 
 bool Renderer::Impl::isLoaded() const {
-    for (const auto& entry: renderSources) {
+    for (const auto& entry : renderSources) {
         if (!entry.second->isLoaded()) {
             return false;
         }
@@ -834,15 +829,21 @@ bool Renderer::Impl::isLoaded() const {
     return true;
 }
 
-void Renderer::Impl::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+void Renderer::Impl::onGlyphsError(const FontStack& fontStack,
+                                   const GlyphRange& glyphRange,
+                                   std::exception_ptr error) {
     Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
-               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(), util::toString(error).c_str());
+               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(),
+               util::toString(error).c_str());
     observer->onResourceError(error);
 }
 
-void Renderer::Impl::onTileError(RenderSource& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+void Renderer::Impl::onTileError(RenderSource& source,
+                                 const OverscaledTileID& tileID,
+                                 std::exception_ptr error) {
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               util::toString(tileID).c_str(), source.baseImpl->id.c_str(), util::toString(error).c_str());
+               util::toString(tileID).c_str(), source.baseImpl->id.c_str(),
+               util::toString(error).c_str());
     observer->onResourceError(error);
 }
 

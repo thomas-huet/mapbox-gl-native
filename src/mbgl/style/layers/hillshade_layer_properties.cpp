@@ -3,7 +3,5 @@
 #include <mbgl/style/layers/hillshade_layer_properties.hpp>
 
 namespace mbgl {
-namespace style {
-
-} // namespace style
+namespace style {} // namespace style
 } // namespace mbgl

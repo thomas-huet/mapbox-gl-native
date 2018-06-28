@@ -6,13 +6,14 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
 namespace mbgl {
 
 namespace util {
-template <typename T> class Thread;
+template <typename T>
+class Thread;
 } // namespace util
 
 class ResourceTransform;
@@ -55,8 +56,8 @@ public:
      * callback, which will be executed on the database thread; it is the responsibility
      * of the SDK bindings to re-execute a user-provided callback on the main thread.
      */
-    void listOfflineRegions(std::function<void (std::exception_ptr,
-                                                optional<std::vector<OfflineRegion>>)>);
+    void listOfflineRegions(
+        std::function<void(std::exception_ptr, optional<std::vector<OfflineRegion>>)>);
 
     /*
      * Create an offline region in the database.
@@ -66,21 +67,21 @@ public:
      * to re-execute a user-provided callback on the main thread.
      *
      * Note that the resulting region will be in an inactive download state; to begin
-     * downloading resources, call `setOfflineRegionDownloadState(OfflineRegionDownloadState::Active)`,
+     * downloading resources, call
+     * `setOfflineRegionDownloadState(OfflineRegionDownloadState::Active)`,
      * optionally registering an `OfflineRegionObserver` beforehand.
      */
     void createOfflineRegion(const OfflineRegionDefinition& definition,
                              const OfflineRegionMetadata& metadata,
-                             std::function<void (std::exception_ptr,
-                                                 optional<OfflineRegion>)>);
+                             std::function<void(std::exception_ptr, optional<OfflineRegion>)>);
 
     /*
      * Update an offline region metadata in the database.
      */
-    void updateOfflineMetadata(const int64_t regionID,
-                               const OfflineRegionMetadata& metadata,
-                               std::function<void (std::exception_ptr,
-                                                   optional<OfflineRegionMetadata>)>);
+    void
+    updateOfflineMetadata(const int64_t regionID,
+                          const OfflineRegionMetadata& metadata,
+                          std::function<void(std::exception_ptr, optional<OfflineRegionMetadata>)>);
     /*
      * Register an observer to be notified when the state of the region changes.
      */
@@ -97,8 +98,9 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void getOfflineRegionStatus(OfflineRegion&, std::function<void (std::exception_ptr,
-                                                                    optional<OfflineRegionStatus>)>) const;
+    void getOfflineRegionStatus(
+        OfflineRegion&,
+        std::function<void(std::exception_ptr, optional<OfflineRegionStatus>)>) const;
 
     /*
      * Remove an offline region from the database and perform any resources evictions
@@ -115,7 +117,7 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void deleteOfflineRegion(OfflineRegion&&, std::function<void (std::exception_ptr)>);
+    void deleteOfflineRegion(OfflineRegion&&, std::function<void(std::exception_ptr)>);
 
     /*
      * Changing or bypassing this limit without permission from Mapbox is prohibited

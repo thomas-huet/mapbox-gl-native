@@ -6,13 +6,14 @@
 
 namespace mbgl {
 
-Mailbox::Mailbox(Scheduler& scheduler_)
-    : scheduler(scheduler_) {
+Mailbox::Mailbox(Scheduler& scheduler_) : scheduler(scheduler_) {
 }
 
 void Mailbox::close() {
-    // Block until neither receive() nor push() are in progress. Two mutexes are used because receive()
-    // must not block send(). Of the two, the receiving mutex must be acquired first, because that is
+    // Block until neither receive() nor push() are in progress. Two mutexes are used because
+    // receive()
+    // must not block send(). Of the two, the receiving mutex must be acquired first, because that
+    // is
     // the order that an actor will obtain them when it self-sends a message, and consistent lock
     // acquisition order prevents deadlocks.
     // The receiving mutex is recursive to allow a mailbox (and thus the actor) to close itself.

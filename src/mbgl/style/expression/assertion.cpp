@@ -7,12 +7,10 @@ namespace expression {
 
 using namespace mbgl::style::conversion;
 ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
-    static std::unordered_map<std::string, type::Type> types {
-        {"string", type::String},
-        {"number", type::Number},
-        {"boolean", type::Boolean},
-        {"object", type::Object}
-    };
+    static std::unordered_map<std::string, type::Type> types{ { "string", type::String },
+                                                              { "number", type::Number },
+                                                              { "boolean", type::Boolean },
+                                                              { "object", type::Object } };
 
     std::size_t length = arrayLength(value);
 
@@ -23,12 +21,13 @@ ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
 
     auto it = types.find(*toString(arrayMember(value, 0)));
     assert(it != types.end());
-    
+
     std::vector<std::unique_ptr<Expression>> parsed;
     parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        ParseResult input = ctx.parse(arrayMember(value, i), i, {type::Value});
-        if (!input) return ParseResult();
+        ParseResult input = ctx.parse(arrayMember(value, i), i, { type::Value });
+        if (!input)
+            return ParseResult();
         parsed.push_back(std::move(*input));
     }
 
@@ -42,23 +41,22 @@ std::string Assertion::getOperator() const {
 EvaluationResult Assertion::evaluate(const EvaluationContext& params) const {
     for (std::size_t i = 0; i < inputs.size(); i++) {
         EvaluationResult value = inputs[i]->evaluate(params);
-        if (!value) return value;
+        if (!value)
+            return value;
         if (!type::checkSubtype(getType(), typeOf(*value))) {
             return value;
         } else if (i == inputs.size() - 1) {
-            return EvaluationError {
-                "Expected value to be of type " + toString(getType()) +
-                ", but found " + toString(typeOf(*value)) + " instead."
-            };
+            return EvaluationError{ "Expected value to be of type " + toString(getType()) +
+                                    ", but found " + toString(typeOf(*value)) + " instead." };
         }
     }
 
     assert(false);
-    return EvaluationError { "Unreachable" };
+    return EvaluationError{ "Unreachable" };
 };
 
 void Assertion::eachChild(const std::function<void(const Expression&)>& visit) const {
-    for(const std::unique_ptr<Expression>& input : inputs) {
+    for (const std::unique_ptr<Expression>& input : inputs) {
         visit(*input);
     }
 };
@@ -83,5 +81,3 @@ std::vector<optional<Value>> Assertion::possibleOutputs() const {
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-
-

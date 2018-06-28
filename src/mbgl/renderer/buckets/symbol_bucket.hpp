@@ -1,16 +1,16 @@
 #pragma once
 
-#include <mbgl/renderer/bucket.hpp>
-#include <mbgl/map/mode.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/programs/segment.hpp>
-#include <mbgl/programs/symbol_program.hpp>
-#include <mbgl/programs/collision_box_program.hpp>
-#include <mbgl/text/glyph_range.hpp>
-#include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
+#include <mbgl/map/mode.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
+#include <mbgl/programs/segment.hpp>
+#include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/text/glyph_range.hpp>
 
 #include <vector>
 
@@ -18,11 +18,24 @@ namespace mbgl {
 
 class PlacedSymbol {
 public:
-    PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
-            std::array<float, 2> lineOffset_, WritingModeType writingModes_, GeometryCoordinates line_, std::vector<float> tileDistances_) :
-        anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffset(lineOffset_), writingModes(writingModes_), line(std::move(line_)), tileDistances(std::move(tileDistances_)), hidden(false), vertexStartIndex(0)
-    {
+    PlacedSymbol(Point<float> anchorPoint_,
+                 uint16_t segment_,
+                 float lowerSize_,
+                 float upperSize_,
+                 std::array<float, 2> lineOffset_,
+                 WritingModeType writingModes_,
+                 GeometryCoordinates line_,
+                 std::vector<float> tileDistances_)
+        : anchorPoint(anchorPoint_),
+          segment(segment_),
+          lowerSize(lowerSize_),
+          upperSize(upperSize_),
+          lineOffset(lineOffset_),
+          writingModes(writingModes_),
+          line(std::move(line_)),
+          tileDistances(std::move(tileDistances_)),
+          hidden(false),
+          vertexStartIndex(0) {
     }
     Point<float> anchorPoint;
     uint16_t segment;
@@ -40,7 +53,9 @@ public:
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
-                 const std::map<std::string, std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>&,
+                 const std::map<std::string,
+                                std::pair<style::IconPaintProperties::PossiblyEvaluated,
+                                          style::TextPaintProperties::PossiblyEvaluated>>&,
                  const style::DataDrivenPropertyValue<float>& textSize,
                  const style::DataDrivenPropertyValue<float>& iconSize,
                  float zoom,
@@ -56,7 +71,7 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
-    
+
     void updateOpacity();
     void sortFeatures(const float angle);
 
@@ -64,9 +79,9 @@ public:
     const bool sdfIcons;
     const bool iconsNeedLinear;
     const bool sortFeaturesByY;
-    
+
     const std::string bucketLeaderID;
-    
+
     optional<float> sortedAngle;
 
     bool staticUploaded = false;
@@ -76,10 +91,11 @@ public:
 
     std::vector<SymbolInstance> symbolInstances;
 
-    std::map<std::string, std::pair<
-        SymbolIconProgram::PaintPropertyBinders,
-        SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
-    
+    std::map<std::string,
+             std::pair<SymbolIconProgram::PaintPropertyBinders,
+                       SymbolSDFTextProgram::PaintPropertyBinders>>
+        paintPropertyBinders;
+
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 
     struct TextBuffer {
@@ -95,9 +111,9 @@ public:
         optional<gl::VertexBuffer<SymbolOpacityAttributes::Vertex>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
-    
+
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
-    
+
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
@@ -126,7 +142,7 @@ public:
         gl::IndexVector<gl::Lines> lines;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
-    
+
     struct CollisionCircleBuffer : public CollisionBuffer {
         gl::IndexVector<gl::Triangles> triangles;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -134,7 +150,7 @@ public:
 
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
-    
+
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
 

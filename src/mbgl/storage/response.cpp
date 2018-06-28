@@ -1,8 +1,8 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 namespace mbgl {
 

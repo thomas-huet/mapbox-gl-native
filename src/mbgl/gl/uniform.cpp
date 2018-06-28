@@ -1,8 +1,8 @@
-#include <mbgl/gl/uniform.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/color.hpp>
-#include <mbgl/util/size.hpp>
 #include <mbgl/util/convert.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <memory>
 
@@ -49,10 +49,10 @@ void bindUniform<std::array<double, 9>>(UniformLocation location, const std::arr
 }
 
 template <>
-void bindUniform<std::array<double, 16>>(UniformLocation location, const std::array<double, 16>& t) {
+void bindUniform<std::array<double, 16>>(UniformLocation location,
+                                         const std::array<double, 16>& t) {
     MBGL_CHECK_ERROR(glUniformMatrix4fv(location, 1, GL_FALSE, util::convert<float>(t).data()));
 }
-
 
 template <>
 void bindUniform<bool>(UniformLocation location, const bool& t) {
@@ -66,16 +66,17 @@ void bindUniform<uint8_t>(UniformLocation location, const uint8_t& t) {
 
 template <>
 void bindUniform<Color>(UniformLocation location, const Color& t) {
-    bindUniform(location, std::array<float, 4> {{ t.r, t.g, t.b, t.a }});
+    bindUniform(location, std::array<float, 4>{ { t.r, t.g, t.b, t.a } });
 }
 
 template <>
 void bindUniform<Size>(UniformLocation location, const Size& t) {
-    bindUniform(location, util::convert<float>(std::array<uint32_t, 2> {{ t.width, t.height }}));
+    bindUniform(location, util::convert<float>(std::array<uint32_t, 2>{ { t.width, t.height } }));
 }
 
 template <>
-void bindUniform<std::array<uint16_t, 2>>(UniformLocation location, const std::array<uint16_t, 2>& t) {
+void bindUniform<std::array<uint16_t, 2>>(UniformLocation location,
+                                          const std::array<uint16_t, 2>& t) {
     bindUniform(location, util::convert<float>(t));
 }
 
@@ -133,8 +134,7 @@ bool verifyUniform<std::array<double, 16>>(const ActiveUniform& uniform) {
 template <>
 bool verifyUniform<bool>(const ActiveUniform& uniform) {
     assert(uniform.size == 1 &&
-           (uniform.type == UniformDataType::Bool ||
-            uniform.type == UniformDataType::Int ||
+           (uniform.type == UniformDataType::Bool || uniform.type == UniformDataType::Int ||
             uniform.type == UniformDataType::Float));
     return true;
 }
@@ -142,8 +142,7 @@ bool verifyUniform<bool>(const ActiveUniform& uniform) {
 template <>
 bool verifyUniform<uint8_t>(const ActiveUniform& uniform) {
     assert(uniform.size == 1 &&
-           (uniform.type == UniformDataType::Int ||
-            uniform.type == UniformDataType::Float ||
+           (uniform.type == UniformDataType::Int || uniform.type == UniformDataType::Float ||
             uniform.type == UniformDataType::Sampler2D));
     return true;
 }
@@ -162,9 +161,8 @@ bool verifyUniform<Size>(const ActiveUniform& uniform) {
 
 template <>
 bool verifyUniform<std::array<uint16_t, 2>>(const ActiveUniform& uniform) {
-    assert(uniform.size == 1 &&
-           (uniform.type == UniformDataType::IntVec2 ||
-            uniform.type == UniformDataType::FloatVec2));
+    assert(uniform.size == 1 && (uniform.type == UniformDataType::IntVec2 ||
+                                 uniform.type == UniformDataType::FloatVec2));
     return true;
 }
 

@@ -9,7 +9,8 @@ class LayerObserver {
 public:
     virtual ~LayerObserver() = default;
 
-    virtual void onLayerChanged(Layer&) {}
+    virtual void onLayerChanged(Layer&) {
+    }
 };
 
 } // namespace style

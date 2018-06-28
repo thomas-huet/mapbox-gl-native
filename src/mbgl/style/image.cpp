@@ -5,10 +5,7 @@
 namespace mbgl {
 namespace style {
 
-Image::Image(std::string id,
-             PremultipliedImage &&image,
-             const float pixelRatio,
-             bool sdf)
+Image::Image(std::string id, PremultipliedImage&& image, const float pixelRatio, bool sdf)
     : baseImpl(makeMutable<Impl>(std::move(id), std::move(image), pixelRatio, sdf)) {
 }
 

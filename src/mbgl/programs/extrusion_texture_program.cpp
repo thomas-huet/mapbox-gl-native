@@ -2,6 +2,7 @@
 
 namespace mbgl {
 
-static_assert(sizeof(ExtrusionTextureLayoutVertex) == 4, "expected ExtrusionTextureLayoutVertex size");
+static_assert(sizeof(ExtrusionTextureLayoutVertex) == 4,
+              "expected ExtrusionTextureLayoutVertex size");
 
 } // namespace mbgl

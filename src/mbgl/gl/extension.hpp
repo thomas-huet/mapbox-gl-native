@@ -1,8 +1,8 @@
 #pragma once
 
+#include <functional>
 #include <initializer_list>
 #include <utility>
-#include <functional>
 
 namespace mbgl {
 namespace gl {

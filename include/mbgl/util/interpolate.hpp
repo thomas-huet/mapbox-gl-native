@@ -1,15 +1,15 @@
 #pragma once
 
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/position.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/style/position.hpp>
-#include <mbgl/style/expression/value.hpp>
 
 #include <array>
-#include <vector>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace mbgl {
 namespace util {
@@ -23,7 +23,6 @@ template <typename T>
 T interpolate(const T& a, const T& b, const double t) {
     return Interpolator<T>()(a, b, t);
 }
-
 
 template <class T, class Enabled>
 struct Interpolator {
@@ -39,7 +38,7 @@ private:
 
     template <std::size_t... I>
     Array operator()(const Array& a, const Array& b, const double t, std::index_sequence<I...>) {
-        return {{ interpolate(a[I], b[I], t)... }};
+        return { { interpolate(a[I], b[I], t)... } };
     }
 
 public:
@@ -47,7 +46,6 @@ public:
         return operator()(a, b, t, std::make_index_sequence<N>());
     }
 };
-
 
 // In order to accept Array<Number, N> as an output value for Curve
 // expressions, we need to have an interpolatable std::vector type.
@@ -57,21 +55,20 @@ public:
 // asserting that (a) the vectors are the same size, and (b) they contain
 // only numeric values.  (These invariants should be relatively safe,
 // being enforced by the expression type system.)
-template<>
+template <>
 struct Interpolator<std::vector<style::expression::Value>> {
     std::vector<style::expression::Value> operator()(const std::vector<style::expression::Value>& a,
-                                  const std::vector<style::expression::Value>& b,
-                                  const double t) const {
+                                                     const std::vector<style::expression::Value>& b,
+                                                     const double t) const {
         assert(a.size() == b.size());
-        if (a.size() == 0) return {};
+        if (a.size() == 0)
+            return {};
         std::vector<style::expression::Value> result;
         for (std::size_t i = 0; i < a.size(); i++) {
             assert(a[i].template is<double>());
             assert(b[i].template is<double>());
-            style::expression::Value item = interpolate(
-                a[i].template get<double>(),
-                b[i].template get<double>(),
-                t);
+            style::expression::Value item =
+                interpolate(a[i].template get<double>(), b[i].template get<double>(), t);
             result.push_back(item);
         }
         return result;
@@ -93,12 +90,8 @@ template <>
 struct Interpolator<Color> {
 public:
     Color operator()(const Color& a, const Color& b, const double t) {
-        return {
-            interpolate(a.r, b.r, t),
-            interpolate(a.g, b.g, t),
-            interpolate(a.b, b.b, t),
-            interpolate(a.a, b.a, t)
-        };
+        return { interpolate(a.r, b.r, t), interpolate(a.g, b.g, t), interpolate(a.b, b.b, t),
+                 interpolate(a.a, b.a, t) };
     }
 };
 
@@ -110,29 +103,21 @@ struct Uninterpolated {
 };
 
 template <>
-struct Interpolator<bool>
-    : Uninterpolated {};
+struct Interpolator<bool> : Uninterpolated {};
 
 template <class T>
-struct Interpolator<T, typename std::enable_if_t<std::is_enum<T>::value>>
-    : Uninterpolated {};
+struct Interpolator<T, typename std::enable_if_t<std::is_enum<T>::value>> : Uninterpolated {};
 
 template <>
-struct Interpolator<std::string>
-    : Uninterpolated {};
+struct Interpolator<std::string> : Uninterpolated {};
 
 template <class T>
-struct Interpolator<std::vector<T>>
-    : Uninterpolated {};
+struct Interpolator<std::vector<T>> : Uninterpolated {};
 
 template <class T>
-struct Interpolatable
-    : std::conditional_t<
-      !std::is_base_of<Uninterpolated, Interpolator<T>>::value,
-      std::true_type,
-      std::false_type> {};
-
-
+struct Interpolatable : std::conditional_t<!std::is_base_of<Uninterpolated, Interpolator<T>>::value,
+                                           std::true_type,
+                                           std::false_type> {};
 
 } // namespace util
 } // namespace mbgl

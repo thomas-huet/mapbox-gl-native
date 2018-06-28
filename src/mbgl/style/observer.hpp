@@ -9,10 +9,14 @@ namespace style {
 
 class Observer : public SourceObserver {
 public:
-    virtual void onStyleLoading() {}
-    virtual void onStyleLoaded() {}
-    virtual void onUpdate() {}
-    virtual void onResourceError(std::exception_ptr) {}
+    virtual void onStyleLoading() {
+    }
+    virtual void onStyleLoaded() {
+    }
+    virtual void onUpdate() {
+    }
+    virtual void onResourceError(std::exception_ptr) {
+    }
 };
 
 } // namespace style

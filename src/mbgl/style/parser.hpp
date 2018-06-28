@@ -1,19 +1,19 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
-#include <mbgl/style/source.hpp>
 #include <mbgl/style/light.hpp>
+#include <mbgl/style/source.hpp>
 
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
-#include <vector>
+#include <forward_list>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <forward_list>
+#include <vector>
 
 namespace mbgl {
 namespace style {

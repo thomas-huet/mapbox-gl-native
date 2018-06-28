@@ -1,19 +1,19 @@
 #pragma once
 
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/map/mode.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/mode.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <cstdint>
-#include <string>
 #include <functional>
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace mbgl {
 
@@ -39,14 +39,14 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void (std::exception_ptr)>;
+    using StillImageCallback = std::function<void(std::exception_ptr)>;
     void renderStill(StillImageCallback);
     void renderStill(const CameraOptions&, MapDebugOptions, StillImageCallback);
 
     // Triggers a repaint.
     void triggerRepaint();
 
-          style::Style& getStyle();
+    style::Style& getStyle();
     const style::Style& getStyle() const;
 
     void setStyle(std::unique_ptr<style::Style>);
@@ -62,9 +62,15 @@ public:
     // Camera
     CameraOptions getCameraOptions(const EdgeInsets&) const;
     void jumpTo(const CameraOptions&);
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&, optional<double> bearing = {}) const;
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}) const;
-    CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}) const;
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&,
+                                        const EdgeInsets&,
+                                        optional<double> bearing = {}) const;
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&,
+                                   const EdgeInsets&,
+                                   optional<double> bearing = {}) const;
+    CameraOptions cameraForGeometry(const Geometry<double>&,
+                                    const EdgeInsets&,
+                                    optional<double> bearing = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
 
     // Position

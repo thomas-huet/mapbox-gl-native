@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace mbgl {
 
@@ -24,9 +24,11 @@ public:
 
     GeometryCoordinates() = default;
     GeometryCoordinates(const std::vector<GeometryCoordinate>& v)
-        : std::vector<GeometryCoordinate>(v) {}
+        : std::vector<GeometryCoordinate>(v) {
+    }
     GeometryCoordinates(std::vector<GeometryCoordinate>&& v)
-        : std::vector<GeometryCoordinate>(std::move(v)) {}
+        : std::vector<GeometryCoordinate>(std::move(v)) {
+    }
 
     using std::vector<GeometryCoordinate>::vector;
 };
@@ -42,8 +44,12 @@ public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
-    virtual PropertyMap getProperties() const { return PropertyMap(); }
-    virtual optional<FeatureIdentifier> getID() const { return {}; }
+    virtual PropertyMap getProperties() const {
+        return PropertyMap();
+    }
+    virtual optional<FeatureIdentifier> getID() const {
+        return {};
+    }
     virtual GeometryCollection getGeometries() const = 0;
 };
 

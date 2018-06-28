@@ -1,9 +1,9 @@
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
-#include <mbgl/style/conversion/json.hpp>
-#include <mbgl/style/conversion/geojson.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {

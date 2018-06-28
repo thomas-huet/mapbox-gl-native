@@ -1,14 +1,14 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/annotation/symbol_annotation_impl.hpp>
-#include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/style_impl.hpp>
+#include <mbgl/annotation/line_annotation_impl.hpp>
+#include <mbgl/annotation/symbol_annotation_impl.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -20,9 +20,7 @@ const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 const std::string AnnotationManager::ShapeLayerID = "com.mapbox.annotations.shape.";
 
-AnnotationManager::AnnotationManager(Style& style_)
-        : style(style_) {
-};
+AnnotationManager::AnnotationManager(Style& style_) : style(style_){};
 
 AnnotationManager::~AnnotationManager() = default;
 
@@ -37,18 +35,14 @@ void AnnotationManager::onStyleLoaded() {
 AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation) {
     std::lock_guard<std::mutex> lock(mutex);
     AnnotationID id = nextID++;
-    Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->add(id, annotation_);
-    });
+    Annotation::visit(annotation, [&](const auto& annotation_) { this->add(id, annotation_); });
     dirty = true;
     return id;
 }
 
 bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation) {
     std::lock_guard<std::mutex> lock(mutex);
-    Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->update(id, annotation_);
-    });
+    Annotation::visit(annotation, [&](const auto& annotation_) { this->update(id, annotation_); });
     return dirty;
 }
 
@@ -65,14 +59,16 @@ void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& anno
 }
 
 void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation) {
-    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
-        std::make_unique<LineAnnotationImpl>(id, annotation)).first->second;
+    ShapeAnnotationImpl& impl =
+        *shapeAnnotations.emplace(id, std::make_unique<LineAnnotationImpl>(id, annotation))
+             .first->second;
     impl.updateStyle(*style.get().impl);
 }
 
 void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation) {
-    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
-        std::make_unique<FillAnnotationImpl>(id, annotation)).first->second;
+    ShapeAnnotationImpl& impl =
+        *shapeAnnotations.emplace(id, std::make_unique<FillAnnotationImpl>(id, annotation))
+             .first->second;
     impl.updateStyle(*style.get().impl);
 }
 
@@ -141,9 +137,8 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
     LatLngBounds tileBounds(tileID);
 
     symbolTree.query(boost::geometry::index::intersects(tileBounds),
-        boost::make_function_output_iterator([&](const auto& val){
-            val->updateLayer(tileID, *pointLayer);
-        }));
+                     boost::make_function_output_iterator(
+                         [&](const auto& val) { val->updateLayer(tileID, *pointLayer); }));
 
     for (const auto& shape : shapeAnnotations) {
         shape.second->updateTileData(tileID, *tileData);
@@ -161,7 +156,7 @@ void AnnotationManager::updateStyle() {
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID, SourceID);
 
         layer->setSourceLayer(PointLayerID);
-        layer->setIconImage({SourceID + ".{sprite}"});
+        layer->setIconImage({ SourceID + ".{sprite}" });
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 
@@ -216,8 +211,8 @@ void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(image->getID());
     images.erase(id);
-    auto inserted = images.emplace(id, style::Image(id, image->getImage().clone(),
-                                                    image->getPixelRatio(), image->isSdf()));
+    auto inserted = images.emplace(
+        id, style::Image(id, image->getImage().clone(), image->getPixelRatio(), image->isSdf()));
     style.get().impl->addImage(std::make_unique<style::Image>(inserted.first->second));
 }
 
@@ -232,7 +227,9 @@ double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
-    return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
+    return it != images.end()
+               ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2
+               : 0;
 }
 
 } // namespace mbgl

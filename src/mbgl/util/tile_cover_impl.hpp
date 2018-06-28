@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/tile_cover.hpp>
 
-#include <vector>
 #include <map>
 #include <queue>
+#include <vector>
 
 namespace mbgl {
 
@@ -50,11 +50,13 @@ struct Bound {
         auto x = p0.x;
         if (dx == 0) {
             return x;
-        } else if (dy == 0){
+        } else if (dy == 0) {
             return y <= p0.y ? p0.x : p1.x;
         }
-        if (y < p0.y) return x;
-        if (y > p1.y) return p1.x;
+        if (y < p0.y)
+            return x;
+        if (y > p1.y)
+            return p1.x;
         x = (dx / dy) * (y - p0.y) + p0.x;
         return x;
     }

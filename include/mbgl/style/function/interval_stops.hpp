@@ -14,8 +14,7 @@ public:
     Stops stops;
 
     IntervalStops() = default;
-    IntervalStops(Stops stops_)
-        : stops(std::move(stops_)) {
+    IntervalStops(Stops stops_) : stops(std::move(stops_)) {
     }
 
     optional<T> evaluate(float z) const {
@@ -41,8 +40,7 @@ public:
         return evaluate(*z);
     }
 
-    friend bool operator==(const IntervalStops& lhs,
-                           const IntervalStops& rhs) {
+    friend bool operator==(const IntervalStops& lhs, const IntervalStops& rhs) {
         return lhs.stops == rhs.stops;
     }
 };

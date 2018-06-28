@@ -4,14 +4,11 @@ namespace mbgl {
 namespace style {
 
 RasterSource::Impl::Impl(SourceType sourceType, std::string id_, uint16_t tileSize_)
-    : Source::Impl(sourceType, std::move(id_)),
-      tileSize(tileSize_) {
+    : Source::Impl(sourceType, std::move(id_)), tileSize(tileSize_) {
 }
 
 RasterSource::Impl::Impl(const Impl& other, Tileset tileset_)
-    : Source::Impl(other),
-      tileSize(other.tileSize),
-      tileset(std::move(tileset_)) {
+    : Source::Impl(other), tileSize(other.tileSize), tileset(std::move(tileset_)) {
 }
 
 uint16_t RasterSource::Impl::getTileSize() const {

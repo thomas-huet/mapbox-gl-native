@@ -69,10 +69,11 @@ OffscreenTexture::OffscreenTexture(gl::Context& context,
     assert(!size.isEmpty());
 }
 
-OffscreenTexture::OffscreenTexture(gl::Context& context,
-                                   const Size size,
-                                   gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer,
-                                   const gl::TextureType type)
+OffscreenTexture::OffscreenTexture(
+    gl::Context& context,
+    const Size size,
+    gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer,
+    const gl::TextureType type)
     : impl(std::make_unique<Impl>(context, std::move(size), renderbuffer, type)) {
     assert(!size.isEmpty());
 }

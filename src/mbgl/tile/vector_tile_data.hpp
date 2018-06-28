@@ -3,8 +3,8 @@
 #include <mapbox/vector_tile.hpp>
 #include <protozero/pbf_reader.hpp>
 
-#include <unordered_map>
 #include <functional>
+#include <unordered_map>
 #include <utility>
 
 namespace mbgl {

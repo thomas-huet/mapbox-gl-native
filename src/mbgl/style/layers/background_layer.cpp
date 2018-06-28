@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ BackgroundLayer::BackgroundLayer(const std::string& layerID)
     : Layer(makeMutable<Impl>(LayerType::Background, layerID, std::string())) {
 }
 
-BackgroundLayer::BackgroundLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+BackgroundLayer::BackgroundLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 BackgroundLayer::~BackgroundLayer() = default;
@@ -34,7 +33,6 @@ std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
 
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
-
 
 // Visibility
 
@@ -64,7 +62,6 @@ void BackgroundLayer::setMaxZoom(float maxZoom) {
 }
 
 // Layout properties
-
 
 // Paint properties
 

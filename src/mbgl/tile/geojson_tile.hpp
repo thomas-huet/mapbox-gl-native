@@ -15,10 +15,8 @@ public:
                 mapbox::geometry::feature_collection<int16_t>);
 
     void updateData(mapbox::geometry::feature_collection<int16_t>);
-    
-    void querySourceFeatures(
-        std::vector<Feature>& result,
-        const SourceQueryOptions&) override;
+
+    void querySourceFeatures(std::vector<Feature>& result, const SourceQueryOptions&) override;
 };
 
 } // namespace mbgl

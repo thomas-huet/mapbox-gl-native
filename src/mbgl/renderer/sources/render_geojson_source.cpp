@@ -1,8 +1,8 @@
-#include <mbgl/renderer/sources/render_geojson_source.hpp>
-#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_geojson_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -43,7 +43,8 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
             const uint8_t maxZ = impl().getZoomRange().max;
             for (const auto& pair : tilePyramid.tiles) {
                 if (pair.first.canonical.z <= maxZ) {
-                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data->getTile(pair.first.canonical));
+                    static_cast<GeoJSONTile*>(pair.second.get())
+                        ->updateData(data->getTile(pair.first.canonical));
                 }
             }
         }
@@ -55,16 +56,11 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
         return;
     }
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::GeoJSON,
-                       util::tileSize,
-                       impl().getZoomRange(),
-                       optional<LatLngBounds>{},
-                       [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data->getTile(tileID.canonical));
+    tilePyramid.update(layers, needsRendering, needsRelayout, parameters, SourceType::GeoJSON,
+                       util::tileSize, impl().getZoomRange(), optional<LatLngBounds>{},
+                       [&](const OverscaledTileID& tileID) {
+                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters,
+                                                                data->getTile(tileID.canonical));
                        });
 }
 
@@ -90,7 +86,8 @@ RenderGeoJSONSource::queryRenderedFeatures(const ScreenLineString& geometry,
     return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
 }
 
-std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryOptions& options) const {
+std::vector<Feature>
+RenderGeoJSONSource::querySourceFeatures(const SourceQueryOptions& options) const {
     return tilePyramid.querySourceFeatures(options);
 }
 

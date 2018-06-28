@@ -1,7 +1,7 @@
-#include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/style/style_impl.hpp>
+#include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/style_impl.hpp>
 
 namespace mbgl {
 
@@ -9,7 +9,10 @@ using namespace style;
 
 LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_)
     : ShapeAnnotationImpl(id_),
-      annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color) {
+      annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}),
+                 annotation_.opacity,
+                 annotation_.width,
+                 annotation_.color) {
 }
 
 void LineAnnotationImpl::updateStyle(Style::Impl& style) const {

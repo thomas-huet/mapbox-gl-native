@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Fill, layerID, sourceID)) {
 }
 
-FillLayer::FillLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+FillLayer::FillLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 FillLayer::~FillLayer() = default;
@@ -92,7 +91,6 @@ void FillLayer::setMaxZoom(float maxZoom) {
 }
 
 // Layout properties
-
 
 // Paint properties
 
@@ -205,7 +203,7 @@ TransitionOptions FillLayer::getFillOutlineColorTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {

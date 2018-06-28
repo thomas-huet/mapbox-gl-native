@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class RenderCircleLayer: public RenderLayer {
+class RenderCircleLayer : public RenderLayer {
 public:
     RenderCircleLayer(Immutable<style::CircleLayer::Impl>);
     ~RenderCircleLayer() final = default;
@@ -16,15 +16,15 @@ public:
     bool hasTransition() const override;
     void render(PaintParameters&, RenderSource*) override;
 
-    bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&) const override;
+    bool queryIntersectsFeature(const GeometryCoordinates&,
+                                const GeometryTileFeature&,
+                                const float,
+                                const TransformState&,
+                                const float,
+                                const mat4&) const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
     style::CirclePaintProperties::Unevaluated unevaluated;

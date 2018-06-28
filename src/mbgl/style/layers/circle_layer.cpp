@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ CircleLayer::CircleLayer(const std::string& layerID, const std::string& sourceID
     : Layer(makeMutable<Impl>(LayerType::Circle, layerID, sourceID)) {
 }
 
-CircleLayer::CircleLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+CircleLayer::CircleLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 CircleLayer::~CircleLayer() = default;
@@ -92,7 +91,6 @@ void CircleLayer::setMaxZoom(float maxZoom) {
 }
 
 // Layout properties
-
 
 // Paint properties
 
@@ -205,7 +203,7 @@ TransitionOptions CircleLayer::getCircleOpacityTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {

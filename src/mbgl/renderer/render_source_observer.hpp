@@ -11,8 +11,10 @@ class RenderSourceObserver {
 public:
     virtual ~RenderSourceObserver() = default;
 
-    virtual void onTileChanged(RenderSource&, const OverscaledTileID&) {}
-    virtual void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) {}
+    virtual void onTileChanged(RenderSource&, const OverscaledTileID&) {
+    }
+    virtual void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) {
+    }
 };
 
 } // namespace mbgl

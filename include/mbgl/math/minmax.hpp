@@ -1,8 +1,8 @@
 #pragma once
 
-#include <type_traits>
 #include <algorithm>
 #include <cmath>
+#include <type_traits>
 
 namespace mbgl {
 namespace util {

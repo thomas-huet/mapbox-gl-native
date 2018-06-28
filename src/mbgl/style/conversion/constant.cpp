@@ -22,7 +22,8 @@ optional<float> Converter<float>::operator()(const Convertible& value, Error& er
     return *converted;
 }
 
-optional<std::string> Converter<std::string>::operator()(const Convertible& value, Error& error) const {
+optional<std::string> Converter<std::string>::operator()(const Convertible& value,
+                                                         Error& error) const {
     optional<std::string> converted = toString(value);
     if (!converted) {
         error = { "value must be a string" };
@@ -47,7 +48,8 @@ optional<Color> Converter<Color>::operator()(const Convertible& value, Error& er
     return *color;
 }
 
-optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Convertible& value, Error& error) const {
+optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Convertible& value,
+                                                                       Error& error) const {
     if (!isArray(value)) {
         error = { "value must be an array" };
         return {};
@@ -68,7 +70,8 @@ optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Con
     return result;
 }
 
-optional<std::vector<std::string>> Converter<std::vector<std::string>>::operator()(const Convertible& value, Error& error) const {
+optional<std::vector<std::string>> Converter<std::vector<std::string>>::
+operator()(const Convertible& value, Error& error) const {
     if (!isArray(value)) {
         error = { "value must be an array" };
         return {};

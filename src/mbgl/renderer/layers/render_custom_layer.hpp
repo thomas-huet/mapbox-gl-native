@@ -5,16 +5,18 @@
 
 namespace mbgl {
 
-class RenderCustomLayer: public RenderLayer {
+class RenderCustomLayer : public RenderLayer {
 public:
     RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
     ~RenderCustomLayer() final;
 
-    void transition(const TransitionParameters&) final {}
+    void transition(const TransitionParameters&) final {
+    }
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const final;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const final;
     void render(PaintParameters&, RenderSource*) final;
 
     const style::CustomLayer::Impl& impl() const;

@@ -1,25 +1,23 @@
-#include <mbgl/util/grid_index.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/util/grid_index.hpp>
 
-#include <unordered_set>
 #include <cmath>
+#include <unordered_set>
 
 namespace mbgl {
 
-
 template <class T>
-GridIndex<T>::GridIndex(const float width_, const float height_, const int16_t cellSize_) :
-    width(width_),
-    height(height_),
-    xCellCount(std::ceil(width_ / cellSize_)),
-    yCellCount(std::ceil(height_ / cellSize_)),
-    xScale(xCellCount / width_),
-    yScale(yCellCount / height_)
-    {
-        boxCells.resize(xCellCount * yCellCount);
-        circleCells.resize(xCellCount * yCellCount);
-    }
+GridIndex<T>::GridIndex(const float width_, const float height_, const int16_t cellSize_)
+    : width(width_),
+      height(height_),
+      xCellCount(std::ceil(width_ / cellSize_)),
+      yCellCount(std::ceil(height_ / cellSize_)),
+      xScale(xCellCount / width_),
+      yScale(yCellCount / height_) {
+    boxCells.resize(xCellCount * yCellCount);
+    circleCells.resize(xCellCount * yCellCount);
+}
 
 template <class T>
 void GridIndex<T>::insert(T&& t, const BBox& bbox) {
@@ -72,7 +70,8 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
 }
 
 template <class T>
-std::vector<std::pair<T, typename GridIndex<T>::BBox>> GridIndex<T>::queryWithBoxes(const BBox& queryBBox) const {
+std::vector<std::pair<T, typename GridIndex<T>::BBox>>
+GridIndex<T>::queryWithBoxes(const BBox& queryBBox) const {
     std::vector<std::pair<T, BBox>> result;
     query(queryBBox, [&](const T& t, const BBox& bbox) -> bool {
         result.push_back(std::make_pair(t, bbox));
@@ -103,25 +102,28 @@ bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
 
 template <class T>
 bool GridIndex<T>::noIntersection(const BBox& queryBBox) const {
-    return queryBBox.max.x < 0 || queryBBox.min.x >= width || queryBBox.max.y < 0 || queryBBox.min.y >= height;
+    return queryBBox.max.x < 0 || queryBBox.min.x >= width || queryBBox.max.y < 0 ||
+           queryBBox.min.y >= height;
 }
 
 template <class T>
 bool GridIndex<T>::completeIntersection(const BBox& queryBBox) const {
-    return queryBBox.min.x <= 0 && queryBBox.min.y <= 0 && width <= queryBBox.max.x && height <= queryBBox.max.y;
+    return queryBBox.min.x <= 0 && queryBBox.min.y <= 0 && width <= queryBBox.max.x &&
+           height <= queryBBox.max.y;
 }
 
 template <class T>
 typename GridIndex<T>::BBox GridIndex<T>::convertToBox(const BCircle& circle) const {
-    return BBox{{circle.center.x - circle.radius, circle.center.y - circle.radius},
-                {circle.center.x + circle.radius, circle.center.y + circle.radius}};
+    return BBox{ { circle.center.x - circle.radius, circle.center.y - circle.radius },
+                 { circle.center.x + circle.radius, circle.center.y + circle.radius } };
 }
 
 template <class T>
-void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, const BBox&)> resultFn) const {
+void GridIndex<T>::query(const BBox& queryBBox,
+                         std::function<bool(const T&, const BBox&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
-    
+
     if (noIntersection(queryBBox)) {
         return;
     } else if (completeIntersection(queryBBox)) {
@@ -161,7 +163,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
                     }
                 }
             }
-            
+
             // Look up circles
             for (auto uid : circleCells[cellIndex]) {
                 if (seenCircles.count(uid) == 0) {
@@ -181,7 +183,8 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
 }
 
 template <class T>
-void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const T&, const BBox&)> resultFn) const {
+void GridIndex<T>::query(const BCircle& queryBCircle,
+                         std::function<bool(const T&, const BBox&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
 
@@ -224,7 +227,7 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
                     }
                 }
             }
-            
+
             // Look up other circles
             for (auto uid : circleCells[cellIndex]) {
                 if (seenCircles.count(uid) == 0) {
@@ -255,10 +258,8 @@ int16_t GridIndex<T>::convertToYCellCoord(const float y) const {
 
 template <class T>
 bool GridIndex<T>::boxesCollide(const BBox& first, const BBox& second) const {
-	return first.min.x <= second.max.x &&
-           first.min.y <= second.max.y &&
-           first.max.x >= second.min.x &&
-           first.max.y >= second.min.y;
+    return first.min.x <= second.max.x && first.min.y <= second.max.y &&
+           first.max.x >= second.min.x && first.max.y >= second.min.y;
 }
 
 template <class T>
@@ -296,7 +297,6 @@ template <class T>
 bool GridIndex<T>::empty() const {
     return boxElements.empty() && circleElements.empty();
 }
-
 
 template class GridIndex<IndexedSubfeature>;
 

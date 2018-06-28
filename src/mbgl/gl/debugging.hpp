@@ -22,7 +22,8 @@ private:
 
 #define __MBGL_DEBUG_GROUP_NAME2(counter) __MBGL_DEBUG_GROUP_##counter
 #define __MBGL_DEBUG_GROUP_NAME(counter) __MBGL_DEBUG_GROUP_NAME2(counter)
-#define MBGL_DEBUG_GROUP(context, name) const ::mbgl::gl::DebugGroup __MBGL_DEBUG_GROUP_NAME(__LINE__)(context, name);
+#define MBGL_DEBUG_GROUP(context, name)                                                            \
+    const ::mbgl::gl::DebugGroup __MBGL_DEBUG_GROUP_NAME(__LINE__)(context, name);
 
 #else
 

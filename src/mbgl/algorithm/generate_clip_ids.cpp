@@ -1,15 +1,15 @@
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
 #include <mbgl/algorithm/covered_by_children.hpp>
+#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
 
 #include <mbgl/util/std.hpp>
 
-#include <list>
-#include <vector>
+#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <iostream>
-#include <algorithm>
 #include <iterator>
+#include <list>
+#include <vector>
 
 namespace mbgl {
 namespace algorithm {
@@ -52,8 +52,8 @@ std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getClipIDs() const {
 
         // Loop through all preceding stencils, and find all parents.
 
-        for (auto parentIt = std::reverse_iterator<decltype(it)>(it);
-             parentIt != clipIDs.rend(); ++parentIt) {
+        for (auto parentIt = std::reverse_iterator<decltype(it)>(it); parentIt != clipIDs.rend();
+             ++parentIt) {
             auto& parentId = parentIt->first;
             if (childId.isChildOf(parentId)) {
                 // Once we have a parent, we add the bits  that this ID hasn't set yet.

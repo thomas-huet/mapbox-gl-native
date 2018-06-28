@@ -1,24 +1,24 @@
-#include <mbgl/map/map.hpp>
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/observer.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/style/observer.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/mapbox.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/math/log2.hpp>
+#include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <utility>
 
 namespace mbgl {
@@ -26,15 +26,13 @@ namespace mbgl {
 using namespace style;
 
 struct StillImageRequest {
-    StillImageRequest(Map::StillImageCallback&& callback_)
-        : callback(std::move(callback_)) {
+    StillImageRequest(Map::StillImageCallback&& callback_) : callback(std::move(callback_)) {
     }
 
     Map::StillImageCallback callback;
 };
 
-class Map::Impl : public style::Observer,
-                  public RendererObserver {
+class Map::Impl : public style::Observer, public RendererObserver {
 public:
     Impl(Map&,
          RendererFrontend&,
@@ -65,7 +63,7 @@ public:
 
     const float pixelRatio;
 
-    MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
+    MapDebugOptions debugOptions{ MapDebugOptions::NoDebug };
 
     std::unique_ptr<Style> style;
     AnnotationManager annotationManager;
@@ -107,8 +105,7 @@ Map::Impl::Impl(Map& map_,
       rendererFrontend(frontend),
       fileSource(fileSource_),
       scheduler(scheduler_),
-      transform(constrainMode_,
-                viewportMode_),
+      transform(constrainMode_, viewportMode_),
       pixelRatio(pixelRatio_),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
       annotationManager(*style) {
@@ -132,7 +129,8 @@ void Map::renderStill(StillImageCallback callback) {
     }
 
     if (impl->stillImageRequest) {
-        callback(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")));
+        callback(
+            std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")));
         return;
     }
 
@@ -146,7 +144,9 @@ void Map::renderStill(StillImageCallback callback) {
     impl->onUpdate();
 }
 
-void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions, StillImageCallback callback) {
+void Map::renderStill(const CameraOptions& camera,
+                      MapDebugOptions debugOptions,
+                      StillImageCallback callback) {
     impl->cameraMutated = true;
     impl->debugOptions = debugOptions;
     impl->transform.jumpTo(camera);
@@ -226,7 +226,6 @@ void Map::resetPosition(const EdgeInsets& padding) {
     impl->onUpdate();
 }
 
-
 #pragma mark - Zoom
 
 void Map::setZoom(double zoom) {
@@ -245,24 +244,27 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom) {
     impl->onUpdate();
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing) const {
-    return cameraForLatLngs({
-        bounds.northwest(),
-        bounds.southwest(),
-        bounds.southeast(),
-        bounds.northeast(),
-    }, padding, bearing);
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds,
+                                         const EdgeInsets& padding,
+                                         optional<double> bearing) const {
+    return cameraForLatLngs(
+        {
+            bounds.northwest(), bounds.southwest(), bounds.southeast(), bounds.northeast(),
+        },
+        padding, bearing);
 }
 
-CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transform& transform, const EdgeInsets& padding) {
+CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs,
+                               const Transform& transform,
+                               const EdgeInsets& padding) {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;
     }
     Size size = transform.getState().getSize();
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
-    ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
-    ScreenCoordinate swPixel = {INFINITY, INFINITY};
+    ScreenCoordinate nePixel = { -INFINITY, -INFINITY };
+    ScreenCoordinate swPixel = { INFINITY, INFINITY };
     double viewportHeight = size.height;
     for (LatLng latLng : latLngs) {
         ScreenCoordinate pixel = transform.latLngToScreenCoordinate(latLng);
@@ -289,12 +291,10 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
     ScreenCoordinate paddedNEPixel = {
-        padding.right() / minScale,
-        padding.top() / minScale,
+        padding.right() / minScale, padding.top() / minScale,
     };
     ScreenCoordinate paddedSWPixel = {
-        padding.left() / minScale,
-        padding.bottom() / minScale,
+        padding.left() / minScale, padding.bottom() / minScale,
     };
     centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
     centerPixel /= 2.0;
@@ -307,9 +307,11 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     return options;
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing) const {
-    if(bearing) {
-        double angle = -*bearing * util::DEG2RAD;  // Convert to radians
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs,
+                                    const EdgeInsets& padding,
+                                    optional<double> bearing) const {
+    if (bearing) {
+        double angle = -*bearing * util::DEG2RAD; // Convert to radians
         Transform transform(impl->transform.getState());
         transform.setAngle(angle);
         CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
@@ -320,24 +322,23 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     }
 }
 
-CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing) const {
+CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry,
+                                     const EdgeInsets& padding,
+                                     optional<double> bearing) const {
 
     std::vector<LatLng> latLngs;
-    forEachPoint(geometry, [&](const Point<double>& pt) {
-        latLngs.push_back({ pt.y, pt.x });
-    });
+    forEachPoint(geometry, [&](const Point<double>& pt) { latLngs.push_back({ pt.y, pt.x }); });
     return cameraForLatLngs(latLngs, padding, bearing);
 }
 
 LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
-    Transform shallow { impl->transform.getState() };
+    Transform shallow{ impl->transform.getState() };
     Size size = shallow.getState().getSize();
 
     shallow.jumpTo(camera);
     return LatLngBounds::hull(
         shallow.screenCoordinateToLatLng({}),
-        shallow.screenCoordinateToLatLng({ double(size.width), double(size.height) })
-    );
+        shallow.screenCoordinateToLatLng({ double(size.width), double(size.height) }));
 }
 
 void Map::resetZoom() {
@@ -612,26 +613,24 @@ void Map::Impl::onUpdate() {
     if (!stillImageRequest) {
         return;
     }
-    
+
     TimePoint timePoint = Clock::time_point::max();
 
-    UpdateParameters params = {
-        style->impl->isLoaded(),
-        pixelRatio,
-        debugOptions,
-        timePoint,
-        transform.getState(),
-        style->impl->getGlyphURL(),
-        style->impl->spriteLoaded,
-        style->impl->getTransitionOptions(),
-        style->impl->getLight()->impl,
-        style->impl->getImageImpls(),
-        style->impl->getSourceImpls(),
-        style->impl->getLayerImpls(),
-        annotationManager,
-        prefetchZoomDelta,
-        bool(stillImageRequest)
-    };
+    UpdateParameters params = { style->impl->isLoaded(),
+                                pixelRatio,
+                                debugOptions,
+                                timePoint,
+                                transform.getState(),
+                                style->impl->getGlyphURL(),
+                                style->impl->spriteLoaded,
+                                style->impl->getTransitionOptions(),
+                                style->impl->getLight()->impl,
+                                style->impl->getImageImpls(),
+                                style->impl->getSourceImpls(),
+                                style->impl->getLayerImpls(),
+                                annotationManager,
+                                prefetchZoomDelta,
+                                bool(stillImageRequest) };
 
     rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
 }
@@ -657,9 +656,11 @@ void Map::Impl::onResourceError(std::exception_ptr error) {
 }
 
 void Map::dumpDebugLogs() const {
-    Log::Info(Event::General, "--------------------------------------------------------------------------------");
+    Log::Info(Event::General,
+              "--------------------------------------------------------------------------------");
     impl->style->impl->dumpDebugLogs();
-    Log::Info(Event::General, "--------------------------------------------------------------------------------");
+    Log::Info(Event::General,
+              "--------------------------------------------------------------------------------");
 }
 
 } // namespace mbgl

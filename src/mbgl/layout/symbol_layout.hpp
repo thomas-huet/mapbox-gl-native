@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
-#include <mbgl/text/bidi.hpp>
-#include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/text/bidi.hpp>
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <unordered_set>
 #include <vector>
 
@@ -32,15 +32,16 @@ public:
                  ImageDependencies&,
                  GlyphDependencies&);
 
-    void prepare(const GlyphMap&, const GlyphPositions&,
-                 const ImageMap&, const ImagePositions&);
+    void prepare(const GlyphMap&, const GlyphPositions&, const ImageMap&, const ImagePositions&);
 
     std::unique_ptr<SymbolBucket> place(const bool showCollisionBoxes);
 
     bool hasSymbolInstances() const;
 
     std::map<std::string,
-        std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
+             std::pair<style::IconPaintProperties::PossiblyEvaluated,
+                       style::TextPaintProperties::PossiblyEvaluated>>
+        layerPaintProperties;
 
     const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
@@ -60,10 +61,10 @@ private:
     // Adds placed items to the buffer.
     template <typename Buffer>
     size_t addSymbol(Buffer&,
-                   const Range<float> sizeData,
-                   const SymbolQuad&,
-                   const Anchor& labelAnchor,
-                   PlacedSymbol& placedSymbol);
+                     const Range<float> sizeData,
+                     const SymbolQuad&,
+                     const Anchor& labelAnchor,
+                     PlacedSymbol& placedSymbol);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
@@ -79,13 +80,14 @@ private:
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
-    
+
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
 
     std::vector<SymbolFeature> features;
 
-    BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
+    BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs;
+               // use of BiDi/ubiditransform object must be constrained to one thread
 };
 
 } // namespace mbgl

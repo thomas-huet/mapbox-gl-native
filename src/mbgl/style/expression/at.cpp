@@ -1,7 +1,6 @@
 #include <mbgl/style/expression/at.hpp>
 #include <mbgl/util/string.hpp>
 
-
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -15,26 +14,21 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     if (!evaluatedInput) {
         return evaluatedInput.error();
     }
-    
+
     const auto i = evaluatedIndex->get<double>();
     const auto inputArray = evaluatedInput->get<std::vector<Value>>();
-    
+
     if (i < 0) {
-        return EvaluationError {
-            "Array index out of bounds: " + util::toString(i) + " < 0."
-        };
+        return EvaluationError{ "Array index out of bounds: " + util::toString(i) + " < 0." };
     }
-    
+
     if (i >= inputArray.size()) {
-        return EvaluationError {
-            "Array index out of bounds: " + util::toString(i) +
-            " > " + util::toString(inputArray.size() - 1) + "."
-        };
+        return EvaluationError{ "Array index out of bounds: " + util::toString(i) + " > " +
+                                util::toString(inputArray.size() - 1) + "." };
     }
     if (i != std::floor(i)) {
-        return EvaluationError {
-            "Array index must be an integer, but found " + util::toString(i) + " instead."
-        };
+        return EvaluationError{ "Array index must be an integer, but found " + util::toString(i) +
+                                " instead." };
     }
     return inputArray[static_cast<std::size_t>(i)];
 }
@@ -54,15 +48,15 @@ ParseResult At::parse(const Convertible& value, ParsingContext& ctx) {
         return ParseResult();
     }
 
-    ParseResult index = ctx.parse(arrayMember(value, 1), 1, {type::Number});
-    
-    type::Type inputType = type::Array(ctx.getExpected() ? *ctx.getExpected() : type::Value);
-    ParseResult input = ctx.parse(arrayMember(value, 2), 2, {inputType});
+    ParseResult index = ctx.parse(arrayMember(value, 1), 1, { type::Number });
 
-    if (!index || !input) return ParseResult();
+    type::Type inputType = type::Array(ctx.getExpected() ? *ctx.getExpected() : type::Value);
+    ParseResult input = ctx.parse(arrayMember(value, 2), 2, { inputType });
+
+    if (!index || !input)
+        return ParseResult();
 
     return ParseResult(std::make_unique<At>(std::move(*index), std::move(*input)));
-
 }
 
 } // namespace expression

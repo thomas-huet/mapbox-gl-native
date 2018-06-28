@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/renderer/query.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/renderer/mode.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geo.hpp>
 
@@ -23,7 +23,10 @@ class UpdateParameters;
 
 class Renderer {
 public:
-    Renderer(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&,
+    Renderer(RendererBackend&,
+             float pixelRatio_,
+             FileSource&,
+             Scheduler&,
              GLContextMode = GLContextMode::Unique,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});
@@ -36,10 +39,14 @@ public:
     void render(const UpdateParameters&);
 
     // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions& options = {}) const;
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options = {}) const;
-    std::vector<Feature> queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options = {}) const;
-    std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options = {}) const;
+    std::vector<Feature> queryRenderedFeatures(const ScreenLineString&,
+                                               const RenderedQueryOptions& options = {}) const;
+    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate& point,
+                                               const RenderedQueryOptions& options = {}) const;
+    std::vector<Feature> queryRenderedFeatures(const ScreenBox& box,
+                                               const RenderedQueryOptions& options = {}) const;
+    std::vector<Feature> querySourceFeatures(const std::string& sourceID,
+                                             const SourceQueryOptions& options = {}) const;
     AnnotationIDs queryPointAnnotations(const ScreenBox& box) const;
     AnnotationIDs queryShapeAnnotations(const ScreenBox& box) const;
     AnnotationIDs getAnnotationIDs(const std::vector<Feature>&) const;

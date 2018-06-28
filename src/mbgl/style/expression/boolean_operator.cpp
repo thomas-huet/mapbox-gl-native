@@ -7,8 +7,10 @@ namespace expression {
 EvaluationResult Any::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         const EvaluationResult result = (*it)->evaluate(params);
-        if (!result) return result;
-        if (result->get<bool>()) return EvaluationResult(true);
+        if (!result)
+            return result;
+        if (result->get<bool>())
+            return EvaluationResult(true);
     }
     return EvaluationResult(false);
 }
@@ -27,15 +29,16 @@ bool Any::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> Any::possibleOutputs() const {
-    return {{ true }, { false }};
+    return { { true }, { false } };
 }
-
 
 EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         const EvaluationResult result = (*it)->evaluate(params);
-        if (!result) return result;
-        if (!result->get<bool>()) return EvaluationResult(false);
+        if (!result)
+            return result;
+        if (!result->get<bool>())
+            return EvaluationResult(false);
     }
     return EvaluationResult(true);
 }
@@ -54,29 +57,29 @@ bool All::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> All::possibleOutputs() const {
-    return {{ true }, { false }};
+    return { { true }, { false } };
 }
 
 using namespace mbgl::style::conversion;
 
 template <class T>
 ParseResult parseBooleanOp(const Convertible& value, ParsingContext& ctx) {
-    
+
     assert(isArray(value));
     auto length = arrayLength(value);
- 
+
     std::vector<std::unique_ptr<Expression>> parsedInputs;
-    
+
     parsedInputs.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        auto parsed = ctx.parse(arrayMember(value, i), i, {type::Boolean});
+        auto parsed = ctx.parse(arrayMember(value, i), i, { type::Boolean });
         if (!parsed) {
             return parsed;
         }
-        
+
         parsedInputs.push_back(std::move(*parsed));
     }
- 
+
     return ParseResult(std::make_unique<T>(std::move(parsedInputs)));
 }
 
@@ -88,8 +91,6 @@ ParseResult All::parse(const Convertible& value, ParsingContext& ctx) {
     return parseBooleanOp<All>(value, ctx);
 }
 
-
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

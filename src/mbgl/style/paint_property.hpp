@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/style/properties.hpp>
-#include <mbgl/style/property_value.hpp>
-#include <mbgl/style/heatmap_color_property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/renderer/data_driven_property_evaluator.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/heatmap_color_property_value.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/style/property_value.hpp>
 
 #include <utility>
 
@@ -67,8 +67,10 @@ public:
     using PossiblyEvaluatedType = Color;
     using Type = Color;
     static constexpr bool IsDataDriven = false;
-    
-    static Color defaultValue() { return {}; }
+
+    static Color defaultValue() {
+        return {};
+    }
 };
 
 } // namespace style

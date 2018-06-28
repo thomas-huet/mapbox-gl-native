@@ -1,27 +1,27 @@
 #pragma once
 
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/observer.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/sprite/sprite_loader_observer.hpp>
+#include <mbgl/style/collection.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/light_observer.hpp>
-#include <mbgl/sprite/sprite_loader_observer.hpp>
-#include <mbgl/style/image.hpp>
+#include <mbgl/style/observer.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/layer.hpp>
-#include <mbgl/style/collection.hpp>
+#include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 #include <mbgl/map/camera.hpp>
 
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/geo.hpp>
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 
@@ -55,19 +55,18 @@ public:
         return lastError;
     }
 
-    std::vector<      Source*> getSources();
+    std::vector<Source*> getSources();
     std::vector<const Source*> getSources() const;
     Source* getSource(const std::string& id) const;
 
     void addSource(std::unique_ptr<Source>);
     std::unique_ptr<Source> removeSource(const std::string& sourceID);
 
-    std::vector<      Layer*> getLayers();
+    std::vector<Layer*> getLayers();
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
 
-    Layer* addLayer(std::unique_ptr<Layer>,
-                    optional<std::string> beforeLayerID = {});
+    Layer* addLayer(std::unique_ptr<Layer>, optional<std::string> beforeLayerID = {});
     std::unique_ptr<Layer> removeLayer(const std::string& layerID);
 
     std::string getName() const;

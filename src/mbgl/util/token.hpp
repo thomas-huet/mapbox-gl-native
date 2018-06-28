@@ -2,9 +2,9 @@
 
 #include <mbgl/util/optional.hpp>
 
+#include <algorithm>
 #include <map>
 #include <string>
-#include <algorithm>
 
 namespace mbgl {
 namespace util {
@@ -13,7 +13,7 @@ const static std::string tokenReservedChars = "{}";
 
 // Replaces {tokens} in a string by calling the lookup function.
 template <typename Lookup>
-std::string replaceTokens(const std::string &source, const Lookup &lookup) {
+std::string replaceTokens(const std::string& source, const Lookup& lookup) {
     std::string result;
     result.reserve(source.size());
 
@@ -25,9 +25,11 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
         result.append(pos, brace);
         pos = brace;
         if (pos != end) {
-            for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
+            for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos;
+                 brace++)
+                ;
             if (brace != end && *brace == '}') {
-                std::string key { pos + 1, brace };
+                std::string key{ pos + 1, brace };
                 if (optional<std::string> replacement = lookup(key)) {
                     result.append(*replacement);
                 } else {

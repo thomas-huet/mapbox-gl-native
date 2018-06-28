@@ -8,7 +8,8 @@ namespace gl {
 
 class Texture {
 public:
-    Texture(Size size_, UniqueTexture texture_,
+    Texture(Size size_,
+            UniqueTexture texture_,
             TextureFilter filter_ = TextureFilter::Nearest,
             TextureMipMap mipmap_ = TextureMipMap::No,
             TextureWrap wrapX_ = TextureWrap::Clamp,
@@ -18,7 +19,8 @@ public:
           filter(filter_),
           mipmap(mipmap_),
           wrapX(wrapX_),
-          wrapY(wrapY_) {}
+          wrapY(wrapY_) {
+    }
 
     Size size;
     UniqueTexture texture;

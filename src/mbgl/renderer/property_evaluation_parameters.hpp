@@ -12,17 +12,19 @@ public:
           now(Clock::time_point::max()),
           zoomHistory(),
           defaultFadeDuration(0),
-          useIntegerZoom(false) {}
+          useIntegerZoom(false) {
+    }
 
     PropertyEvaluationParameters(ZoomHistory zoomHistory_,
-                          TimePoint now_,
-                          Duration defaultFadeDuration_,
-                          bool useIntegerZoom_ = false)
+                                 TimePoint now_,
+                                 Duration defaultFadeDuration_,
+                                 bool useIntegerZoom_ = false)
         : z(zoomHistory_.lastZoom),
           now(std::move(now_)),
           zoomHistory(std::move(zoomHistory_)),
           defaultFadeDuration(std::move(defaultFadeDuration_)),
-          useIntegerZoom(useIntegerZoom_) {}
+          useIntegerZoom(useIntegerZoom_) {
+    }
 
     float z;
     TimePoint now;

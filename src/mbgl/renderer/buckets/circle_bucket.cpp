@@ -1,8 +1,8 @@
-#include <mbgl/renderer/buckets/circle_bucket.hpp>
-#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/programs/circle_program.hpp>
-#include <mbgl/style/layers/circle_layer_impl.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -10,14 +10,13 @@ namespace mbgl {
 
 using namespace style;
 
-CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
+CircleBucket::CircleBucket(const BucketParameters& parameters,
+                           const std::vector<const RenderLayer*>& layers) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+            std::piecewise_construct, std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(layer->as<RenderCircleLayer>()->evaluated,
+                                  parameters.tileID.overscaledZ));
     }
 }
 
@@ -41,8 +40,10 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& circle : geometry) {
-        for(auto& point : circle) {
-            if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+        for (auto& point : circle) {
+            if (segments.empty() ||
+                segments.back().vertexLength + vertexLength >
+                    std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
                 segments.emplace_back(vertices.vertexSize(), triangles.indexSize());
             }
@@ -57,9 +58,9 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
             // └─────────┘
             //
             vertices.emplace_back(CircleProgram::vertex(point, -1, -1)); // 1
-            vertices.emplace_back(CircleProgram::vertex(point,  1, -1)); // 2
-            vertices.emplace_back(CircleProgram::vertex(point,  1,  1)); // 3
-            vertices.emplace_back(CircleProgram::vertex(point, -1,  1)); // 4
+            vertices.emplace_back(CircleProgram::vertex(point, 1, -1));  // 2
+            vertices.emplace_back(CircleProgram::vertex(point, 1, 1));   // 3
+            vertices.emplace_back(CircleProgram::vertex(point, -1, 1));  // 4
 
             auto& segment = segments.back();
             assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
@@ -81,7 +82,9 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 }
 
 template <class Property>
-static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
+static float
+get(const RenderCircleLayer& layer,
+    const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
         return layer.evaluated.get<Property>().constantOr(Property::defaultValue());

@@ -1,9 +1,9 @@
-#include <mbgl/util/logging.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 
-#include <cstdio>
 #include <cstdarg>
+#include <cstdio>
 #include <sstream>
 
 namespace mbgl {
@@ -24,7 +24,7 @@ std::unique_ptr<Log::Observer> Log::removeObserver() {
     return observer;
 }
 
-void Log::record(EventSeverity severity, Event event, const std::string &msg) {
+void Log::record(EventSeverity severity, Event event, const std::string& msg) {
     record(severity, event, -1, msg);
 }
 
@@ -48,7 +48,7 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const char* 
     record(severity, event, code, std::string{ msg });
 }
 
-void Log::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
+void Log::record(EventSeverity severity, Event event, int64_t code, const std::string& msg) {
     if (currentObserver && severity != EventSeverity::Debug &&
         currentObserver->onRecord(severity, event, code, msg)) {
         return;

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/font_stack.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/util/util.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <string>
 
@@ -33,13 +33,13 @@ public:
     };
 
     enum class LoadingMethod : uint8_t {
-        None        = 0b00,
-        Cache       = 0b01,
-        Network     = 0b10,
+        None = 0b00,
+        Cache = 0b01,
+        Network = 0b10,
 
-        CacheOnly   = Cache,
+        CacheOnly = Cache,
         NetworkOnly = Network,
-        All         = Cache | Network,
+        All = Cache | Network,
     };
 
     Resource(Kind kind_,
@@ -69,7 +69,7 @@ public:
     static Resource spriteImage(const std::string& base, float pixelRatio);
     static Resource spriteJSON(const std::string& base, float pixelRatio);
     static Resource image(const std::string& url);
-    
+
     Kind kind;
     LoadingMethod loadingMethod;
     std::string url;
@@ -83,16 +83,18 @@ public:
     std::shared_ptr<const std::string> priorData;
 };
 
-
-MBGL_CONSTEXPR Resource::LoadingMethod operator|(Resource::LoadingMethod a, Resource::LoadingMethod b) {
+MBGL_CONSTEXPR Resource::LoadingMethod operator|(Resource::LoadingMethod a,
+                                                 Resource::LoadingMethod b) {
     return Resource::LoadingMethod(mbgl::underlying_type(a) | mbgl::underlying_type(b));
 }
 
-MBGL_CONSTEXPR Resource::LoadingMethod& operator|=(Resource::LoadingMethod& a, Resource::LoadingMethod b) {
+MBGL_CONSTEXPR Resource::LoadingMethod& operator|=(Resource::LoadingMethod& a,
+                                                   Resource::LoadingMethod b) {
     return (a = a | b);
 }
 
-MBGL_CONSTEXPR Resource::LoadingMethod operator&(Resource::LoadingMethod a, Resource::LoadingMethod b) {
+MBGL_CONSTEXPR Resource::LoadingMethod operator&(Resource::LoadingMethod a,
+                                                 Resource::LoadingMethod b) {
     return Resource::LoadingMethod(mbgl::underlying_type(a) & mbgl::underlying_type(b));
 }
 

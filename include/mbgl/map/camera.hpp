@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/unitbezier.hpp>
 
 #include <functional>
 
@@ -33,11 +33,8 @@ struct CameraOptions {
 };
 
 constexpr bool operator==(const CameraOptions& a, const CameraOptions& b) {
-    return a.center == b.center
-        && a.padding == b.padding
-        && a.zoom == b.zoom
-        && a.angle == b.angle
-        && a.pitch == b.pitch;
+    return a.center == b.center && a.padding == b.padding && a.zoom == b.zoom &&
+           a.angle == b.angle && a.pitch == b.pitch;
 }
 
 constexpr bool operator!=(const CameraOptions& a, const CameraOptions& b) {

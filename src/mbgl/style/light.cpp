@@ -9,9 +9,7 @@ namespace style {
 
 static LightObserver nullObserver;
 
-Light::Light()
-    : impl(makeMutable<Impl>()),
-      observer(&nullObserver) {
+Light::Light() : impl(makeMutable<Impl>()), observer(&nullObserver) {
 }
 
 Light::~Light() = default;
@@ -127,7 +125,6 @@ void Light::setIntensityTransition(const TransitionOptions& options) {
 TransitionOptions Light::getIntensityTransition() const {
     return impl->properties.template get<LightIntensity>().options;
 }
-
 
 } // namespace style
 } // namespace mbgl

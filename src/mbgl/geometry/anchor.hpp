@@ -14,7 +14,8 @@ public:
     int segment = -1;
 
     Anchor(float x_, float y_, float angle_, float scale_, int segment_ = -1)
-        : point(x_, y_), angle(angle_), scale(scale_), segment(segment_) {}
+        : point(x_, y_), angle(angle_), scale(scale_), segment(segment_) {
+    }
 };
 
 using Anchors = std::vector<Anchor>;

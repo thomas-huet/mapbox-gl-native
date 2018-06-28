@@ -1,10 +1,10 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
@@ -32,9 +32,10 @@ public:
     struct Options {
         TileFunction fetchTileFunction;
         TileFunction cancelTileFunction;
-        Range<uint8_t> zoomRange = { 0, 18};
+        Range<uint8_t> zoomRange = { 0, 18 };
         TileOptions tileOptions;
     };
+
 public:
     CustomGeometrySource(std::string id, CustomGeometrySource::Options options);
     ~CustomGeometrySource() final;
@@ -45,6 +46,7 @@ public:
     // Private implementation
     class Impl;
     const Impl& impl() const;
+
 private:
     std::unique_ptr<Actor<CustomTileLoader>> loader;
 };

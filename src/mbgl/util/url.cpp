@@ -1,12 +1,12 @@
-#include <mbgl/util/url.hpp>
 #include <mbgl/util/token.hpp>
+#include <mbgl/util/url.hpp>
 
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <cstdlib>
-#include <algorithm>
-#include <cstring>
 
 namespace {
 
@@ -76,9 +76,11 @@ URL::URL(const std::string& str)
           return { queryPos, (hashPos != std::string::npos ? hashPos : str.size()) - queryPos };
       }()),
       scheme([&]() -> Segment {
-          if (str.empty() || !isAlphaCharacter(str.front())) return { 0, 0 };
+          if (str.empty() || !isAlphaCharacter(str.front()))
+              return { 0, 0 };
           size_t schemeEnd = 0;
-          while (schemeEnd < query.first && isSchemeCharacter(str[schemeEnd])) ++schemeEnd;
+          while (schemeEnd < query.first && isSchemeCharacter(str[schemeEnd]))
+              ++schemeEnd;
           return { 0, str[schemeEnd] == ':' ? schemeEnd : 0 };
       }()),
       domain([&]() -> Segment {

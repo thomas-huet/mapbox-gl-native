@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace mbgl {
 namespace util {

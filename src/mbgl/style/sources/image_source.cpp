@@ -1,9 +1,9 @@
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/style/source_observer.hpp>
 #include <mbgl/util/premultiply.hpp>
-#include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -54,18 +54,20 @@ void ImageSource::loadDescription(FileSource& fileSource) {
         loaded = true;
     }
 
-    if (req ||  loaded) {
+    if (req || loaded) {
         return;
     }
-    const Resource imageResource { Resource::Image, *url, {} };
+    const Resource imageResource{ Resource::Image, *url, {} };
 
     req = fileSource.request(imageResource, [this](Response res) {
         if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onSourceError(
+                *this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty image url")));
+            observer->onSourceError(
+                *this, std::make_exception_ptr(std::runtime_error("unexpectedly empty image url")));
         } else {
             try {
                 baseImpl = makeMutable<Impl>(impl(), decodeImage(*res.data));

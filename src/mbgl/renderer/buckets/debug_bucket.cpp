@@ -1,6 +1,6 @@
-#include <mbgl/renderer/buckets/debug_bucket.hpp>
-#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
+#include <mbgl/programs/fill_program.hpp>
+#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -26,7 +26,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
     gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> indices;
 
-    auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
+    auto addText = [&](const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
             if (c < 32 || c >= 127)
                 continue;
@@ -38,16 +38,13 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                 if (glyph.data[j] == -1 && glyph.data[j + 1] == -1) {
                     prev = {};
                 } else {
-                    Point<int16_t> p {
-                        int16_t(::round(left + glyph.data[j] * scale)),
-                        int16_t(::round(baseline - glyph.data[j + 1] * scale))
-                    };
+                    Point<int16_t> p{ int16_t(::round(left + glyph.data[j] * scale)),
+                                      int16_t(::round(baseline - glyph.data[j + 1] * scale)) };
 
                     vertices.emplace_back(FillProgram::layoutVertex(p));
 
                     if (prev) {
-                        indices.emplace_back(vertices.vertexSize() - 2,
-                                             vertices.vertexSize() - 1);
+                        indices.emplace_back(vertices.vertexSize() - 2, vertices.vertexSize() - 1);
                     }
 
                     prev = p;

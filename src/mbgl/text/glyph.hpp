@@ -2,24 +2,24 @@
 
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/util/font_stack.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/immutable.hpp>
-#include <mbgl/util/image.hpp>
 #include <mbgl/util/util.hpp>
 
 #include <cstdint>
-#include <vector>
-#include <string>
 #include <map>
 #include <set>
+#include <string>
+#include <vector>
 
 namespace mbgl {
 
 using GlyphID = char16_t;
 using GlyphIDs = std::set<GlyphID>;
-    
+
 // Note: this only works for the BMP
 GlyphRange getGlyphRange(GlyphID glyph);
 
@@ -32,11 +32,8 @@ struct GlyphMetrics {
 };
 
 inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
-    return lhs.width == rhs.width &&
-        lhs.height == rhs.height &&
-        lhs.left == rhs.left &&
-        lhs.top == rhs.top &&
-        lhs.advance == rhs.advance;
+    return lhs.width == rhs.width && lhs.height == rhs.height && lhs.left == rhs.left &&
+           lhs.top == rhs.top && lhs.advance == rhs.advance;
 }
 
 class Glyph {
@@ -60,7 +57,8 @@ using GlyphMap = std::map<FontStack, Glyphs>;
 class PositionedGlyph {
 public:
     explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_)
-        : glyph(glyph_), x(x_), y(y_), vertical(vertical_) {}
+        : glyph(glyph_), x(x_), y(y_), vertical(vertical_) {
+    }
 
     GlyphID glyph = 0;
     float x = 0;
@@ -71,10 +69,11 @@ public:
 enum class WritingModeType : uint8_t;
 
 class Shaping {
-    public:
+public:
     explicit Shaping() = default;
     explicit Shaping(float x, float y, WritingModeType writingMode_)
-        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {}
+        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {
+    }
     std::vector<PositionedGlyph> positionedGlyphs;
     float top = 0;
     float bottom = 0;
@@ -82,7 +81,9 @@ class Shaping {
     float right = 0;
     WritingModeType writingMode;
 
-    explicit operator bool() const { return !positionedGlyphs.empty(); }
+    explicit operator bool() const {
+        return !positionedGlyphs.empty();
+    }
 };
 
 enum class WritingModeType : uint8_t {
@@ -111,7 +112,7 @@ MBGL_CONSTEXPR WritingModeType operator~(WritingModeType value) {
     return WritingModeType(~mbgl::underlying_type(value));
 }
 
-using GlyphDependencies = std::map<FontStack,GlyphIDs>;
-using GlyphRangeDependencies = std::map<FontStack,GlyphRangeSet>;
+using GlyphDependencies = std::map<FontStack, GlyphIDs>;
+using GlyphRangeDependencies = std::map<FontStack, GlyphRangeSet>;
 
 } // end namespace mbgl

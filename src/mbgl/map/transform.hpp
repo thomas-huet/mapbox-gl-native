@@ -8,18 +8,18 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <functional>
 
 namespace mbgl {
 
 class Transform : private util::noncopyable {
 public:
-    Transform(ConstrainMode = ConstrainMode::HeightOnly,
-              ViewportMode = ViewportMode::Default);
+    Transform(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
 
-    Transform(const TransformState &state_) : state(state_) {}
+    Transform(const TransformState& state_) : state(state_) {
+    }
 
     // Map view
     void resize(Size size);
@@ -101,7 +101,9 @@ public:
     double getYSkew() const;
 
     // Transform state
-    const TransformState& getState() const { return state; }
+    const TransformState& getState() const {
+        return state;
+    }
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;

@@ -1,8 +1,8 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,8 +11,7 @@ LineLayer::LineLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Line, layerID, sourceID)) {
 }
 
-LineLayer::LineLayer(Immutable<Impl> impl_)
-    : Layer(std::move(impl_)) {
+LineLayer::LineLayer(Immutable<Impl> impl_) : Layer(std::move(impl_)) {
 }
 
 LineLayer::~LineLayer() = default;
@@ -216,7 +215,7 @@ TransitionOptions LineLayer::getLineColorTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate() const {
@@ -378,7 +377,7 @@ TransitionOptions LineLayer::getLineBlurTransition() const {
 }
 
 PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
-    return { {  } };
+    return { {} };
 }
 
 PropertyValue<std::vector<float>> LineLayer::getLineDasharray() const {

@@ -1,30 +1,31 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/math/clamp.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/unitbezier.hpp>
-#include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/util/projection.hpp>
-#include <mbgl/math/clamp.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/projection.hpp>
+#include <mbgl/util/unitbezier.hpp>
 
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
 
 namespace mbgl {
 
-/** Converts the given angle (in radians) to be numerically close to the anchor angle, allowing it to be interpolated properly without sudden jumps. */
-static double _normalizeAngle(double angle, double anchorAngle)
-{
+/** Converts the given angle (in radians) to be numerically close to the anchor angle, allowing it
+ * to be interpolated properly without sudden jumps. */
+static double _normalizeAngle(double angle, double anchorAngle) {
     if (std::isnan(angle) || std::isnan(anchorAngle)) {
         return 0;
     }
 
     angle = util::wrap(angle, -M_PI, M_PI);
-    if (angle == -M_PI) angle = M_PI;
+    if (angle == -M_PI)
+        angle = M_PI;
     double diff = std::abs(angle - anchorAngle);
     if (std::abs(angle - util::M2PI - anchorAngle) < diff) {
         angle -= util::M2PI;
@@ -36,8 +37,7 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-Transform::Transform(ConstrainMode constrainMode,
-                     ViewportMode viewportMode)
+Transform::Transform(ConstrainMode constrainMode, ViewportMode viewportMode)
     : state(constrainMode, viewportMode) {
 }
 
@@ -102,7 +102,7 @@ void Transform::jumpTo(const CameraOptions& camera) {
     state.angle = util::wrap(angle, -M_PI, M_PI);
     state.pitch = pitch;
     if (!padding.isFlush()) {
-      state.moveLatLng(latLng, center);
+        state.moveLatLng(latLng, center);
     }
 }
 
@@ -110,8 +110,7 @@ void Transform::jumpTo(const CameraOptions& camera) {
 
 void Transform::moveBy(const ScreenCoordinate& offset) {
     ScreenCoordinate centerOffset = {
-        offset.x,
-        -offset.y,
+        offset.x, -offset.y,
     };
     ScreenCoordinate centerPoint = getScreenCoordinate() - centerOffset;
 
@@ -121,7 +120,7 @@ void Transform::moveBy(const ScreenCoordinate& offset) {
 }
 
 void Transform::setLatLng(const LatLng& latLng) {
-    setLatLng(latLng, optional<ScreenCoordinate> {});
+    setLatLng(latLng, optional<ScreenCoordinate>{});
 }
 
 void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding) {
@@ -135,7 +134,8 @@ void Transform::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> ancho
     CameraOptions camera;
     camera.center = latLng;
     if (anchor) {
-        camera.padding = EdgeInsets(anchor->y, anchor->x, state.size.height - anchor->y, state.size.width - anchor->x);
+        camera.padding = EdgeInsets(anchor->y, anchor->x, state.size.height - anchor->y,
+                                    state.size.width - anchor->x);
     }
     jumpTo(camera);
 }
@@ -145,7 +145,8 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom) {
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding) {
-    if (std::isnan(zoom)) return;
+    if (std::isnan(zoom))
+        return;
 
     CameraOptions camera;
     camera.center = latLng;
@@ -170,7 +171,6 @@ ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const
     }
 }
 
-
 #pragma mark - Zoom
 
 void Transform::setZoom(double zoom) {
@@ -193,22 +193,26 @@ void Transform::setLatLngBounds(optional<LatLngBounds> bounds) {
 }
 
 void Transform::setMinZoom(const double minZoom) {
-    if (std::isnan(minZoom)) return;
+    if (std::isnan(minZoom))
+        return;
     state.setMinZoom(minZoom);
 }
 
 void Transform::setMaxZoom(const double maxZoom) {
-    if (std::isnan(maxZoom)) return;
+    if (std::isnan(maxZoom))
+        return;
     state.setMaxZoom(maxZoom);
 }
 
 void Transform::setMinPitch(double minPitch) {
-    if (std::isnan(minPitch)) return;
+    if (std::isnan(minPitch))
+        return;
     state.setMinPitch(minPitch);
 }
 
 void Transform::setMaxPitch(double maxPitch) {
-    if (std::isnan(maxPitch)) return;
+    if (std::isnan(maxPitch))
+        return;
     state.setMaxPitch(maxPitch);
 }
 
@@ -234,7 +238,8 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
 }
 
 void Transform::setAngle(double angle) {
-    if (std::isnan(angle)) return;
+    if (std::isnan(angle))
+        return;
     CameraOptions camera;
     camera.angle = angle;
     jumpTo(camera);
@@ -247,7 +252,8 @@ double Transform::getAngle() const {
 #pragma mark - Pitch
 
 void Transform::setPitch(double pitch) {
-    if (std::isnan(pitch)) return;
+    if (std::isnan(pitch))
+        return;
     CameraOptions camera;
     camera.pitch = pitch;
     jumpTo(camera);

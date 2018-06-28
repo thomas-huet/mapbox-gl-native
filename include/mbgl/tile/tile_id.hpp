@@ -2,13 +2,13 @@
 
 #include <mbgl/util/constants.hpp>
 
-#include <cstdint>
-#include <array>
-#include <tuple>
-#include <forward_list>
 #include <algorithm>
-#include <iosfwd>
+#include <array>
 #include <cassert>
+#include <cstdint>
+#include <forward_list>
+#include <iosfwd>
+#include <tuple>
 
 namespace mbgl {
 
@@ -96,7 +96,8 @@ namespace util {
 std::string toString(const UnwrappedTileID&);
 } // namespace util
 
-inline CanonicalTileID::CanonicalTileID(uint8_t z_, uint32_t x_, uint32_t y_) : z(z_), x(x_), y(y_) {
+inline CanonicalTileID::CanonicalTileID(uint8_t z_, uint32_t x_, uint32_t y_)
+    : z(z_), x(x_), y(y_) {
     assert(z <= 32);
     assert(x < (1ull << z));
     assert(y < (1ull << z));
@@ -140,12 +141,15 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
     } };
 }
 
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, CanonicalTileID canonical_)
+inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_,
+                                          int16_t wrap_,
+                                          CanonicalTileID canonical_)
     : overscaledZ(overscaledZ_), wrap(wrap_), canonical(std::move(canonical_)) {
     assert(overscaledZ >= canonical.z);
 }
 
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, uint8_t z, uint32_t x, uint32_t y)
+inline OverscaledTileID::OverscaledTileID(
+    uint8_t overscaledZ_, int16_t wrap_, uint8_t z, uint32_t x, uint32_t y)
     : overscaledZ(overscaledZ_), wrap(wrap_), canonical(z, x, y) {
     assert(overscaledZ >= canonical.z);
 }
@@ -165,7 +169,7 @@ inline OverscaledTileID::OverscaledTileID(CanonicalTileID&& canonical_)
 }
 
 inline bool OverscaledTileID::operator==(const OverscaledTileID& rhs) const {
-    return overscaledZ == rhs.overscaledZ && wrap == rhs.wrap &&canonical == rhs.canonical;
+    return overscaledZ == rhs.overscaledZ && wrap == rhs.wrap && canonical == rhs.canonical;
 }
 
 inline bool OverscaledTileID::operator!=(const OverscaledTileID& rhs) const {
@@ -173,7 +177,8 @@ inline bool OverscaledTileID::operator!=(const OverscaledTileID& rhs) const {
 }
 
 inline bool OverscaledTileID::operator<(const OverscaledTileID& rhs) const {
-    return std::tie(overscaledZ, wrap, canonical) < std::tie(rhs.overscaledZ, rhs.wrap, rhs.canonical);
+    return std::tie(overscaledZ, wrap, canonical) <
+           std::tie(rhs.overscaledZ, rhs.wrap, rhs.canonical);
 }
 
 inline uint32_t OverscaledTileID::overscaleFactor() const {
@@ -270,4 +275,3 @@ struct hash<mbgl::OverscaledTileID> {
 };
 
 } // namespace std
-

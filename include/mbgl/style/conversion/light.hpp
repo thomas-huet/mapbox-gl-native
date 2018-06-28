@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/light.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/light.hpp>
 
 namespace mbgl {
 namespace style {

@@ -4,9 +4,9 @@
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/text/local_glyph_rasterizer.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/immutable.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -25,7 +25,9 @@ public:
 
 class GlyphManager : public util::noncopyable {
 public:
-    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
+    GlyphManager(FileSource&,
+                 std::unique_ptr<LocalGlyphRasterizer> =
+                     std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
@@ -64,9 +66,9 @@ private:
     void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);
     void notify(GlyphRequestor&, const GlyphDependencies&);
-    
+
     GlyphManagerObserver* observer = nullptr;
-    
+
     std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer;
 };
 

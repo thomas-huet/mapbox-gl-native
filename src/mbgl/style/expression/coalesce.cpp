@@ -1,5 +1,5 @@
-#include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
+#include <mbgl/style/expression/coalesce.hpp>
 
 namespace mbgl {
 namespace style {
@@ -9,7 +9,8 @@ EvaluationResult Coalesce::evaluate(const EvaluationContext& params) const {
     EvaluationResult result = Null;
     for (const auto& arg : args) {
         result = arg->evaluate(params);
-        if (!result || *result != Null) break;
+        if (!result || *result != Null)
+            break;
     }
     return result;
 }
@@ -45,7 +46,7 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
         ctx.error("Expected at least one argument.");
         return ParseResult();
     }
- 
+
     optional<type::Type> outputType;
     optional<type::Type> expectedType = ctx.getExpected();
     if (expectedType && *expectedType != type::Value) {
@@ -55,7 +56,8 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     Coalesce::Args args;
     args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        auto parsed = ctx.parse(arrayMember(value, i), i, outputType, ParsingContext::omitTypeAnnotations);
+        auto parsed =
+            ctx.parse(arrayMember(value, i), i, outputType, ParsingContext::omitTypeAnnotations);
         if (!parsed) {
             return parsed;
         }
@@ -71,12 +73,13 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     // preempt the desired null-coalescing behavior.
     // Thus, if any of our arguments would have needed an annotation, we
     // need to wrap the enclosing coalesce expression with it instead.
-    bool needsAnnotation = expectedType &&
-        std::any_of(args.begin(), args.end(), [&] (const auto& arg) {
+    bool needsAnnotation =
+        expectedType && std::any_of(args.begin(), args.end(), [&](const auto& arg) {
             return type::checkSubtype(*expectedType, arg->getType());
         });
 
-    return ParseResult(std::make_unique<Coalesce>(needsAnnotation ? type::Value : *outputType, std::move(args)));
+    return ParseResult(
+        std::make_unique<Coalesce>(needsAnnotation ? type::Value : *outputType, std::move(args)));
 }
 
 } // namespace expression

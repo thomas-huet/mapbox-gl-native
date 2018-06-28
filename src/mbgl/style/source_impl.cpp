@@ -3,9 +3,7 @@
 namespace mbgl {
 namespace style {
 
-Source::Impl::Impl(SourceType type_, std::string id_)
-    : type(type_),
-      id(std::move(id_)) {
+Source::Impl::Impl(SourceType type_, std::string id_) : type(type_), id(std::move(id_)) {
 }
 
 } // namespace style

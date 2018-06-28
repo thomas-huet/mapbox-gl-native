@@ -1,7 +1,7 @@
-#include <mbgl/tile/geojson_tile.hpp>
-#include <mbgl/tile/geojson_tile_data.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/tile/geojson_tile_data.hpp>
 
 namespace mbgl {
 
@@ -16,11 +16,10 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
 void GeoJSONTile::updateData(mapbox::geometry::feature_collection<int16_t> features) {
     setData(std::make_unique<GeoJSONTileData>(std::move(features)));
 }
-    
-void GeoJSONTile::querySourceFeatures(
-    std::vector<Feature>& result,
-    const SourceQueryOptions& options) {
-    
+
+void GeoJSONTile::querySourceFeatures(std::vector<Feature>& result,
+                                      const SourceQueryOptions& options) {
+
     // Ignore the sourceLayer, there is only one
     if (auto tileData = getData()) {
         if (auto layer = tileData->getLayer({})) {
@@ -29,7 +28,9 @@ void GeoJSONTile::querySourceFeatures(
                 auto feature = layer->getFeature(i);
 
                 // Apply filter, if any
-                if (options.filter && !(*options.filter)(style::expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() })) {
+                if (options.filter &&
+                    !(*options.filter)(style::expression::EvaluationContext{
+                        static_cast<float>(this->id.overscaledZ), feature.get() })) {
                     continue;
                 }
 

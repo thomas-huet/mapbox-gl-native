@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 namespace mbgl {
 namespace style {

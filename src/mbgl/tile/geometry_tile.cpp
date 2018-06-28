@@ -1,23 +1,23 @@
-#include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/tile/geometry_tile_worker.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/query.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
-#include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/map/transform_state.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/geometry_tile_worker.hpp>
+#include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/actor/scheduler.hpp>
 
 #include <iostream>
 
@@ -87,7 +87,6 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
 }
 
-
 void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
@@ -97,10 +96,8 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
 
     for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        if (layer->type == LayerType::Background ||
-            layer->type == LayerType::Custom ||
-            layer->source != sourceID ||
-            id.overscaledZ < std::floor(layer->minZoom) ||
+        if (layer->type == LayerType::Background || layer->type == LayerType::Custom ||
+            layer->source != sourceID || id.overscaledZ < std::floor(layer->minZoom) ||
             id.overscaledZ >= std::ceil(layer->maxZoom) ||
             layer->visibility == VisibilityType::None) {
             continue;
@@ -117,7 +114,8 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
     if (showCollisionBoxes != showCollisionBoxes_) {
         showCollisionBoxes = showCollisionBoxes_;
         ++correlationID;
-        worker.invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
+        worker.invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes,
+                      correlationID);
     }
 }
 
@@ -127,9 +125,9 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    
+
     buckets = std::move(result.buckets);
-    
+
     latestFeatureIndex = std::move(result.featureIndex);
 
     if (result.glyphAtlasImage) {
@@ -149,7 +147,7 @@ void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelat
     }
     observer->onTileError(*this, err);
 }
-    
+
 void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {
     worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphs));
 }
@@ -167,7 +165,7 @@ void GeometryTile::getImages(ImageRequestPair pair) {
 }
 
 void GeometryTile::upload(gl::Context& context) {
-    auto uploadFn = [&] (Bucket& bucket) {
+    auto uploadFn = [&](Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(context);
         }
@@ -217,7 +215,8 @@ void GeometryTile::queryRenderedFeatures(
     const RenderedQueryOptions& options,
     const mat4& projMatrix) {
 
-    if (!getData()) return;
+    if (!getData())
+        return;
 
     const float queryPadding = getQueryPadding(layers);
 
@@ -225,27 +224,20 @@ void GeometryTile::queryRenderedFeatures(
     transformState.matrixFor(posMatrix, id.toUnwrapped());
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    latestFeatureIndex->query(result,
-                              queryGeometry,
-                              transformState,
-                              posMatrix,
-                              util::tileSize * id.overscaleFactor(),
-                              std::pow(2, transformState.getZoom() - id.overscaledZ),
-                              options,
-                              id.toUnwrapped(),
-                              layers,
-                              queryPadding * transformState.maxPitchScaleFactor());
+    latestFeatureIndex->query(
+        result, queryGeometry, transformState, posMatrix, util::tileSize * id.overscaleFactor(),
+        std::pow(2, transformState.getZoom() - id.overscaledZ), options, id.toUnwrapped(), layers,
+        queryPadding * transformState.maxPitchScaleFactor());
 }
 
-void GeometryTile::querySourceFeatures(
-    std::vector<Feature>& result,
-    const SourceQueryOptions& options) {
+void GeometryTile::querySourceFeatures(std::vector<Feature>& result,
+                                       const SourceQueryOptions& options) {
 
     // Data not yet available, or tile is empty
     if (!getData()) {
         return;
     }
-    
+
     // No source layers, specified, nothing to do
     if (!options.sourceLayers) {
         Log::Warning(Event::General, "At least one sourceLayer required");
@@ -256,14 +248,16 @@ void GeometryTile::querySourceFeatures(
         // Go throught all sourceLayers, if any
         // to gather all the features
         auto layer = getData()->getLayer(sourceLayer);
-        
+
         if (layer) {
             auto featureCount = layer->featureCount();
             for (std::size_t i = 0; i < featureCount; i++) {
                 auto feature = layer->getFeature(i);
 
                 // Apply filter, if any
-                if (options.filter && !(*options.filter)(style::expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() })) {
+                if (options.filter &&
+                    !(*options.filter)(style::expression::EvaluationContext{
+                        static_cast<float>(this->id.overscaledZ), feature.get() })) {
                     continue;
                 }
 

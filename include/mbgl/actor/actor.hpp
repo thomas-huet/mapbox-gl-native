@@ -1,12 +1,12 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/message.hpp>
-#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
-#include <memory>
 #include <future>
+#include <memory>
 #include <type_traits>
 
 namespace mbgl {
@@ -48,18 +48,23 @@ namespace mbgl {
 template <class Object>
 class Actor : public util::noncopyable {
 public:
-
     // Enabled for Objects with a constructor taking ActorRef<Object> as the first parameter
-    template <typename U = Object, class... Args, typename std::enable_if<std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
+    template <typename U = Object,
+              class... Args,
+              typename std::enable_if<
+                  std::is_constructible<U, ActorRef<U>, Args...>::value>::type* = nullptr>
     Actor(Scheduler& scheduler, Args&&... args_)
-            : mailbox(std::make_shared<Mailbox>(scheduler)),
-              object(self(), std::forward<Args>(args_)...) {
+        : mailbox(std::make_shared<Mailbox>(scheduler)),
+          object(self(), std::forward<Args>(args_)...) {
     }
 
     // Enabled for plain Objects
-    template<typename U = Object, class... Args, typename std::enable_if<!std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
-    Actor(Scheduler& scheduler, Args&& ... args_)
-            : mailbox(std::make_shared<Mailbox>(scheduler)), object(std::forward<Args>(args_)...) {
+    template <typename U = Object,
+              class... Args,
+              typename std::enable_if<
+                  !std::is_constructible<U, ActorRef<U>, Args...>::value>::type* = nullptr>
+    Actor(Scheduler& scheduler, Args&&... args_)
+        : mailbox(std::make_shared<Mailbox>(scheduler)), object(std::forward<Args>(args_)...) {
     }
 
     ~Actor() {
@@ -78,7 +83,8 @@ public:
 
         std::promise<ResultType> promise;
         auto future = promise.get_future();
-        mailbox->push(actor::makeMessage(std::move(promise), object, fn, std::forward<Args>(args)...));
+        mailbox->push(
+            actor::makeMessage(std::move(promise), object, fn, std::forward<Args>(args)...));
         return future;
     }
 

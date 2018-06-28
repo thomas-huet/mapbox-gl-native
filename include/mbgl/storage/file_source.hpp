@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mbgl/storage/response.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/async_request.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <functional>
 #include <memory>
@@ -15,7 +15,7 @@ class FileSource : private util::noncopyable {
 public:
     virtual ~FileSource() = default;
 
-    using Callback = std::function<void (Response)>;
+    using Callback = std::function<void(Response)>;
 
     // Request a resource. The callback will be called asynchronously, in the same
     // thread as the request was made. This thread must have an active RunLoop. The

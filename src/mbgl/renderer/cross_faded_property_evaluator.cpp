@@ -16,9 +16,9 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
 }
 
 template <typename T>
-Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::CameraFunction<T>& function) const {
-    return calculate(function.evaluate(parameters.z - 1.0f),
-                     function.evaluate(parameters.z),
+Faded<T> CrossFadedPropertyEvaluator<T>::
+operator()(const style::CameraFunction<T>& function) const {
+    return calculate(function.evaluate(parameters.z - 1.0f), function.evaluate(parameters.z),
                      function.evaluate(parameters.z + 1.0f));
 }
 
@@ -33,8 +33,8 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
             : 1.0f;
 
     return z > parameters.zoomHistory.lastIntegerZoom
-        ? Faded<T> { min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
-        : Faded<T> { max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
+               ? Faded<T>{ min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
+               : Faded<T>{ max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
 }
 
 template class CrossFadedPropertyEvaluator<std::string>;

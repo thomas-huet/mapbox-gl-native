@@ -1,5 +1,5 @@
-#include <mbgl/sprite/sprite_loader_worker.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
+#include <mbgl/sprite/sprite_loader_worker.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 
 namespace mbgl {
@@ -9,7 +9,7 @@ SpriteLoaderWorker::SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<Sp
 }
 
 void SpriteLoaderWorker::parse(std::shared_ptr<const std::string> image,
-                              std::shared_ptr<const std::string> json) {
+                               std::shared_ptr<const std::string> json) {
     try {
         if (!image) {
             // This shouldn't happen, since we always invoke it with a non-empty pointer.

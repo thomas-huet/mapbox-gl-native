@@ -6,22 +6,19 @@ namespace style {
 namespace expression {
 
 Length::Length(std::unique_ptr<Expression> input_)
-    : Expression(type::Number),
-      input(std::move(input_)) {
+    : Expression(type::Number), input(std::move(input_)) {
 }
 
 EvaluationResult Length::evaluate(const EvaluationContext& params) const {
     const EvaluationResult value = input->evaluate(params);
-    if (!value) return value;
+    if (!value)
+        return value;
     return value->match(
-        [] (const std::string& s) {
-            return EvaluationResult { double(s.size()) };
-        },
-        [] (const std::vector<Value>& v) {
-            return EvaluationResult { double(v.size()) };
-        },
-        [&] (const auto&) -> EvaluationResult {
-            return EvaluationError { "Expected value to be of type string or array, but found " + toString(typeOf(*value)) + " instead." };
+        [](const std::string& s) { return EvaluationResult{ double(s.size()) }; },
+        [](const std::vector<Value>& v) { return EvaluationResult{ double(v.size()) }; },
+        [&](const auto&) -> EvaluationResult {
+            return EvaluationError{ "Expected value to be of type string or array, but found " +
+                                    toString(typeOf(*value)) + " instead." };
         });
 }
 
@@ -50,11 +47,13 @@ ParseResult Length::parse(const Convertible& value, ParsingContext& ctx) {
     }
 
     ParseResult input = ctx.parse(arrayMember(value, 1), 1);
-    if (!input) return ParseResult();
+    if (!input)
+        return ParseResult();
 
     type::Type type = (*input)->getType();
     if (!type.is<type::Array>() && !type.is<type::StringType>() && !type.is<type::ValueType>()) {
-        ctx.error("Expected argument of type string or array, but found " + toString(type) + " instead.");
+        ctx.error("Expected argument of type string or array, but found " + toString(type) +
+                  " instead.");
         return ParseResult();
     }
 

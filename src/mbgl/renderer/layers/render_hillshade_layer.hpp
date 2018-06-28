@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class RenderHillshadeLayer: public RenderLayer {
+class RenderHillshadeLayer : public RenderLayer {
 public:
     RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl>);
     ~RenderHillshadeLayer() final = default;
@@ -18,13 +18,15 @@ public:
 
     void render(PaintParameters&, RenderSource* src) override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&,
+                                         const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
     style::HillshadePaintProperties::Unevaluated unevaluated;
     style::HillshadePaintProperties::PossiblyEvaluated evaluated;
 
     const style::HillshadeLayer::Impl& impl() const;
+
 private:
     const std::array<float, 2> getLatRange(const UnwrappedTileID& id);
     const std::array<float, 2> getLight(const PaintParameters& parameters);

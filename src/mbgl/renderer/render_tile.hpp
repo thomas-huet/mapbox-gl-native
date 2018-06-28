@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/mat4.hpp>
-#include <mbgl/util/clip_id.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/clip_id.hpp>
+#include <mbgl/util/mat4.hpp>
 
 #include <array>
 
@@ -16,7 +16,8 @@ class PaintParameters;
 
 class RenderTile final {
 public:
-    RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {}
+    RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {
+    }
     RenderTile(const RenderTile&) = delete;
     RenderTile(RenderTile&&) = default;
     RenderTile& operator=(const RenderTile&) = delete;

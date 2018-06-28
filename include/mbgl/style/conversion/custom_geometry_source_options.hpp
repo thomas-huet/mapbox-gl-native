@@ -76,7 +76,6 @@ struct Converter<CustomGeometrySource::Options> {
 
         return { options };
     }
-
 };
 
 } // namespace conversion

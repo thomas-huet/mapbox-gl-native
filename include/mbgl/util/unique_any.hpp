@@ -1,8 +1,8 @@
 #pragma once
 
-#include <typeinfo>
-#include <type_traits>
 #include <stdexcept>
+#include <type_traits>
+#include <typeinfo>
 namespace mbgl {
 namespace util {
 
@@ -38,15 +38,14 @@ public:
  * Inspired by linb::any (https://github.com/thelink2012/any) and the
  * libc++ implementation (https://github.com/llvm-mirror/libcxx).
  */
-class unique_any final
-{
+class unique_any final {
 public:
     unique_any() = default;
 
-    //Copy constructor (deleted)
+    // Copy constructor (deleted)
     unique_any(const unique_any& rhs) = delete;
 
-    unique_any(unique_any&& rhs)  : vtable(rhs.vtable) {
+    unique_any(unique_any&& rhs) : vtable(rhs.vtable) {
         if (vtable) {
             vtable->move(std::move(rhs.storage), storage);
         }
@@ -55,8 +54,8 @@ public:
 
     // Constructs with a direct-initilizated object of type ValueType
     template <typename ValueType,
-        typename _Vt = std::decay_t<ValueType>,
-        typename = std::enable_if_t<!std::is_same<_Vt, unique_any>::value> >
+              typename _Vt = std::decay_t<ValueType>,
+              typename = std::enable_if_t<!std::is_same<_Vt, unique_any>::value>>
     unique_any(ValueType&& value) {
         create(std::forward<ValueType>(value));
     }
@@ -65,26 +64,27 @@ public:
         reset();
     }
 
-    unique_any& operator=(unique_any&& rhs)  {
+    unique_any& operator=(unique_any&& rhs) {
         unique_any(std::move(rhs)).swap(*this);
         return *this;
     }
 
-    template <class ValueType,
-        typename = std::enable_if_t<!std::is_same<std::decay_t<ValueType>, unique_any>::value> >
+    template <
+        class ValueType,
+        typename = std::enable_if_t<!std::is_same<std::decay_t<ValueType>, unique_any>::value>>
     unique_any& operator=(ValueType&& rhs) {
         unique_any(std::forward<ValueType>(rhs)).swap(*this);
         return *this;
     }
 
-    void reset()  {
+    void reset() {
         if (vtable) {
             vtable->destroy(storage);
             vtable = nullptr;
         }
     }
 
-    void swap(unique_any& rhs)  {
+    void swap(unique_any& rhs) {
         if (this == &rhs) {
             return;
         } else {
@@ -100,30 +100,31 @@ public:
         }
     }
 
-    const std::type_info& type() const  {
-      return !has_value()? typeid(void) : vtable->type();
+    const std::type_info& type() const {
+        return !has_value() ? typeid(void) : vtable->type();
     }
 
-    bool has_value() const  {
+    bool has_value() const {
         return vtable != nullptr;
     }
 
 private:
-
     union Storage {
-        using StackStorage = std::aligned_storage_t<3*sizeof(void*), std::alignment_of<void*>::value>;
+        using StackStorage =
+            std::aligned_storage_t<3 * sizeof(void*), std::alignment_of<void*>::value>;
         Storage() = default;
 
-        void * dynamic { nullptr };
+        void* dynamic{ nullptr };
         StackStorage stack;
     };
 
-    template<typename T>
-    struct AllocateOnStack : std::integral_constant<bool,
-        sizeof(T) <= sizeof(Storage::stack)
-        && std::alignment_of<T>::value <= std::alignment_of<Storage::StackStorage>::value
-        && std::is_nothrow_move_constructible<T>::value> {
-    };
+    template <typename T>
+    struct AllocateOnStack
+        : std::integral_constant<bool,
+                                 sizeof(T) <= sizeof(Storage::stack) &&
+                                     std::alignment_of<T>::value <=
+                                         std::alignment_of<Storage::StackStorage>::value &&
+                                     std::is_nothrow_move_constructible<T>::value> {};
 
     struct VTable {
         virtual ~VTable() = default;
@@ -131,7 +132,7 @@ private:
         virtual void destroy(Storage&) = 0;
         virtual const std::type_info& type() = 0;
     };
-  
+
     template <typename ValueType>
     struct VTableHeap : public VTable {
         void move(Storage&& src, Storage& dest) override {
@@ -170,20 +171,19 @@ private:
 
     template <typename ValueType>
     static VTable* vtableForType() {
-        using VTableType = std::conditional_t<AllocateOnStack<ValueType>::value, VTableStack<ValueType>, VTableHeap<ValueType> >;
+        using VTableType = std::conditional_t<AllocateOnStack<ValueType>::value,
+                                              VTableStack<ValueType>, VTableHeap<ValueType>>;
         static VTableType vtable;
         return &vtable;
     }
 
     template <typename ValueType, typename _Vt>
-    std::enable_if_t<AllocateOnStack<_Vt>::value>
-    createStorage(ValueType&& value) {
+    std::enable_if_t<AllocateOnStack<_Vt>::value> createStorage(ValueType&& value) {
         new (static_cast<void*>(&storage.stack)) _Vt(std::forward<ValueType>(value));
     }
 
     template <typename ValueType, typename _Vt>
-    std::enable_if_t<!AllocateOnStack<_Vt>::value>
-    createStorage(ValueType&& value) {
+    std::enable_if_t<!AllocateOnStack<_Vt>::value> createStorage(ValueType&& value) {
         storage.dynamic = static_cast<void*>(new _Vt(std::forward<ValueType>(value)));
     }
 
@@ -194,44 +194,40 @@ private:
         createStorage<ValueType, _Vt>(std::forward<ValueType>(value));
     }
 
-    VTable* vtable { nullptr };
+    VTable* vtable{ nullptr };
     Storage storage;
 
 protected:
-    template<class ValueType>
-    friend const ValueType* any_cast(const unique_any* operand) ;
+    template <class ValueType>
+    friend const ValueType* any_cast(const unique_any* operand);
 
-    template<class ValueType>
-    friend ValueType* any_cast(unique_any* operand) ;
+    template <class ValueType>
+    friend ValueType* any_cast(unique_any* operand);
 
-    template<typename ValueType, typename _Vt = std::decay_t<ValueType> >
-    ValueType* cast()
-    {
-        return reinterpret_cast<ValueType *>(
-            AllocateOnStack<_Vt>::value ? &storage.stack : storage.dynamic);
+    template <typename ValueType, typename _Vt = std::decay_t<ValueType>>
+    ValueType* cast() {
+        return reinterpret_cast<ValueType*>(AllocateOnStack<_Vt>::value ? &storage.stack
+                                                                        : storage.dynamic);
     }
 };
 
-template<typename ValueType>
-inline const ValueType* any_cast(const unique_any* any)
-{
-    return any_cast<ValueType>(const_cast<unique_any *>(any));
+template <typename ValueType>
+inline const ValueType* any_cast(const unique_any* any) {
+    return any_cast<ValueType>(const_cast<unique_any*>(any));
 }
 
-template<typename ValueType>
-inline ValueType* any_cast(unique_any* any)
-{
-    if(any == nullptr || any->type() != typeid(ValueType))
+template <typename ValueType>
+inline ValueType* any_cast(unique_any* any) {
+    if (any == nullptr || any->type() != typeid(ValueType))
         return nullptr;
     else
         return any->cast<ValueType>();
 }
 
-template<typename ValueType, typename _Vt = std::decay_t<ValueType> >
-inline ValueType any_cast(const unique_any& any)
-{
+template <typename ValueType, typename _Vt = std::decay_t<ValueType>>
+inline ValueType any_cast(const unique_any& any) {
     static_assert(std::is_constructible<ValueType, const _Vt&>::value,
-        "any_cast type can't construct copy of contained object");
+                  "any_cast type can't construct copy of contained object");
     auto temp = any_cast<_Vt>(&any);
     if (temp == nullptr) {
         throw bad_any_cast();
@@ -239,11 +235,10 @@ inline ValueType any_cast(const unique_any& any)
     return static_cast<ValueType>(*temp);
 }
 
-template<typename ValueType, typename _Vt = std::decay_t<ValueType> >
-inline ValueType any_cast(unique_any& any)
-{
+template <typename ValueType, typename _Vt = std::decay_t<ValueType>>
+inline ValueType any_cast(unique_any& any) {
     static_assert(std::is_constructible<ValueType, const _Vt&>::value,
-        "any_cast type can't construct copy of contained object");
+                  "any_cast type can't construct copy of contained object");
     auto temp = any_cast<_Vt>(&any);
     if (temp == nullptr) {
         throw bad_any_cast();
@@ -251,9 +246,8 @@ inline ValueType any_cast(unique_any& any)
     return static_cast<ValueType>(*temp);
 }
 
-template<typename ValueType, typename _Vt = std::remove_cv_t<ValueType> >
-inline ValueType any_cast(unique_any&& any)
-{
+template <typename ValueType, typename _Vt = std::remove_cv_t<ValueType>>
+inline ValueType any_cast(unique_any&& any) {
     auto temp = any_cast<_Vt>(&any);
     if (temp == nullptr) {
         throw bad_any_cast();
@@ -268,7 +262,7 @@ inline ValueType any_cast(unique_any&& any)
 
 namespace std {
 
-inline void swap(mbgl::util::unique_any& lhs, mbgl::util::unique_any& rhs)  {
+inline void swap(mbgl::util::unique_any& lhs, mbgl::util::unique_any& rhs) {
     lhs.swap(rhs);
 }
 

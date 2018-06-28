@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/util/range.hpp>
+#include <cstdint>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/range.hpp>
+#include <string>
 #include <tuple>
 #include <vector>
-#include <string>
-#include <cstdint>
 
 namespace mbgl {
 
@@ -24,7 +24,6 @@ public:
     DEMEncoding encoding;
     optional<LatLngBounds> bounds;
 
-
     Tileset(std::vector<std::string> tiles_ = std::vector<std::string>(),
             Range<uint8_t> zoomRange_ = { 0, util::DEFAULT_MAX_ZOOM },
             std::string attribution_ = {},
@@ -35,13 +34,13 @@ public:
           attribution(std::move(attribution_)),
           scheme(scheme_),
           encoding(encoding_),
-          bounds() {};
+          bounds(){};
 
     // TileJSON also includes center and zoom but they are not used by mbgl.
 
     friend bool operator==(const Tileset& lhs, const Tileset& rhs) {
-        return std::tie(lhs.tiles, lhs.zoomRange, lhs.attribution, lhs.scheme, lhs.bounds)
-            == std::tie(rhs.tiles, rhs.zoomRange, rhs.attribution, rhs.scheme, rhs.bounds);
+        return std::tie(lhs.tiles, lhs.zoomRange, lhs.attribution, lhs.scheme, lhs.bounds) ==
+               std::tie(rhs.tiles, rhs.zoomRange, rhs.attribution, rhs.scheme, rhs.bounds);
     }
 
     friend bool operator!=(const Tileset& lhs, const Tileset& rhs) {
